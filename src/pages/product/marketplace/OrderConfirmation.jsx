@@ -1,0 +1,55 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./orderConfirmation.css";
+import Nav from "../../../components/Header/Nav";
+
+const OrderConfirmation = () => {
+  const navigate = useNavigate();
+  const [orderDetails, setOrderDetails] = useState(null);
+  const orderId = sessionStorage.getItem("lastOrderId"); // Retrieve order ID
+
+  useEffect(() => {
+    if (!orderId) {
+      navigate("/"); // Redirect if no order ID
+      return;
+    }
+
+    fetch(`https://spida.africa/individual/get_order_details.php?order_id=${orderId}`)
+      .then((res) => res.json())
+      .then((data) => setOrderDetails(data))
+      .catch((error) => console.error("Error fetching order:", error));
+  }, [orderId, navigate]);
+
+  if (!orderDetails) {
+    return <p>Loading order details...</p>;
+  }
+
+  return (
+<div>
+    <Nav />
+    <div className="order-confirmation-container">
+      <h2>Order Confirmation</h2>
+      <p>Thank you for your purchase! Your order ID is <strong>#{orderDetails.order_id}</strong>.</p>
+      
+      <div className="order-summary">
+        <h3>Order Summary</h3>
+        {orderDetails.items.map((item) => (
+          <div key={item.id} className="order-item">
+            <img src={`https://spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
+            <div>
+              <h4>{item.produce_name}</h4>
+              <p>Quantity: {item.quantity}</p>
+              <p>Price: #{item.price}</p>
+            </div>
+          </div>
+        ))}
+        <h3>Total: #{orderDetails.total_amount}</h3>
+      </div>
+
+      <button onClick={() => navigate("/")}>Back to Home</button>
+    </div>
+</div>
+  );
+};
+
+export default OrderConfirmation;

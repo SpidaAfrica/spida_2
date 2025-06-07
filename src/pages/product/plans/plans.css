@@ -1,0 +1,179 @@
+.plans_page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 120px 0 0;
+  position: relative;
+}
+
+.plans_page > img {
+    position: absolute;
+}
+
+.plans_page > img.fruits {
+    left: 0;
+    bottom: 0;
+}
+
+.plans_page > img.flower1 {
+    top: 0;
+    right: -20px;
+}
+
+.plans_page > img.flower2 {
+    top: 20px;
+    right: 100px;
+}
+
+.plans_page > div > h1 {
+  font-family: Montserrat;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 48.76px;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--brand-primary);
+}
+
+.plans_page > div > p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+  color: var(--brand-home-users-h3);
+  margin: 0 0 42px;
+}
+
+.plans_page .subscription_plans {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 68px;
+}
+
+.plans_page .subscription_plans > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.plans_page .subscription_plans > div .plan {
+  padding: 36px 24px;
+  border: 0.25px solid var(--brand-primary);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.plans_page .subscription_plans > div .plan.selected {
+  padding: 51px 47px;
+  color: var(--brand-white);
+  background: var(--brand-primary);
+}
+
+.plan .plan_head {
+  border-bottom: 0.5px solid var(--brand-black);
+  padding: 0 0 24px;
+  margin: 0 0 24px;
+}
+
+.plan.selected .plan_head {
+  border-bottom: 0.5px solid var(--brand-white);
+}
+
+.plan .plan_head h2 {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 54px;
+}
+
+.plan .plan_head p {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 27px;
+}
+
+.plan .features {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  margin: 0 0 36px;
+}
+
+.plan .features .feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan .features .feature p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 21.6px;
+}
+
+.plan button {
+  width: 100%;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 27px;
+  padding: 11px 0;
+  text-transform: uppercase;
+  border-radius: 12px;
+  border: none;
+  color: var(--brand-white);
+  background: var(--brand-primary);
+  cursor: pointer;
+}
+
+.plan.selected button {
+  border: none;
+  color: var(--brand-primary);
+  background: var(--brand-white);
+}
+
+/* features list */
+
+.features_list {
+    margin: 0 0 200px;
+}
+
+.features_list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.features_list table thead tr {
+  margin: 0 0 15px;
+}
+
+.features_list table thead tr th {
+  background: var(--brand-primary);
+  color: var(--brand-white);
+  padding: 12px 24px;
+  text-align: left;
+  border: none;
+}
+
+.features_list table tr th:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.features_list table tr th:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.features_list table tr td,
+.features_list table tr th {
+  padding: 12px 24px;
+  border-bottom: 0.25px solid #ddd;
+  font-size: 10px;
+  font-weight: 300;
+  line-height: 14px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+}
+
+.features_list table tbody tr td:first-child,
+.features_list table tbody tr.cost_row td {
+  font-weight: 700;
+}
