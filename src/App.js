@@ -250,6 +250,7 @@ function App() {
               <TrackingPage/>
             }
           />
+          <Route path="/marketplace/:type" element={<Marketplace />} />
 
           
         </Routes>
