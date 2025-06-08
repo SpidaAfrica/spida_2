@@ -58,7 +58,7 @@ const Footer = () => {
                 <h4>Home</h4>
                 <ul>
                     <li>
-                        <Link to="/">Available Products</Link>
+                        <Link to="/marketplace">Available Products</Link>
                     </li>
                     <li>
                         <Link to="/">Features</Link>
@@ -72,7 +72,7 @@ const Footer = () => {
                 <h4>Company</h4>
                 <ul>
                     <li>
-                        <Link to="/">About Us</Link>
+                        <Link to="/about">About Us</Link>
                     </li>
                     <li>
                         <Link to="/">Privacy Policy</Link>
@@ -86,19 +86,19 @@ const Footer = () => {
                 <h4>Support</h4>
                 <ul>
                     <li>
-                        <Link to="/">FAQs</Link>
+                        <Link to="/faqs">FAQs</Link>
                     </li>
                     <li>
                         <Link to="/">Customer Support</Link>
                     </li>
                     <li>
-                        <Link to="/">Contact Us</Link>
+                        <Link to="/contact">Contact Us</Link>
                     </li>
                 </ul>
             </div>
         </div>
       </div>
-      <span>©2024 Spida. All rights reserved.</span>
+      <span>©2025 Spida. All rights reserved.</span>
     </footer>
   );
 };
