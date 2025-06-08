@@ -74,6 +74,28 @@ const Cart = () => {
       .catch((error) => console.error("Error updating quantity:", error));
   };
 
+
+  const clearCart = () => {
+    fetch("https://spida.africa/individual/clear_cart.php", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setCart([]); // Clear the local state too
+        } else {
+          alert("Failed to clear cart.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error clearing cart:", error);
+        alert("Error clearing cart.");
+      });
+  };
+  
+
   return (
 <div>
    <Nav />
@@ -105,7 +127,11 @@ const Cart = () => {
         <p>Your cart is empty.</p>
       )}
       <h3>Total: #{total.toLocaleString()}</h3>
-      <button onClick={() => navigate("/checkout")}>Checkout!</button>
+      <div className="cart-buttons">
+        <button onClick={() => navigate("/marketplace")}>Buy More Produce</button>
+        <button className="delete" onClick={clearCart}>Clear Cart</button>
+        <button onClick={() => navigate("/checkout")}>Checkout!</button>
+      </div>    
     </div>
     <section className="footer_section">
       <Footer />

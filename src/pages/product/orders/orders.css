@@ -202,10 +202,23 @@
 }
 
 .ongoing_delivery_page .delivery_items {
-  max-width: 100%;
   display: flex;
   gap: 30px;
-  margin: 0 0 30px;
+  margin: 10px 0 30px;
+
+  max-width: 100%;
+  overflow-x: auto;          /* enable horizontal scrolling */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  scroll-behavior: smooth;
+
+  /* Optional: hide scrollbar */
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.ongoing_delivery_page .delivery_items::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
 }
 
 .logistics_ongoing_delivery_page .delivery_items {

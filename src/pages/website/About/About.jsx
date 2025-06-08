@@ -87,7 +87,7 @@ const About = () => {
                 <img src={triumph} alt="" />
               </div>
               <h4>Triumphant Babalola</h4>
-              <p>Chief Technical Officer</p>
+              <p>Technical Co-founder</p>
             </div>
           </div>
         </div>

@@ -23,17 +23,16 @@ const Footer = () => {
             <div className="address_item">
               <img src={locationicon} alt="" />
               <p>
-                Eveniet voluptatum et sunt et qui qui id praesentium. Rerum
-                nesciunt qui quo quam quia et.{" "}
+                Germany
               </p>
             </div>
             <div className="address_item">
               <img src={emailicon} alt="" />
-              <p>info@spida.com</p>
+              <p>info@spida.africa</p>
             </div>
             <div className="address_item">
               <img src={callicon} alt="" />
-              <p>+234 801 234 5678</p>
+              <p>+49 163 7926797</p>
             </div>
           </div>
           <div className="social_media">

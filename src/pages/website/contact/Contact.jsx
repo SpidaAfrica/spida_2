@@ -31,28 +31,28 @@ const Contact = () => {
               <img src={whatsapp} alt="" />
               <div className="name">
                 <h4>WhatsApp</h4>
-                <p>+234 810 123 4567</p>
+                <p>+49 163 7926797</p>
               </div>
             </div>
             <div className="sub_item">
               <img src={callicon} alt="" />
               <div className="name">
                 <h4>Call/SMS</h4>
-                <p>+234 810 123 4567</p>
+                <p>+49 163 7926797</p>
               </div>
             </div>
             <div className="sub_item">
               <img src={emailicon} alt="" />
               <div className="name">
                 <h4>Email Address</h4>
-                <p>admin@spida.com</p>
+                <p>info@spida.africa</p>
               </div>
             </div>
             <div className="sub_item">
               <img src={locationicon} alt="" />
               <div className="name">
                 <h4>Office Address</h4>
-                <p>57, Oluwole Street, Ikeja, Lagos.</p>
+                <p>Germany</p>
               </div>
             </div>
           </div>

@@ -36,11 +36,13 @@ import Checkout from "./pages/product/marketplace/Checkout";
 import { UserProvider } from "./UserContext";
 import { CartProvider } from "./CartContext";
 import OrderConfirmation from "./pages/product/marketplace/OrderConfirmation";
+import TrackingPage from "./pages/product/marketplace/TrackingPage";
 import FarmerOrders from "./pages/product/orders/FarmerOrders";
 import BlogForm from "./pages/website/news/BlogForm";
 import NewsBlog from "./pages/website/news/NewsBlog";
 import LogisticsOrders from "./components/orders/LogisticsOrders";
 import PrivateRoute from "./PrivateRoute";
+
 
 axios.defaults.withCredentials = true;
 
@@ -240,6 +242,12 @@ function App() {
             path="/order-confirmation"
             element={
               <OrderConfirmation/>
+            }
+          />
+          <Route
+            path="/order-confirmation/:id"
+            element={
+              <TrackingPage/>
             }
           />
 

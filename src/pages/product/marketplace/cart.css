@@ -2,6 +2,7 @@
     background-color: green;
     color: white;
     padding: 8px 12px;
+    margin-right: 5px;
     border: none;
     cursor: pointer;
     border-radius: 5px;
@@ -9,6 +10,12 @@
   
   button:hover {
     background-color: darkgreen;
+  }
+  .cart-buttons{
+    margin-top: 10px;
+  }
+  .cart-buttons .delete{
+    background-color: #c82333;
   }
   
   @media (max-width: 600px) {

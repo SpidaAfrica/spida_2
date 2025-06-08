@@ -111,7 +111,7 @@ const Login = () => {
 
         sessionStorage.setItem("userType", userType);
         sessionStorage.setItem(`${userType}Id`, data.userId);
-        localStorage.setItem("token", data.token);
+        sessionStorage.setItem("token", data.token);
   
         // Fetch additional user details (name)
         const nameRes = await fetch(`https://spida.africa/${userType}/${userType}.php?${userType}_id=${data.userId}`);

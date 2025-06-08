@@ -10,6 +10,7 @@ import message from "../../../assets/images/icons/message.png";
 import ownerImg from "../../../assets/images/icons/ownerImg.png";
 import prev from "../../../assets/images/icons/prev.png";
 import next from "../../../assets/images/icons/next.png";
+import DeliveryMap from "../../../components/orders/DeliveryMap";
 
 const OngoingDelivery = () => {
   const [currentPage, setCurrentPage] = useState(1); // State for the current page
@@ -61,9 +62,8 @@ const OngoingDelivery = () => {
   return (
     <div className="ongoing_delivery_page">
       <h1>Ongoing Delivery</h1>
-      
+      <div className="delivery_items">     
       {currentOrders.map((order, index) => (
-      <div className="delivery_items">
       <div className="delivery_items">
         <div className="delivery_item">
           <div className="shipment_info">
@@ -101,14 +101,11 @@ const OngoingDelivery = () => {
           </div>
         </div>
       </div>
-    </div>
         ))}
+      </div>
       <div className="map">
         {/* <img src={map} alt="" /> */}
-        <iframe
-          frameborder="0"
-          src="https://www.google.com/maps/embed/v1/place?q=akure&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-        ></iframe>
+        <DeliveryMap orders={orders} />
       </div>
 
       <div className="recent_orders pickup_summaries">

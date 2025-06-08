@@ -27,7 +27,7 @@
 .navbar .nav_items ul li a {
   text-decoration: none;
   color: var(--brand-primary);
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 10.8px;
   text-transform: uppercase;

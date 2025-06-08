@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./orderConfirmation.css";
 import Nav from "../../../components/Header/Nav";
+import Footer from "../../../components/Footer/Footer";
 
 const OrderConfirmation = () => {
   const navigate = useNavigate();
@@ -45,9 +46,15 @@ const OrderConfirmation = () => {
         ))}
         <h3>Total: #{orderDetails.total_amount}</h3>
       </div>
-
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <p>use this link to track your order: <Link to={`/order-confirmation/${orderDetails.order_id}`}>https://spi-ecommerce.spida.africa/order-confirmation/{orderDetails.order_id}</Link></p>
+      <div className="cart-buttons">
+        <button onClick={() => navigate("/")}>Back to Home</button>
+        <button onClick={() => navigate(`/order-confirmation/${orderDetails.order_id}`)}>Go to Tracking Page</button>
+      </div> 
     </div>
+    <section className="footer_section">
+      <Footer />
+    </section>
 </div>
   );
 };

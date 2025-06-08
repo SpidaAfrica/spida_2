@@ -20,7 +20,7 @@ const Nav = () => {
 
   // ✅ Check for token on component mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
 
@@ -31,7 +31,7 @@ const Nav = () => {
     navigate("/login");
   };
   const goToDashboard = () => {
-    const userType = localStorage.getItem("userType"); // ✅ Fix: retrieve userType
+    const userType = sessionStorage.getItem("userType"); // ✅ Fix: retrieve userType
     if (userType) {
       navigate(`/dashboard/${userType}`);
     } else {
