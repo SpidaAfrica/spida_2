@@ -252,7 +252,10 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
           </span>
         </div>
 
-        <button type="submit">Create Account</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create Account"}
+        </button>
+
       </form>
       <p className="no_account">
         Dont have an account? <Link to="/login">Login</Link>
