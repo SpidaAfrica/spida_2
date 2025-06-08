@@ -28,46 +28,48 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
           setFormData({ ...formData, [e.target.name]: e.target.value });
       };
   
-      const handleSubmit = async (e) => {
-          e.preventDefault();
-          setLoading(true); // Show loading state
+    const handleSubmit = async (e) => {
+      e.preventDefault();
     
-
-          const formDataToSend = new FormData();
-          Object.keys(formData).forEach((key) => {
-              formDataToSend.append(key, formData[key]);
-          });
-  
-          try {
-            const response = await fetch("https://spida.africa/buyer/business_signup.php", {
-                method: "POST",
-                body: formDataToSend,
-            });
-        
-            // Check if the response is OK (status 200)
-            if (response.ok) {
-                const result = await response.json(); // Assuming API returns JSON
-        
-                if (result.email == formData.email) {
-                    alert(result.message);
-                    sessionStorage.setItem("businessEmail", formData.email);
-                    sessionStorage.setItem("businessId", formData.id);
-                    sessionStorage.setItem("businessName", formData.fullName);
-                    navigate('/verify/business');
-                } else {
-                    alert("There is an issue, please try signing up again. Ensure you fill all form input");
-                }
-            } else {
-                alert("Server error! Please try again later.");
-            }
-        } catch (error) {
-            console.error("Error submitting form:", error);
-            alert("Network error! Please check your internet connection and try again. Also Ensure you fill all form input");
-        } finally {
-          setLoading(false); // Hide loading state
+      // Prevent double submissions
+      if (loading) return;
+      setLoading(true);
+    
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) => {
+        formDataToSend.append(key, formData[key]);
+      });
+    
+      try {
+        const response = await fetch("https://spida.africa/buyer/business_signup.php", {
+          method: "POST",
+          body: formDataToSend,
+        });
+    
+        const result = await response.json();
+        console.log("API result:", result);
+    
+        if (response.ok && result.success) {
+          alert(result.message || "Signup successful!");
+          
+          // Store the actual values returned from backend, not local inputs
+          sessionStorage.setItem("businessEmail", result.email || formData.business_email);
+          sessionStorage.setItem("businessId", result.id || "");
+          sessionStorage.setItem("businessName", result.business_name || "");
+    
+          navigate("/verify/business");
+        } else {
+          alert(result.error || "Signup failed. Please review your inputs and try again.");
         }
     
-      };
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("Network error. Please check your internet connection and try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
   
 
   return (
