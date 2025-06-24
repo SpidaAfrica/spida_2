@@ -10,7 +10,7 @@
 .navbar .logo {
   cursor: pointer;
 }
-.logo img{ width: 7rem;}
+.logo img{ width: 9rem;}
 
 .navbar .nav_items {
   display: flex;
