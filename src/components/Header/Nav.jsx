@@ -44,7 +44,7 @@ const Nav = () => {
     <header>
       <nav className="navbar">
         <div onClick={handleNavigateHome} className="logo">
-          <a href="/"><img src={logo} alt="Logo" /></a> 
+          <a href="/"><img src={logo} style={{width:8rem}} alt="Logo" /></a> 
         </div>
 
         <div className="hamburger" onClick={toggleMenu}>
