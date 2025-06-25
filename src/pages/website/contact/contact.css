@@ -66,6 +66,20 @@
     font-weight: 400;
     line-height: 16.2px;
 }
+.contact_form .form_field > div select {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19.2px;
+  letter-spacing: -0.03em;
+  border-radius: 12px;
+  background: var(--brand-f6);
+  color: var(--brand-27c);
+}
+
 
 /* 
 .contact_section .contact_form {
