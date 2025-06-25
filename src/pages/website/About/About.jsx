@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Nav from "../../../components/Header/Nav";
 import ReadyToConnect from "../../../components/ready_to_connect/ReadyToConnect";
 import Footer from "../../../components/Footer/Footer";
-import FoundersComponent from "../../../components/FoundersComponent";
+import FoundersComponent from "../../../components/forms/FoundersComponent";
 import aboutImg from "../../../assets/images/aboutImg.png";
 import userimg from "../../../assets/images/userimg.png";
 import daniel from "../../../assets/images/daniel.jpeg";
