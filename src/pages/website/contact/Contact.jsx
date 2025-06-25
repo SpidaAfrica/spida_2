@@ -1,5 +1,5 @@
-import React from "react";
-
+import React, { useRef } from "react";
+import emailjs from "@emailjs/browser";
 import Nav from "../../../components/Header/Nav";
 import ReadyToConnect from "../../../components/ready_to_connect/ReadyToConnect";
 import Footer from "../../../components/Footer/Footer";
@@ -13,6 +13,28 @@ import "./contact.css";
 
 
 const Contact = () => {
+const form = useRef();
+
+const sendEmail = (e) => {
+  e.preventDefault();
+
+  emailjs.sendForm(
+    "service_wupx2nf",     // Replace with your actual EmailJS service ID
+    "template_aubwrzw",    // Replace with your template ID
+    form.current,
+    "bswxk6e-b-vZP8C8f"      // Replace with your EmailJS public key
+  ).then(
+    () => {
+      alert("Message sent successfully!");
+      form.current.reset();
+    },
+    (error) => {
+      alert("Failed to send message. Please try again.");
+      console.error(error);
+    }
+  );
+};
+
   return (
     <div className="">
       <Nav />
@@ -59,60 +81,64 @@ const Contact = () => {
         </div>
         <div className="contact_item ">
           <div className="contact_form">
-            <form action="">
+            <form ref={form} onSubmit={sendEmail}>
               <div className="">
                 <div className="form_field">
                   <div>
-                    <label htmlFor="">Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Enter your name"
-                    />
+                    <label htmlFor="name">Name</label>
+                    <input type="text" name="user_name" placeholder="Enter your name" required />
                   </div>
                   <div>
-                    <label htmlFor="">E-mail Address</label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email address"
-                    />
+                    <label htmlFor="email">Email</label>
+                    <input type="email" name="user_email" placeholder="Enter your email address" required />
                   </div>
                 </div>
-                <div className="form_field">
-                  <div className="">
-                    <label htmlFor="">Phone Number</label>
-                    <input
-                      type="text"
-                      name="phoneNumber"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                  <div className="">
-                    <label htmlFor="">Subject</label>
-                    <input
-                      type="text"
-                      name="subject"
-                      placeholder="Enter the subject of your message"
-                    />
-                  </div>
-                </div>
+            
                 <div className="form_field">
                   <div>
-                    <label htmlFor="">Message</label>
-                    <textarea
-                      placeholder="Enter your message"
-                      name="message"
-                      id=""
-                      cols="30"
-                      rows="10"
-                    ></textarea>
+                    <label htmlFor="phone">Phone Number</label>
+                    <input type="text" name="phone_number" placeholder="Enter your phone number" />
+                  </div>
+                  <div>
+                    <label htmlFor="subject">Subject</label>
+                    <input type="text" name="subject" placeholder="Enter the subject of your message" />
+                  </div>
+                </div>
+            
+                <div className="form_field">
+                  <div>
+                    <label htmlFor="location">Location</label>
+                    <input type="text" name="location" placeholder="Enter your location" required />
+                  </div>
+                  <div>
+                    <label htmlFor="role">Who You Are</label>
+                    <select name="role" required>
+                      <option value="" disabled selected>Select your role</option>
+                      <option>Farmer</option>
+                      <option>Financial Partner</option>
+                      <option>Tractor Providers</option>
+                      <option>Logistics Companies</option>
+                      <option>Individual Buyers</option>
+                      <option>Food Processor</option>
+                      <option>Restaurants</option>
+                      <option>Market Women</option>
+                      <option>Agribusiness</option>
+                      <option>Government</option>
+                      <option>NGO</option>
+                    </select>
+                  </div>
+                </div>
+            
+                <div className="form_field">
+                  <div>
+                    <label htmlFor="message">Message</label>
+                    <textarea name="message" placeholder="Enter your message" cols="30" rows="10" required></textarea>
                   </div>
                 </div>
               </div>
-
-              <button>Submit</button>
+              <button type="submit">Submit</button>
             </form>
+
           </div>
         </div>
       </section>
