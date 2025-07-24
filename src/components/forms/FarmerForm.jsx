@@ -293,8 +293,8 @@ const FarmerSignupForm = () => {
             
             </div>
           </div>
-        </div>
-        */}
+          */}
+        </div> 
         <div className="form_field">
           <div>
             <label htmlFor="password">Password</label>
