@@ -1,4 +1,347 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import uploadicon from "../../assets/images/product/uploadicon.png";
+import { openDB } from "idb";
+
+const DB_NAME = "FarmerFormDB";
+const STORE_NAME = "signupForms";
+
+const initDB = async () => {
+  return await openDB(DB_NAME, 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { autoIncrement: true });
+      }
+    },
+  });
+};
+
+const FarmerSignupForm = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    dob: "",
+    email: "",
+    phone: "",
+    addressVerification: "",
+    verificationNumber: "",
+    location: "",
+    homeAddress: "",
+    farmName: "",
+    farmLocation: "",
+    farmLGA: "",
+    farmAddress: "",
+    password: "",
+    utilityBill: null,
+    farmOwnershipProof: null,
+    confirmPassword: "",
+    termsAgreed: false
+  });
+
+  const locations = ["Lagos", "Abuja", "Port Harcourt", "Kano", "Enugu"];
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+  };
+
+  const sendToServer = async (data) => {
+    const formDataObj = new FormData();
+    for (const key in data) {
+      formDataObj.append(key, data[key]);
+    }
+
+    const response = await fetch("https://spida.africa/farmer/farmer_signup.php", {
+      method: "POST",
+      body: formDataObj,
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.email === data.email) {
+        alert(result.message);
+        sessionStorage.setItem("farmerEmail", data.email);
+        sessionStorage.setItem("farmerName", data.fullName);
+        sessionStorage.setItem("farmerId", data.id);
+        navigate("/verify/farmer");
+      } else {
+        alert("There is an issue, please try signing up again.");
+      }
+    } else {
+      throw new Error("Server error");
+    }
+  };
+
+  const syncData = async () => {
+    const db = await initDB();
+    const allData = await db.getAll(STORE_NAME);
+    for (const item of allData) {
+      try {
+        await sendToServer(item);
+      } catch (err) {
+        console.error("Failed to sync: ", err);
+        return;
+      }
+    }
+    await db.clear(STORE_NAME);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    if (navigator.onLine) {
+      try {
+        await sendToServer(formData);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("Network error. Form saved locally.");
+      }
+    } else {
+      const db = await initDB();
+      await db.add(STORE_NAME, formData);
+      alert("You are offline. Form saved locally and will sync automatically.");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener("online", syncData);
+    return () => window.removeEventListener("online", syncData);
+  }, []);
+
+  return (
+    <div>
+      <form className="form farmer_form" onSubmit={handleSubmit} enctype="multipart/form-data">
+        <h1>Personal Information</h1>
+        <div className="form_field">
+          <div>
+            <label htmlFor="fullName">Full Name</label>
+            <input
+              name="fullName"
+              type="text"
+              placeholder="Enter your Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="dob">Date of Birth</label>
+            <input
+              name="dob"
+              type="date"
+              placeholder="Enter your Date of Birth"
+              value={formData.dob}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="form_field">
+          <div>
+            <label htmlFor="email">Email Address</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter your Email Address"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              name="phone"
+              type="text"
+              placeholder="Enter your Phone Number"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="form_field">
+          <div>
+            <label htmlFor="addressVerification">Address Verification</label>
+            <select
+              name="addressVerification"
+              value={formData.addressVerification}
+              onChange={handleChange}
+            >
+              <option value="govermentIssued">Government Issued ID</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="verificationNumber">
+              Identity Verification Number
+            </label>
+            <input
+              name="verificationNumber"
+              type="text"
+              placeholder="Enter your Identity Verification Number"
+              value={formData.verificationNumber}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="form_field">
+          <div>
+            <label htmlFor="location">Location</label>
+            <select
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            >
+              <option value="">Select your Location</option>
+              {locations.map((loc, index) => (
+                <option key={index} value={loc}>
+                  {loc}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="homeAddress">Home Address</label>
+            <input
+              name="homeAddress"
+              type="text"
+              placeholder="Enter your Home Address"
+              value={formData.homeAddress}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="form_field">
+          <div className="custom_file_input">
+            <input name="utilityBill" type="file" onChange={handleFileChange} />
+            <div>
+              <h2>
+                <img src={uploadicon} alt="" />
+                <span>
+                {formData.utilityBill ? formData.utilityBill.name : "No file selected"}
+                </span>
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div className="farm_info">
+          <h1>Farm Information</h1>
+          <div className="form_field">
+            <div>
+              <label htmlFor="farmName">Farm Name</label>
+              <input
+                name="farmName"
+                type="text"
+                placeholder="Enter Farm Name"
+                value={formData.farmName}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="farmLocation">Farm Location</label>
+              <input
+                name="farmLocation"
+                type="text"
+                placeholder="Enter Farm Location"
+                value={formData.farmLocation}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="form_field">
+            <div>
+              <label htmlFor="farmLGA">
+                Farm Local Government Area
+              </label>
+              <input
+                name="farmLGA"
+                type="text"
+                placeholder="Enter Farm Local Government Area"
+                value={formData.farmLGA}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="farmAddress">Farm Address</label>
+              <input
+                name="farmAddress"
+                type="text"
+                placeholder="Enter Farm Address"
+                value={formData.farmAddress}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="form_field">
+            <div className="custom_file_input">
+              <input
+                name="farmOwnershipProof"
+                type="file"
+                onChange={handleFileChange}
+              />
+              <div>
+                <h2>
+                  <img src={uploadicon} alt="" />
+                  <span>
+                  {formData.farmOwnershipProof ? formData.farmOwnershipProof.name : "No file selected"}
+                  </span>
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="form_field">
+          <div>
+            <label htmlFor="password">Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter Password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="confirmPassword">Re-enter Password</label>
+            <input
+              name="confirmPassword"
+              type="password"
+              placeholder="Re-enter Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="agreement">
+          <input
+            type="checkbox"
+            name="termsAgreed"
+            checked={formData.termsAgreed}
+            onChange={handleChange}
+          />
+          <span>
+            I have read and agree to the{" "}
+            <Link to="/terms-of-service">Terms of Service</Link> and{" "}
+            <Link to="/privacy-policy">Privacy Policy</Link>.
+          </span>
+        </div>
+        <button type="submit" target="_blank" disabled={loading}>
+          {loading ? "Creating..." : "Create Account"}
+        </button>
+      </form>
+      <p className="no_account">
+        Don't have an account? <Link to="/login">Login</Link>
+      </p>
+    </div>
+  );
+};
+
+export default FarmerSignupForm;
+
+
+/*import React, { useState } from "react";
 import { Link, useNavigate} from "react-router-dom";
 import uploadicon from "../../assets/images/product/uploadicon.png";
 
@@ -297,7 +640,7 @@ const FarmerSignupForm = () => {
 };
 
 export default FarmerSignupForm;
-
+*/
 /*
 const initialFormState = {
   fullName: "",
