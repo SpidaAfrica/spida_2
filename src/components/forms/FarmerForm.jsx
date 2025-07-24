@@ -274,8 +274,8 @@ const FarmerSignupForm = () => {
               />
             </div>
           </div>
+          {/*
           <div className="form_field">
-           {/*
             <div className="custom_file_input">
               <input
                 name="farmOwnershipProof"
@@ -290,10 +290,11 @@ const FarmerSignupForm = () => {
                   </span>
                 </h2>
               </div>
-            */}
+            
             </div>
           </div>
         </div>
+        */}
         <div className="form_field">
           <div>
             <label htmlFor="password">Password</label>
