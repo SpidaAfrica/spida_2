@@ -220,7 +220,7 @@ const FarmerSignupForm = () => {
               <h2>
                 <img src={uploadicon} alt="" />
                 <span>
-                {formData.utilityBill ? formData.utilityBill.name : "No file selected"}
+                {formData.utilityBill ? formData.utilityBill.name : "Upload Passport Photograph"}
                 </span>
               </h2>
             </div>
@@ -276,11 +276,12 @@ const FarmerSignupForm = () => {
           </div>
           <div className="form_field">
             <div className="custom_file_input">
+              {/*
               <input
                 name="farmOwnershipProof"
                 type="file"
                 onChange={handleFileChange}
-              />
+              />*/}
               <div>
                 <h2>
                   <img src={uploadicon} alt="" />
