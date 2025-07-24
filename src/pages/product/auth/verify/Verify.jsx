@@ -27,7 +27,7 @@ const Verify = () => {
   const handleResendOTP = async () => {
     alert("I am resending OTP");
     try {
-      const response = await fetch(`https://spida.africa/${accountType}/resend_otp.php`, {
+      const response = await fetch(`https://api.spida.africa/${accountType}/resend_otp.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const Verify = () => {
     }
   
     try {
-      const response = await fetch(`https://spida.africa/${accountType}/verify_${accountType}.php`, {
+      const response = await fetch(`https://api.spida.africa/${accountType}/verify_${accountType}.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

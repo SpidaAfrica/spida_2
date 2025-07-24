@@ -32,7 +32,7 @@ const LogisticsPickup = () => {
     }
   
     try {
-      const response = await fetch(`https://spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
+      const response = await fetch(`https://api.spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
       const data = await response.json();
   
       if (data.success) {
@@ -54,7 +54,7 @@ const LogisticsPickup = () => {
     }
   
     try {
-      const response = await fetch(`https://spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
+      const response = await fetch(`https://api.spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
       const data = await response.json();
   
       if (data.success) {
@@ -78,7 +78,7 @@ const LogisticsPickup = () => {
     const pickupTime = now.toTimeString().split(" ")[0]; // Format: HH:MM:SS
   
     try {
-      const response = await fetch("https://spida.africa/logistics/confirm_pickup.php", {
+      const response = await fetch("https://api.spida.africa/logistics/confirm_pickup.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -126,7 +126,7 @@ return (
           <div className="pickup_items">
             {currentOrders.map((order, index) => (
               <div className="pickup_item" key={index}>
-                <img src={`https://spida.africa/farmer/${order.product_image}`} alt="" />
+                <img src={`https://api.spida.africa/farmer/${order.product_image}`} alt="" />
                 <div className="pickup_details">
                   <div className="order_id">
                     <h3>Order ID</h3>

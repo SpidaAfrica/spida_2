@@ -8,7 +8,7 @@ const NewsBlog = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch("https://spida.africa/get_blog.php")
+    fetch("https://api.spida.africa/get_blog.php")
       .then((response) => response.json())
       .then((data) => setPosts(data))
       .catch((error) => console.error("Error fetching blogs:", error));
@@ -31,7 +31,7 @@ const NewsBlog = () => {
             return (
               <div className="related_item" key={post.id}>
                 <div className="item_img">
-                  <img src={`https://spida.africa/${post.imgSrc}`} alt={post.title} />
+                  <img src={`https://api.spida.africa/${post.imgSrc}`} alt={post.title} />
                   <h3 className="post_label">{post.label}</h3>
                 </div>
                 <div className="item_content">

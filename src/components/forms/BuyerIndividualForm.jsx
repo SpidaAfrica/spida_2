@@ -38,7 +38,7 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
           formDataObj.append(key, formData[key]);
       }
       try {
-        const response = await fetch("https://spida.africa/buyer/individual_signup.php", {
+        const response = await fetch("https://api.spida.africa/buyer/individual_signup.php", {
             method: "POST",
             body: formDataObj,
         });

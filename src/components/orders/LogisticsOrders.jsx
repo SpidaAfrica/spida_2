@@ -30,7 +30,7 @@ const LogisticsOrders = () => {
       }
   
       try {
-        const response = await fetch("https://spida.africa/individual/get_orders.php", {
+        const response = await fetch("https://api.spida.africa/individual/get_orders.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ farmer_id: farmerId }),
@@ -107,7 +107,7 @@ const LogisticsOrders = () => {
     }
   
     try {
-      const response = await fetch(`https://spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
+      const response = await fetch(`https://api.spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${logisticsId}`);
       const data = await response.json();
   
       if (data.success) {
@@ -125,7 +125,7 @@ const LogisticsOrders = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     console.log(`Updating order ${orderId} to status: ${newStatus}`);
     try {
-      const response = await fetch("https://spida.africa/logistics/update_order_status.php", {
+      const response = await fetch("https://api.spida.africa/logistics/update_order_status.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order_id: orderId, status: newStatus, logistics_id: logisticsId }),

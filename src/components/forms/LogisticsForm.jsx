@@ -80,7 +80,7 @@ const LogisticsForm = () => {
         formDataObj.append("longitude", longitude);
 
       try {
-        const response = await fetch("https://spida.africa/logistics/logistics_signup.php", {
+        const response = await fetch("https://api.spida.africa/logistics/logistics_signup.php", {
             method: "POST",
             body: formDataObj,
         });

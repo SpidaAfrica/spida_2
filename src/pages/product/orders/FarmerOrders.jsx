@@ -31,7 +31,7 @@ const FarmOrders = () => {
     }
 
     try {
-      const response = await fetch("https://spida.africa/individual/get_orders.php", {
+      const response = await fetch("https://api.spida.africa/individual/get_orders.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ farmer_id: farmerId }),

@@ -61,7 +61,7 @@ const AddNewProduce = () => {
     }
 
     try {
-      const response = await fetch("https://spida.africa/farmer/upload_farm_produce.php", {
+      const response = await fetch("https://api.spida.africa/farmer/upload_farm_produce.php", {
         method: "POST",
         body: formDataToSend,
       });

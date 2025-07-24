@@ -72,7 +72,7 @@ const Checkout = () => {
         userType = "guest";
         }
 
-    fetch(`https://spida.africa/individual/get_individual_cart.php?user_id=${userId}`)
+    fetch(`https://api.spida.africa/individual/get_individual_cart.php?user_id=${userId}`)
       .then((res) => res.json())
       .then((data) => {
         setCart(data.cart);
@@ -86,7 +86,7 @@ const Checkout = () => {
   };
 /*
   const handleSubmit = () => {
-    fetch("https://spida.africa/individual/delivery_info.php", {
+    fetch("https://api.spida.africa/individual/delivery_info.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -119,7 +119,7 @@ const Checkout = () => {
     userId = sessionStorage.getItem("userId");
     userType = "guest";
     }
-    fetch("https://spida.africa/individual/process_orders.php", {
+    fetch("https://api.spida.africa/individual/process_orders.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -157,7 +157,7 @@ const Checkout = () => {
           userType: sessionStorage.getItem("userType") || "guest",
         };
       
-        fetch("https://spida.africa/logistics/delivery_info.php", {
+        fetch("https://api.spida.africa/logistics/delivery_info.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedData),
@@ -201,7 +201,7 @@ const Checkout = () => {
           <h3>Order Summary</h3>
           {cart.map((item) => (
             <div key={item.id} className="order-item">
-              <img src={`https://spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
+              <img src={`https://api.spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
               <div>
                 <h4>{item.produce_name}</h4>
                 <p>#{item.price_per_unit} per {item.unit}</p>

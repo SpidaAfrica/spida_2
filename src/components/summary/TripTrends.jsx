@@ -15,7 +15,7 @@ const [data, setData] = useState([]);
 const logisticsId = sessionStorage.getItem("logisticsId");
 
   useEffect(() => {
-    fetch(`https://spida.africa/logistics/trip_trends.php?logistics_id=${logisticsId}&timeframe=${timeframe}`)
+    fetch(`https://api.spida.africa/logistics/trip_trends.php?logistics_id=${logisticsId}&timeframe=${timeframe}`)
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error("Error fetching trip trends:", error));

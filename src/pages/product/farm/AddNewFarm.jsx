@@ -74,7 +74,7 @@ const AddNewFarm = () => {
     formDataObj.append("longitude", longitude);
 
     try {
-      const response = await fetch("https://spida.africa/farmer/farm.php", {
+      const response = await fetch("https://api.spida.africa/farmer/farm.php", {
         method: "POST",
         body: formDataObj,
       });

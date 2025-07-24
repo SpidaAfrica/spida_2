@@ -58,7 +58,7 @@ const FarmerSignupForm = () => {
       }
     }
 
-    const response = await fetch("https://spida.africa/farmer/farmer_signup.php", {
+    const response = await fetch("https://api.spida.africa/farmer/farmer_signup.php", {
       method: "POST",
       body: formDataObj,
     });
@@ -401,7 +401,7 @@ const FarmerSignupForm = () => {
       }
 
       try {
-        const response = await fetch("https://spida.africa/farmer/farmer_signup.php", {
+        const response = await fetch("https://api.spida.africa/farmer/farmer_signup.php", {
             method: "POST",
             body: formDataObj,
         });

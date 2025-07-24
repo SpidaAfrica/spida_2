@@ -41,7 +41,7 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
       });
     
       try {
-        const response = await fetch("https://spida.africa/buyer/business_signup.php", {
+        const response = await fetch("https://api.spida.africa/buyer/business_signup.php", {
           method: "POST",
           body: formDataToSend,
         });

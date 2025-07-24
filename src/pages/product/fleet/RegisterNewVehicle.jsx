@@ -47,7 +47,7 @@ const RegisterNewVehicle = () => {
 
 
     try {
-      const response = await fetch("https://spida.africa/logistics/vehicles.php", {
+      const response = await fetch("https://api.spida.africa/logistics/vehicles.php", {
         method: "POST",
         body: formDataObj,
       });

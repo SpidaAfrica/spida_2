@@ -7,7 +7,7 @@ const PickupDistribution = () => {
   const logisticsId = sessionStorage.getItem("logisticsId");
 
   useEffect(() => {
-    fetch(`https://spida.africa/logistics/produce_distribution.php?logistics_id=${logisticsId}&timeframe=${timeframe}`)
+    fetch(`https://api.spida.africa/logistics/produce_distribution.php?logistics_id=${logisticsId}&timeframe=${timeframe}`)
       .then(response => response.json())
       .then(data => {
         const labels = data.map(item => item.produce_category);

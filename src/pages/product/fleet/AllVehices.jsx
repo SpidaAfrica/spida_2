@@ -147,7 +147,7 @@ const AllVehicles = () => {
 
   // Fetch vehicles from API
   useEffect(() => {
-    fetch(`https://spida.africa/logistics/get_vehicles.php?logistics_id=${logistics_id}`)
+    fetch(`https://api.spida.africa/logistics/get_vehicles.php?logistics_id=${logistics_id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
@@ -170,7 +170,7 @@ const AllVehicles = () => {
               <div className="farm_item" key={vehicle.id}>
                 <h3>{index + 1}</h3>
                 <div className="item_img">
-                  <img src={`https://spida.africa/logistics/${vehicle.vehicle_img}` || vehImg} alt="Vehicle" style={{ width: "100px" }}/>
+                  <img src={`https://api.spida.africa/logistics/${vehicle.vehicle_img}` || vehImg} alt="Vehicle" style={{ width: "100px" }}/>
                   <div className="item_name">
                     <h3>Type of vehicle</h3>
                     <p>{vehicle.vehicle_type}</p>

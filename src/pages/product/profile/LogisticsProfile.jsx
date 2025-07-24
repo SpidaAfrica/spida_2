@@ -26,7 +26,7 @@ const LogisticsProfile = () => {
   // Fetch existing user profile
   useEffect(() => {
     if (logisticsId) {
-      fetch(`https://spida.africa/logistics/logistics_profile.php?id=${logisticsId}`)
+      fetch(`https://api.spida.africa/logistics/logistics_profile.php?id=${logisticsId}`)
         .then((res) => res.json())
         .then((data) => {
           if (!data.error) {
@@ -66,7 +66,7 @@ const LogisticsProfile = () => {
       }
     });
 
-    fetch("https://spida.africa/logistics/logistics_profile.php", {
+    fetch("https://api.spida.africa/logistics/logistics_profile.php", {
       method: "POST",
       body: formDataToSend,
     })

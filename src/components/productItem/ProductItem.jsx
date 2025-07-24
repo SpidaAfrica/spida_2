@@ -31,7 +31,7 @@ const ProductItem = ({ product, isSelected, onSelect }) => {
       className={isSelected ? "product_item selected" : "product_item"}
     >
       <div className="product_img">
-        <img className="img" src={`https://spida.africa/farmer/${product.product_image}`} alt="" />
+        <img className="img" src={`https://api.spida.africa/farmer/${product.product_image}`} alt="" />
         <img
           onClick={toggleLike}
           className="heart"

@@ -176,7 +176,7 @@ const FarmList = () => {
   /*
   useEffect(() => {
     const farmer_id = localStorage.getItem('userId');
-    fetch(`https://spida.africa/farmer/farm.php?farmer_id=${farmer_id}`)
+    fetch(`https://api.spida.africa/farmer/farm.php?farmer_id=${farmer_id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "success") {
@@ -196,7 +196,7 @@ const FarmList = () => {
             throw new Error("User not logged in");
           }
   
-          const statsResponse = await fetch(`https://spida.africa/farmer/farm.php?farmer_id=${farmer_id}`);
+          const statsResponse = await fetch(`https://api.spida.africa/farmer/farm.php?farmer_id=${farmer_id}`);
   
           const statsData = await statsResponse.json();
   
@@ -233,7 +233,7 @@ const FarmList = () => {
             <div className="farm_item" key={farm.id} onClick={() => produceList(farm.farm_id)} style={{cursor:"pointer"}}>
               <h3>{index + 1}</h3>
               <div className="item_img">
-                <img src={`https://spida.africa/farmer/${farm.farm_images}` || farmImg} alt="Farm" style={{width:100}} />
+                <img src={`https://api.spida.africa/farmer/${farm.farm_images}` || farmImg} alt="Farm" style={{width:100}} />
                 <div className="item_name">
                   <h3>Name of Farm</h3>
                   <p>{farm.farm_name}</p>

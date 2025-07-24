@@ -36,7 +36,7 @@ const Pickup = () => {
     }
 
     try {
-      const response = await fetch("https://spida.africa/individual/get_orders.php", {
+      const response = await fetch("https://api.spida.africa/individual/get_orders.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ farmer_id: farmerId }),
@@ -59,7 +59,7 @@ const Pickup = () => {
     const farmerId = sessionStorage.getItem("farmerId");
   
     try {
-      const response = await fetch("https://spida.africa/farmer/farmer_confirm_pickup.php", {
+      const response = await fetch("https://api.spida.africa/farmer/farmer_confirm_pickup.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order_id: orderId, farmer_id: farmerId }),
@@ -102,7 +102,7 @@ return (
           <div className="pickup_items">
             {currentOrders.map((order, index) => (
               <div className="pickup_item" key={index} style={{display:display}}>
-                <img className="image_product" src={`https://spida.africa/farmer/${order.product_image}`} alt="" />
+                <img className="image_product" src={`https://api.spida.africa/farmer/${order.product_image}`} alt="" />
                 <div className="pickup_details">
                   <div className="order_id">
                     <h3>Order ID</h3>

@@ -36,7 +36,7 @@ export const CartProvider = ({ children }) => {
     const user_id = getUserId();
 
     try {
-      const response = await fetch("https://spida.africa/individual/individual_add_to_cart.php", {
+      const response = await fetch("https://api.spida.africa/individual/individual_add_to_cart.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -98,7 +98,7 @@ const Login = () => {
   
     try {
       // Fetch user details after successful login
-      const response = await fetch("https://spida.africa/login.php", {
+      const response = await fetch("https://api.spida.africa/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, userType, guest_id: guestId }),
@@ -114,7 +114,7 @@ const Login = () => {
         sessionStorage.setItem("token", data.token);
   
         // Fetch additional user details (name)
-        const nameRes = await fetch(`https://spida.africa/${userType}/${userType}.php?${userType}_id=${data.userId}`);
+        const nameRes = await fetch(`https://api.spida.africa/${userType}/${userType}.php?${userType}_id=${data.userId}`);
         const userDetails = await nameRes.json();
         console.log(userDetails);
   

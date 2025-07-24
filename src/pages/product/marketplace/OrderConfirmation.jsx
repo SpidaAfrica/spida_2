@@ -15,7 +15,7 @@ const OrderConfirmation = () => {
       return;
     }
 
-    fetch(`https://spida.africa/individual/get_order_details.php?order_id=${orderId}`)
+    fetch(`https://api.spida.africa/individual/get_order_details.php?order_id=${orderId}`)
       .then((res) => res.json())
       .then((data) => setOrderDetails(data))
       .catch((error) => console.error("Error fetching order:", error));
@@ -36,7 +36,7 @@ const OrderConfirmation = () => {
         <h3>Order Summary</h3>
         {orderDetails.items.map((item) => (
           <div key={item.id} className="order-item">
-            <img src={`https://spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
+            <img src={`https://api.spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
             <div>
               <h4>{item.produce_name}</h4>
               <p>Quantity: {item.quantity}</p>

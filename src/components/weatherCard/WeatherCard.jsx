@@ -11,7 +11,7 @@ const WeatherCard = () => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch("https://spida.africa/farmer/weather.php");
+        const response = await fetch("https://api.spida.africa/farmer/weather.php");
         const data = await response.json();
         
         if (response.ok) {

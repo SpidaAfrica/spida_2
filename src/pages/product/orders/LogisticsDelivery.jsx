@@ -31,7 +31,7 @@ const OngoingDelivery = () => {
       }
     
       try {
-        const response = await fetch(`https://spida.africa/logistics/get_order_delivery.php?logistics_id=${logisticsId}`);
+        const response = await fetch(`https://api.spida.africa/logistics/get_order_delivery.php?logistics_id=${logisticsId}`);
         const data = await response.json();
     
         if (data.success) {

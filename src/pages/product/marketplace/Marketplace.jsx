@@ -86,7 +86,7 @@ const [locations, setLocations] = useState([]);
 
 // Fetch Unique Locations for Filtering
 useEffect(() => {
-  fetch("https://spida.africa/farmer/farm_location.php")
+  fetch("https://api.spida.africa/farmer/farm_location.php")
     .then(response => response.json())
     .then(data => setLocations(data))
     .catch(error => console.error("Error fetching locations:", error));
@@ -94,7 +94,7 @@ useEffect(() => {
 
 // Fetch Products based on filters
 const fetchProducts = () => {
-  let url = `https://spida.africa/individual/individual_marketplace.php?`;
+  let url = `https://api.spida.africa/individual/individual_marketplace.php?`;
 
   Object.keys(filters).forEach(key => {
     if (filters[key]) url += `${key}=${filters[key]}&`;
@@ -132,7 +132,7 @@ const handlePageChange = (newPage) => {
   };
 
   useEffect(() => {
-    fetch("https://spida.africa/get_blog.php")
+    fetch("https://api.spida.africa/get_blog.php")
       .then((response) => response.json())
       .then((data) => setPosts(data))
       .catch((error) => console.error("Error fetching blogs:", error));
@@ -256,7 +256,7 @@ return (
               return (
                 <div className="related_item" key={post.id}>
                   <div className="item_img">
-                    <img src={`https://spida.africa/${post.imgSrc}`} alt={post.title} />
+                    <img src={`https://api.spida.africa/${post.imgSrc}`} alt={post.title} />
                     <h3 className="post_label">{post.label}</h3>
                   </div>
                   <div className="item_content">

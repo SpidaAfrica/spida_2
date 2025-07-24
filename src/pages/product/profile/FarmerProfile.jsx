@@ -44,7 +44,7 @@ const FarmerProfile = () => {
   useEffect(() => {
     const fetchFarmerDetails = async () => {
       try {
-        const response = await fetch(`https://spida.africa/farmer/farmer.php?farmer_id=${farmer_id}`); // Replace 1 dynamically
+        const response = await fetch(`https://api.spida.africa/farmer/farmer.php?farmer_id=${farmer_id}`); // Replace 1 dynamically
         const data = await response.json();
   
         if (data.status === "success") {
@@ -110,7 +110,7 @@ const FarmerProfile = () => {
     });
   
     try {
-      const response = await fetch("https://spida.africa/farmer/update_farmer_profile.php", {
+      const response = await fetch("https://api.spida.africa/farmer/update_farmer_profile.php", {
         method: "POST",
         body: updatedFormData,
       });

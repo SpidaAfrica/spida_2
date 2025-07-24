@@ -17,7 +17,7 @@ const Cart = () => {
   const removeFromCart = (cartId) => {    
     let userType = sessionStorage.getItem("userType");
     let userId = sessionStorage.getItem(`${userType}Id`);
-    fetch("https://spida.africa/individual/remove_from_cart.php", {
+    fetch("https://api.spida.africa/individual/remove_from_cart.php", {
       method: "POST",
       body: JSON.stringify({ cart_id: cartId,  user_id: userId }),
       headers: { "Content-Type": "application/json" },
@@ -38,7 +38,7 @@ const Cart = () => {
 
   useEffect(() => {
 
-    fetch(`https://spida.africa/individual/get_individual_cart.php`, {
+    fetch(`https://api.spida.africa/individual/get_individual_cart.php`, {
       method: "POST",
       body: JSON.stringify({ user_id: userId }),
       headers: { "Content-Type": "application/json" },
@@ -58,7 +58,7 @@ const Cart = () => {
 
     if (newQuantity < 1) return; // Prevents setting quantity below 1
 
-    fetch("https://spida.africa/individual/update_cart_quantity.php", {
+    fetch("https://api.spida.africa/individual/update_cart_quantity.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cart_id: cartId, quantity: newQuantity, user_id: userId }),
@@ -76,7 +76,7 @@ const Cart = () => {
 
 
   const clearCart = () => {
-    fetch("https://spida.africa/individual/clear_cart.php", {
+    fetch("https://api.spida.africa/individual/clear_cart.php", {
       method: "POST",
       body: JSON.stringify({ user_id: userId }),
       headers: { "Content-Type": "application/json" },
@@ -104,7 +104,7 @@ const Cart = () => {
       {cart.length > 0 ? (
         cart.map((item) => (
         <div className="cart-item" key={item.id}>
-            <img src={`https://spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
+            <img src={`https://api.spida.africa/farmer/${item.product_image}`} alt={item.produce_name} />
             <div className="details">
                 <h3>{item.produce_name}</h3>
                 <p>Harvest Date: {item.harvest_date}</p>

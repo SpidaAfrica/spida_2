@@ -130,7 +130,7 @@ const MyFarm = () => {
   useEffect(() => {
     const fetchFarmProduce = async () => {
       try {
-        const response = await fetch(`https://spida.africa/farmer/get_farm_produce.php?farm_id=${farmId}`);
+        const response = await fetch(`https://api.spida.africa/farmer/get_farm_produce.php?farm_id=${farmId}`);
         const data = await response.json();
 
         if (data) {
@@ -172,7 +172,7 @@ const MyFarm = () => {
           <div className="my_farm_products">
             {currentProducts.map((product) => (
               <div className="product" key={product.id}>
-                <img src={`https://spida.africa/farmer/${product.product_image}`} alt={product.produce_name} style={{ width: "100px" }} />
+                <img src={`https://api.spida.africa/farmer/${product.product_image}`} alt={product.produce_name} style={{ width: "100px" }} />
                 <div className="my_product_details">
                   <label>Organic Certification</label>
                   <div>
