@@ -10,7 +10,7 @@ const initDB = async () => {
   return await openDB(DB_NAME, 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { autoIncrement: true });
+        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
       }
     },
   });
@@ -98,15 +98,17 @@ const FarmerSignupForm = () => {
     setLoading(true);
     const db = await initDB();
 
+    const entry = { ...formData, createdAt: new Date().toISOString() };
+
     if (navigator.onLine) {
       try {
-        await sendToServer(formData);
+        await sendToServer(entry);
       } catch (error) {
-        await db.add(STORE_NAME, formData);
+        await db.add(STORE_NAME, entry);
         alert("Network error. Form saved locally.");
       }
     } else {
-      await db.add(STORE_NAME, formData);
+      await db.add(STORE_NAME, entry);
       alert("You are offline. Form saved locally and will sync automatically.");
     }
 
