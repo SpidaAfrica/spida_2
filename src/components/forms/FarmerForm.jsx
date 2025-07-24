@@ -53,7 +53,9 @@ const FarmerSignupForm = () => {
   const sendToServer = async (data) => {
     const formDataObj = new FormData();
     for (const key in data) {
-      formDataObj.append(key, data[key]);
+      if (data[key] !== null && data[key] !== undefined) {
+        formDataObj.append(key, data[key]);
+      }
     }
 
     const response = await fetch("https://spida.africa/farmer/farmer_signup.php", {
@@ -63,7 +65,7 @@ const FarmerSignupForm = () => {
 
     if (response.ok) {
       const result = await response.json();
-      if (result.email === data.email) {
+      if (result && result.email === data.email) {
         alert(result.message);
         sessionStorage.setItem("farmerEmail", data.email);
         sessionStorage.setItem("farmerName", data.fullName);
@@ -83,35 +85,43 @@ const FarmerSignupForm = () => {
     for (const item of allData) {
       try {
         await sendToServer(item);
+        await db.delete(STORE_NAME, item.id);
       } catch (err) {
-        console.error("Failed to sync: ", err);
+        console.error("Failed to sync:", err);
         return;
       }
     }
-    await db.clear(STORE_NAME);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const db = await initDB();
+
     if (navigator.onLine) {
       try {
         await sendToServer(formData);
       } catch (error) {
-        console.error("Error submitting form:", error);
+        await db.add(STORE_NAME, formData);
         alert("Network error. Form saved locally.");
       }
     } else {
-      const db = await initDB();
       await db.add(STORE_NAME, formData);
       alert("You are offline. Form saved locally and will sync automatically.");
     }
+
     setLoading(false);
   };
 
   useEffect(() => {
-    window.addEventListener("online", syncData);
-    return () => window.removeEventListener("online", syncData);
+    const syncWhenOnline = async () => {
+      if (navigator.onLine) {
+        await syncData();
+      }
+    };
+    window.addEventListener("online", syncWhenOnline);
+    syncWhenOnline();
+    return () => window.removeEventListener("online", syncWhenOnline);
   }, []);
 
   return (
