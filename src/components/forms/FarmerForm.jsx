@@ -275,13 +275,13 @@ const FarmerSignupForm = () => {
             </div>
           </div>
           <div className="form_field">
+           {/*
             <div className="custom_file_input">
-              {/*
               <input
                 name="farmOwnershipProof"
                 type="file"
                 onChange={handleFileChange}
-              />*/}
+              />
               <div>
                 <h2>
                   <img src={uploadicon} alt="" />
@@ -290,6 +290,7 @@ const FarmerSignupForm = () => {
                   </span>
                 </h2>
               </div>
+            */}
             </div>
           </div>
         </div>
