@@ -97,7 +97,7 @@ const Home = () => {
       <section className="why_spider">
         <div className="why_header">
           <h1>
-            Why <span>SPIDER?</span>
+            Why <span>SPIDA?</span>
           </h1>
           <h1>Discover the benefits</h1>
         </div>
