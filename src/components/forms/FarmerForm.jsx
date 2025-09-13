@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import uploadicon from "../../assets/images/product/uploadicon.png";
 import { openDB } from "idb";
@@ -286,7 +286,7 @@ const FarmerSignupForm = () => {
               />
             </div>
           </div>
-          {/*
+          /*
           <div className="form_field">
             <div className="custom_file_input">
               <input
@@ -305,7 +305,7 @@ const FarmerSignupForm = () => {
             
             </div>
           </div>
-          */}
+          *
         </div> 
         <div className="form_field">
           <div>
@@ -354,9 +354,9 @@ const FarmerSignupForm = () => {
 };
 
 export default FarmerSignupForm;
+*/
 
-
-/*import React, { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate} from "react-router-dom";
 import uploadicon from "../../assets/images/product/uploadicon.png";
 
