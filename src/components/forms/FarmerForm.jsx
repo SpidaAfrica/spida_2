@@ -655,7 +655,7 @@ const FarmerSignupForm = () => {
 };
 
 export default FarmerSignupForm;
-*/
+
 /*
 const initialFormState = {
   fullName: "",
