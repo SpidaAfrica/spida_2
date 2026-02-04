@@ -1,0 +1,63 @@
+.news_blog_marketplace {
+    padding: 40px;
+    background: #f4f4f4;
+  }
+  
+  .marketplace_news_blog_header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .marketplace_news_blog_header h1 {
+    font-size: 28px;
+    color: #333;
+  }
+  
+  .related_content_items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .related_item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .item_img img {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .post_label {
+    background: #007bff;
+    color: white;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  .item_content p {
+    color: #666;
+  }
+  
+  .item_content h2 {
+    font-size: 22px;
+    color: #333;
+  }
+  
+  .item_content a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .item_content a:hover {
+    text-decoration: underline;
+  }
+  

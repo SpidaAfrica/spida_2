@@ -1,0 +1,205 @@
+.summary_cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 15px;
+  margin: 0 15px 30px;
+  border: 0.81px solid var(--brand-dff);
+  border-radius: 12px;
+}
+
+.summary_cards .card {
+  padding: 16px 30px 16px 16px;
+  width: 100%;
+  border-right: 0.81px solid var(--brand-dff);
+}
+
+.summary_cards .card:last-child {
+  border-right: none;
+}
+
+.summary_cards .card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary_cards .icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.summary_cards h2 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 36px;
+}
+
+.summary_cards p {
+  font-family: Montserrat;
+  font-size: 12.92px;
+  font-weight: 400;
+  line-height: 19.38px;
+}
+
+.summary_cards .card-footer {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.summary_cards .trends img {
+  margin-right: 7px;
+}
+
+.summary_cards .arrow {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.summary_cards .percentage {
+  font-family: Montserrat;
+  font-size: 11.31px;
+  font-weight: 400;
+  line-height: 16.96px;
+  color: var(--brand-db5);
+}
+
+
+
+
+/* 
+.summary_cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: calc(33.333% - 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.card-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #888;
+}
+
+.card-footer {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+}
+
+.card-footer .trends {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-footer .percentage {
+  font-size: 14px;
+  color: #888;
+}*/
+
+.chart-container {
+  padding: 22px;
+  background-color: #fff;
+  border-radius: 15px;
+  width: 100%;
+  height: 300px;
+}
+
+.pie-chart-container {
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  background-color: #ffffff;
+  position: relative;
+  width: 100%;
+}
+
+.pie-chart-container > h3 {
+  text-align: left;
+  font-size: 10.33px;
+  font-weight: 700;
+  line-height: 12.4px;
+  margin: 0 0 22px;
+}
+
+.pie-chart-container .chart_content {
+  background: #dff4f6;
+  display: flex;
+  width: 400px; 
+  align-items: center; 
+  /* justify-content: space-between; */
+  text-align: left; 
+}
+
+.chart_content canvas {
+  width: auto !important;
+  height: auto !important;
+  max-width: 300px;
+  max-height: 400px;
+  text-align: left;
+}
+
+
+
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.legend-item > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.legend-item span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.download-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #dff4f6;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

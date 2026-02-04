@@ -1,0 +1,130 @@
+.faq_section {
+  padding: 150px 196px 130px 100px;
+}
+
+.faq_header {
+  width: 350px;
+  position: relative;
+  margin: 0 0 96px;
+}
+
+.faq_header h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 67.2px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+}
+
+.faq_header > img {
+  position: absolute;
+  top: 61px;
+  left: 180px;
+}
+
+.faq_item {
+  display: flex;
+  /* align-items: center; */
+  padding: 48px 0;
+  border-bottom: 1px solid var(--brand-e4);
+  gap: 36px;
+}
+
+.faq_item .dynamic_faq_icon img {
+    position: relative;
+    top: 5px;
+    cursor: pointer;
+}
+
+.faq_question_answers h3 {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 38.4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq_question_answers p {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 32px;
+    margin: 43px 88px 0 28px;
+    padding: 0 0 0 32px;
+    border-left: 1px solid var(--brand-f47);
+}
+/* ============================= */
+/* === FAQ SECTION RESPONSIVE === */
+/* ============================= */
+
+/* Tablets (max-width: 768px) */
+@media (max-width: 768px) {
+  .faq_section {
+    padding: 80px 40px;
+  }
+
+  .faq_header {
+    width: 100%;
+    margin-bottom: 60px;
+  }
+
+  .faq_header h1 {
+    font-size: 36px;
+    line-height: 1.3;
+  }
+
+  .faq_header > img {
+    top: 45px;
+    left: 140px;
+    width: 60px;
+    height: auto;
+  }
+
+  .faq_item {
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px 0;
+  }
+
+  .faq_question_answers h3 {
+    font-size: 20px;
+    line-height: 32px;
+  }
+
+  .faq_question_answers p {
+    font-size: 16px;
+    line-height: 28px;
+    margin: 20px 0 0;
+    padding-left: 16px;
+  }
+}
+
+/* Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .faq_section {
+    padding: 60px 20px;
+  }
+
+  .faq_header h1 {
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .faq_header > img {
+    top: 40px;
+    left: 120px;
+    width: 40px;
+  }
+
+  .faq_question_answers h3 {
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .faq_question_answers p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 12px;
+  }
+}

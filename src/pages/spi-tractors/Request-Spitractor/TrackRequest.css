@@ -1,0 +1,271 @@
+.trk-page {
+    min-height: 100vh;
+    width: 100vw;
+    background: #f6f7f8;
+    font-family: Arial, sans-serif;
+    position: relative;
+  }
+  
+  .trk-back {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #111;
+  }
+  .trk-back:hover { background: rgba(0,0,0,0.04); }
+  
+  .trk-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 70px 18px 40px;
+  }
+  
+  .trk-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  
+  .trk-chip {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    font-size: 12px;
+    color: #111;
+    font-weight: 700;
+  }
+  
+  .trk-title {
+    margin: 10px 0 4px;
+    font-size: 26px;
+    font-weight: 900;
+    color: #111;
+  }
+  .trk-subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: #111;
+    font-weight: 700;
+  }
+  .trk-muted {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .trk-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .trk-btnGhost {
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #000;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .trk-btnGhost:hover { background: #f9fafb; }
+  
+  .trk-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 14px;
+    align-items: start;
+  }
+  
+  .trk-card {
+    background: #fff;
+    border: 1px solid #eef0f2;
+    border-radius: 14px;
+    padding: 16px;
+  }
+  
+  .trk-progressTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .trk-progressLabel { font-size: 12px; color: #6b7280; font-weight: 700; }
+  .trk-progressVal { font-size: 12px; color: #111; font-weight: 900; }
+  
+  .trk-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: #eef0f2;
+    overflow: hidden;
+    margin: 10px 0 14px;
+  }
+  .trk-barFill {
+    height: 100%;
+    background: #16a34a;
+    border-radius: 999px;
+  }
+  
+  .trk-timeline {
+    display: grid;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  
+  .trk-step {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  
+  .trk-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 2px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16a34a;
+    font-weight: 900;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  
+  .trk-stepTitle {
+    font-size: 13px;
+    font-weight: 900;
+    color: #111;
+  }
+  
+  .trk-stepDesc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  
+  .trk-step.done .trk-dot {
+    border-color: #16a34a;
+    background: #dcfce7;
+  }
+  
+  .trk-step.active .trk-dot {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+  }
+  
+  .trk-right { position: sticky; top: 18px; }
+  .trk-rightTitle {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 900;
+    color: #111;
+  }
+  
+  .trk-statusBox {
+    border: 1px solid #eef0f2;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+  .trk-statusKey { font-size: 12px; color: #6b7280; font-weight: 700; }
+  .trk-statusVal { margin-top: 6px; font-size: 14px; font-weight: 900; color: #111; }
+  .trk-statusDesc { margin-top: 6px; font-size: 12px; color: #6b7280; }
+  .trk-mini { margin-top: 10px; font-size: 12px; color: #111; }
+  
+  .trk-map {
+    height: 220px;
+    border-radius: 12px;
+    border: 1px solid #eef0f2;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 12px;
+    background:
+      linear-gradient(0deg, rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
+      repeating-linear-gradient(0deg, #e8eaee 0 1px, transparent 1px 44px),
+      repeating-linear-gradient(90deg, #e8eaee 0 1px, transparent 1px 54px);
+  }
+  
+  .trk-pin {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+  }
+  .trk-pinFarm { left: 64%; top: 46%; background: #16a34a; }
+  .trk-pinTractor { left: 38%; top: 32%; background: #111827; }
+  
+  .trk-path {
+    position: absolute;
+    left: 39%;
+    top: 33%;
+    width: 26%;
+    height: 16%;
+    border-bottom: 2px dashed rgba(22,163,74,0.75);
+    border-right: 2px dashed rgba(22,163,74,0.75);
+    border-radius: 12px;
+    transform: rotate(4deg);
+  }
+  
+  .trk-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .trk-btn {
+    height: 46px;
+    border-radius: 12px;
+    border: none;
+    background: #16a34a;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .trk-btn:hover { background: #15803d; }
+  
+  .trk-btnOutline {
+    height: 46px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #111;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .trk-btnOutline:hover { background: #f9fafb; }
+  
+  .trk-cancel {
+    width: 100%;
+    margin-top: 10px;
+    height: 46px;
+    border-radius: 12px;
+    border: 1px solid #fee2e2;
+    background: #fff;
+    color: #b91c1c;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .trk-cancel:hover { background: #fff5f5; }
+  
+  @media (max-width: 980px) {
+    .trk-grid { grid-template-columns: 1fr; }
+    .trk-right { position: static; }
+    .trk-head { flex-direction: column; }
+    .trk-actions { width: 100%; }
+    .trk-btnGhost { flex: 1; }
+  }
+  

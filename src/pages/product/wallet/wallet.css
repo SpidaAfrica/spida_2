@@ -1,0 +1,269 @@
+.wallet_page {
+  background: var(--about-why-us-bg);
+  padding: 32px 30px;
+  border-radius: 12px;
+  margin: 0 0 48px;
+  position: relative;
+}
+
+.wallet_balance_analysis {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 14px;
+  margin: 0 0 30px;
+}
+
+.wallet_balance_analysis .analysis_graph,
+.wallet_balance_analysis .wallet_balance {
+  padding: 30px;
+  background: var(--brand-primary);
+  border-radius: 11px;
+}
+
+.wallet_balance_analysis .wallet_balance {
+  text-align: center;
+  color: var(--brand-white);
+}
+
+.wallet_balance .balance_header {
+  display: flex;
+  justify-content: start;
+  margin: 0 0 32px;
+  padding: 11px;
+}
+
+.wallet_balance .balance_header div {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wallet_balance .balance_header div p {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 13.5px;
+  letter-spacing: -0.03em;
+}
+
+.wallet_balance .wallet_content h2 {
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 54px;
+  letter-spacing: -0.03em;
+  margin: 0 0 30px;
+}
+
+.wallet_balance .wallet_button button {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  padding: 17px 0;
+  border: none;
+  text-transform: uppercase;
+  border-radius: 12px;
+  background: var(--brand-white);
+  color: var(--brand-primary);
+}
+
+.t_analysis_header {
+  font-family: Montserrat;
+  font-size: 8.83px;
+  font-weight: 400;
+  line-height: 10.77px;
+  letter-spacing: -0.05em;
+}
+
+/* transaction history */
+.transaction_history {
+  padding: 0 15px 20px;
+}
+
+.transaction_history > h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 33.6px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+  /* margin: 0 0 30px; */
+}
+
+.transaction_history > p {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18.2px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+  margin: 0 0 30px;
+}
+
+.transaction_history .items_head {
+  margin: 0 0 15px;
+}
+
+.transaction_history .items_head ul {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  list-style: none;
+  padding: 12px 24px;
+  background: var(--brand-primary);
+  color: var(--brand-white);
+  border-radius: 8px;
+}
+
+.transaction_history li {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 14px;
+  letter-spacing: -0.05em;
+  text-align: center;
+}
+
+.transaction_history .items_body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.transaction_history .items_body .item ul {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  list-style: none;
+  padding: 12px 24px;
+  background: var(--brand-A80);
+  color: var(--brand-white);
+  border-radius: 8px;
+  border: 0.5px solid var(--brand-primary);
+}
+
+.transaction_history .status {
+  padding: 3px 15px;
+  border-radius: 12px;
+  width: max-content;
+  margin: 0 auto;
+  color: var(--brand-white);
+}
+
+.status.paid {
+  background: var(--brand-primary);
+}
+
+.status.pending {
+  background-color: var(--brand-B80);
+}
+
+.status.in-progress {
+  background-color: var(--brand-secondary);
+}
+
+.status.cancelled {
+  background-color: var(--brand-B80);
+}
+
+.transaction_history .items_body .item:nth-child(even) ul {
+  background: var(--brand-white);
+  color: var(--brand-primary);
+}
+
+/* withdraw_modal */
+
+.withdraw_modal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.withdraw_modal .amount_container {
+  padding: 32px;
+  background: var(--brand-primary);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 485px;
+  color: var(--brand-white);
+}
+
+.withdraw_modal .amount_container h3 {
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 16.2px;
+  letter-spacing: -0.03em;
+}
+
+.withdraw_modal .amount_container input {
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  letter-spacing: -0.05em;
+  border: none;
+  border-radius: 12px;
+  outline: none;
+  color: var(--brand-primary);
+  background: var(--brand-029);
+}
+
+.withdraw_modal .amount_container button {
+  width: 100%;
+  padding: 16px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16.2px;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 12px;
+  color: var(--brand-primary);
+  background: var(--brand-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.amount_container .add_new_tansac_account {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.amount_container .add_new_tansac_account {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add_new_tansac_account .tansac_account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--brand-primary);
+  background: var(--brand-029);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.add_new_tansac_account .tansac_account.add {
+  background: var(--brand-home-users-h3);
+}
+
+.add_new_tansac_account .tansac_account > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.07em;
+  color: var(--brand-primary);
+}

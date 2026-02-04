@@ -1,0 +1,113 @@
+.dash-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    background: #f7f8fa;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+  }
+  
+  .dash-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  
+  .dash-content {
+    padding: 18px;
+  }
+  
+  .dash-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .dash-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111;
+    margin: 0 0 10px;
+  }
+  
+  .dash-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .chip {
+    border: 1px solid #eef0f2;
+    background: #fff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #111;
+  }
+  
+  .chev {
+    color: #9ca3af;
+    margin-left: 6px;
+  }
+  
+  .dash-search {
+    position: relative;
+    width: 280px;
+    max-width: 100%;
+  }
+  
+  .dash-search input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border-radius: 10px;
+    border: 1px solid #eef0f2;
+    outline: none;
+    background: #fff;
+  }
+  
+  .search-ic {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.75;
+  }
+  
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 12px;
+    align-items: start;
+  }
+  
+  .dash-left {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+  }
+  
+  .dash-right {
+    min-width: 0;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .dash-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .dash-search {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .sidebar {
+      display: none; /* keep simple; later we can add mobile drawer */
+    }
+  }
+  

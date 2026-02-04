@@ -1,0 +1,254 @@
+.login_page {
+  padding: 100px 275px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login_page > img {
+  position: absolute;
+}
+
+.login_page > img.flower1 {
+  top: 0;
+  right: 150px;
+}
+
+.login_page > img.flower2 {
+  top: 27px;
+  right: 264px;
+}
+
+.login_page > img.flower3 {
+  bottom: 20px;
+  right: 0;
+}
+
+.login_page .login_container {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  width: 100%;
+}
+
+.login_container .login_item_form {
+  width: 478px;
+  /* background: #454545; */
+}
+
+.login_container .login_item h1 {
+  font-family: Montserrat;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 58.51px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+}
+
+.login_container .login_item > p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.4px;
+  letter-spacing: -0.03em;
+  color: var(--brand-primary);
+  margin-bottom: 50px;
+}
+
+.form_field {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 0 0 12px;
+}
+
+.form_field > div {
+  width: 100%;
+}
+
+.form_field > div input,
+.form_field > div select,
+.form_field > div textarea {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19.2px;
+  letter-spacing: -0.03em;
+  padding: 17px 24px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: var(--brand-f6);
+  color: var(--brand-aaa);
+}
+
+.form_field > div label {
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+}
+
+.login_item .other_actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 32px;
+}
+
+.login_item .other_actions a,
+.login_item .other_actions > div span {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.03em;
+  color: var(--brand-primary);
+}
+
+.login_item .other_actions > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.login_item .login_form > button {
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  letter-spacing: -0.03em;
+  padding: 15px;
+  color: var(--brand-white);
+  background-color: var(--brand-primary);
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.login_item .no_account,
+.no_account {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  text-align: center;
+  color: var(--brand-primary);
+  margin: 10px 0 0;
+}
+
+.login_item .no_account a,
+.no_account a {
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--brand-primary);
+}
+/* Base styles remain unchanged (your existing styles) */
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .login_page {
+    padding: 80px 150px;
+  }
+
+  .login_container {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 992px) {
+  .login_page {
+    padding: 60px 80px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .login_container {
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+
+  .login_container .login_item_form {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .login_container .login_item h1 {
+    font-size: 36px;
+    line-height: 1.2;
+  }
+
+  .login_page > img.flower1,
+  .login_page > img.flower2,
+  .login_page > img.flower3,
+  .login_item img{
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .login_page {
+    padding: 40px 30px;
+  }
+
+  .form_field {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .form_field label,.login_item p, .login_item h1{
+    text-align: left;
+  }
+
+  .login_item .login_form > button {
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .login_container .login_item > p {
+    margin-bottom: 30px;
+  }
+
+  .login_item .other_actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login_page {
+    padding: 30px 15px;
+  }
+
+  .login_container .login_item h1 {
+    font-size: 28px;
+  }
+
+  .form_field > div input,
+  .form_field > div select,
+  .form_field > div textarea {
+    font-size: 14px;
+    padding: 14px 18px;
+  }
+
+  .form_field > div label {
+    font-size: 13px;
+  }
+
+  .login_item .no_account,
+  .no_account,
+  .login_item .no_account a,
+  .no_account a {
+    font-size: 13px;
+  }
+
+  .login_item .login_form > button {
+    font-size: 13px;
+    padding: 13px;
+  }
+}

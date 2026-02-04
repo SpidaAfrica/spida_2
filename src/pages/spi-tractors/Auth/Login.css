@@ -1,0 +1,261 @@
+/* ======================
+   LAYOUT
+====================== */
+.login-page {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* ======================
+     LEFT SIDE
+  ====================== */
+  .login-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding: 24px;
+  }
+  
+  .login-wrapper {
+    width: 100%;
+    max-width: 420px;
+  }
+  
+  .logo {
+    height: 40px;
+    margin-bottom: 32px;
+  }
+  
+  .login-card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Typography */
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #111;
+  }
+  
+  .title span {
+    font-weight: 700;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+  }
+  
+  /* ======================
+     BUTTONS
+  ====================== */
+  .social-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  
+  .social-btn:hover {
+    background: #f9fafb;
+  }
+  
+  .social-btn img {
+    height: 20px;
+  }
+  
+  /* ======================
+     DIVIDER
+  ====================== */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  
+  .divider span {
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+  }
+  
+  .divider p {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  
+  /* ======================
+     INPUTS
+  ====================== */
+  .login-card input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: none;
+    background: #f3f4f6;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  
+  /* ======================
+     ACTIONS
+  ====================== */
+  .forgot {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+  
+  .forgot a {
+    font-size: 14px;
+    color: #16a34a;
+    text-decoration: none;
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #22c55e;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .login-btn:hover {
+    background: #16a34a;
+  }
+  
+  /* ======================
+     FOOTER TEXT
+  ====================== */
+  .terms {
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 16px;
+  }
+  
+  .signup {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+  
+  .signup span {
+    color: #16a34a;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  /* ======================
+     RIGHT SIDE (CAROUSEL)
+  ====================== */
+  .login-right {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: none;
+  }
+  
+  .carousel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+  
+  .carousel-slide.active {
+    opacity: 1;
+    z-index: 1;
+  }
+  
+  .bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  
+  .right-content {
+    position: absolute;
+    top: 48px;
+    left: 48px;
+    max-width: 420px;
+    color: #ffffff;
+  }
+  
+  /* Dots */
+  .dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .dots span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+  }
+  
+  .dots span.active {
+    background: #facc15;
+  }
+  
+  .dots span:hover {
+    background: #ffffff;
+  }
+  
+  /* Text */
+  .right-content h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #4ade80;
+    margin-bottom: 12px;
+  }
+  
+  .right-content p {
+    font-size: 14px;
+    color: #e5e7eb;
+  }
+  
+  /* ======================
+     RESPONSIVE
+  ====================== */
+  @media (min-width: 768px) {
+    .login-page {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .login-right {
+      display: block;
+    }
+  }
+  

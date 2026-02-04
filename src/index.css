@@ -1,0 +1,61 @@
+:root {
+  --font-family: "Satoshi", sans-serif;
+
+  --brand-primary: #0c420a;
+  --brand-secondary: #ffc204;
+  --nav-background: #fff;
+  --brand-white: #fff;
+  --brand-black: #04000b;
+  --brand-024: #062028;
+  --brand-grey: #36383a;
+  --brand-home-users-h3: #488746;
+  --brand-home-users-p: #868788;
+  --brand-aaa: #aaa;
+  --ready-background: #daebd9;
+  --brand-footer-text-location: #373634;
+  --footer-copyright-tex: #656565;
+  --about-h3: #878680;
+  --about-why-us-bg: #fafafa;
+  --brand-66: #666666;
+  --brand-e4: #e4e4e4;
+  --brand-f47: #4baf47;
+  --brand-27c: #7da27c;
+  --brand-f6: #f6f6f6;
+  --brand-A80: #0c420a80;
+  --brand-56: #565656;
+  --brand-D9: #d9d9d9;
+  --brand-01A: #0000001A;
+  --brand-484: #848484;
+  --brand-A33: #0C420A33;
+  --brand-C6C: #555C6C;
+  --brand-2A2: #A3C2A2;
+  --brand-dff: #e6edff;
+  --brand-db5: #7C8DB5;
+  --brand-B80: #E24C4B80;
+  --brand-029: #FFB029;
+  --brand-2f2: #F2F2F2;
+  --brand-06F: #DEA06F;
+
+
+
+
+
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  scroll-behavior: smooth;
+}
+
+
+html {
+  font-size: 10px;
+}
+
+
+
+

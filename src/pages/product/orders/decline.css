@@ -1,0 +1,38 @@
+.decline_orders_page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.decline_orders_page > img {
+  position: absolute;
+}
+
+.decline_orders_page > img.flower1 {
+  top: 0;
+  right: 150px;
+}
+
+.decline_orders_page > img.flower2 {
+  top: 27px;
+  right: 264px;
+}
+
+.decline_orders_page .decline_container {
+  text-align: center;
+  width: 900px;
+}
+
+.decline_container h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 29.26px;
+  color: var(--brand-primary);
+  margin-bottom: 50px;
+}
+
+.decline_container .form_field {
+  text-align: left;
+}

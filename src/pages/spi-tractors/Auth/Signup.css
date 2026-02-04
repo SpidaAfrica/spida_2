@@ -1,0 +1,121 @@
+/* RESET */
+* {
+    box-sizing: border-box;
+  }
+  
+  .signup-page {
+    width: 100vw;
+    min-height: 100vh;
+    background: #ffffff;
+    padding: 40px 24px;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Back Button */
+  .back-btn {
+    font-size: 20px;
+    cursor: pointer;
+    margin-bottom: 24px;
+  }
+  
+  /* Container */
+  .signup-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  /* Header */
+  .signup-container h1 {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 40px;
+  }
+  
+  /* Form */
+  .signup-form {
+    width: 100%;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  
+  /* Inputs */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+    color: #166534;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: none;
+    background: #f3f4f6;
+    font-size: 14px;
+    outline: none;
+  }
+  
+  /* Upload */
+  .upload-box {
+    margin: 32px 0;
+    background: #f3f4f6;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .upload-box button {
+    background: #ffffff;
+    border: 1px solid #22c55e;
+    color: #166534;
+    padding: 12px 24px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #4caf50;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  /* Mobile */
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .signup-page {
+      padding: 24px 16px;
+    }
+  
+    .signup-container h1 {
+      font-size: 22px;
+    }
+  }
+  

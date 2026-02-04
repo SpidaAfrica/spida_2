@@ -1,0 +1,194 @@
+/* Ensure pickup container is scrollable and responsive */
+.pickups {
+    padding: 1rem;
+    overflow-x: hidden;
+  }
+  
+  /* General responsive image sizing */
+  .pickups img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  
+  /* Pickup Item Card */
+  .pickup_item {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+  }
+  
+  .pickup_item .image_product{
+    border-radius: 8px;
+    max-height: 200px;
+    width: 100%;
+  }
+  
+  /* Pickup Details */
+  .pickup_details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pickup_location,
+  .item_details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pickup_imgs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .pickup_imgs img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Order Summary Table */
+  .order_items {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Hide desktop table on small screens */
+  @media (max-width: 768px) {
+    .order_items .items_head,
+    .order_items .items_body {
+      display: none;
+    }
+  
+    .order_cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  
+    .order_card {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+  
+    .order_card div {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+    }
+  
+    .order_card button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .pickup_item{
+        flex-direction: column;
+    }
+  }
+  
+  /* Pagination Responsive */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .pagination button {
+    margin: 0 5px;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  .pagination button.active {
+    background-color: #28a745;
+    color: white;
+  }
+  /* Force full-width column layout on mobile */
+.pickup_item {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    align-items: flex-start;
+  }
+  
+  .pickup_item .image_product {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Text section */
+  .pickup_details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Mobile responsive override */
+  @media (max-width: 768px) {
+    .pickup_item {
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+  
+    .pickup_item .image_product {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+    }
+  
+    .pickup_details {
+      width: 100%;
+      gap: 0.8rem;
+    }
+  
+    .item_details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+  
+    .item_details > div {
+      flex-direction: column;
+    }
+  
+    .pickup_details button {
+      width: 100%;
+    }
+  }
+  @media (max-width: 768px) {
+    .pickup_item {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  
+    .pickup_item .image_product {
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+    
+  

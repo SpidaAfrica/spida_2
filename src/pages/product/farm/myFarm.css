@@ -1,0 +1,211 @@
+.my_farm_page {
+  padding: 0 100px 200px 0;
+}
+
+.my_farm_page > h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 29.26px;
+  color: var(--brand-primary);
+  margin: 0 0 30px;
+}
+
+.my_farm_page .my_farm_products {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 60px;
+  grid-row-gap: 60px;
+  grid-row-gap: 12px;
+}
+
+.my_farm_products .product {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.my_farm_products .product > img {
+  width: 180px;
+  /* height: 225px; */
+  /* height: 100%; */
+  object-fit: cover;
+  object-position: center;
+  border-radius: 7px;
+}
+
+.product .my_product_details label {
+  padding: 3px 5px;
+  background: var(--brand-primary);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: -0.05em;
+  color: var(--brand-white);
+  border-radius: 3px;
+  display: inline-block;
+  margin: 0 0 12px;
+}
+
+.product .my_product_details > div {
+  padding: 8px 0;
+  border-bottom: 0.25px solid var(--brand-A80);
+  margin-right: 20px;
+  overflow: visible;
+}
+
+.product .my_product_details > div:last-of-type {
+  padding: 8px 0;
+  border-bottom: none;
+}
+
+.product .my_product_details > div h2 {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25.2px;
+  letter-spacing: -0.05em;
+}
+
+.product .my_product_details button {
+  width: 100%;
+  border: none;
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 8px;
+  font-weight: 400;
+  line-height: 11.2px;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  color: var(--brand-white);
+  background: var(--brand-primary);
+}
+
+/* pagination */
+
+.pagination {
+  display: flex;
+  justify-content: end;
+  margin: 30px 0 0;
+}
+
+.pagination > div {
+  display: flex;
+  gap: 3px;
+}
+
+.pagination > div button {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pagination > div button.active {
+  background: var(--brand-primary);
+  color: var(--brand-white);
+}
+
+/* new_produce */
+.new_produce {
+  margin: 30px 0 0;
+}
+
+.new_produce button {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  border: none;
+  border-radius: 12px;
+  padding: 17px;
+  background: var(--brand-primary);
+  color: var(--brand-white);
+  cursor: pointer;
+}
+
+.pagination span{
+  font-size: 20px;
+  cursor: pointer;
+}
+/* ===== Responsive Fixes ===== */
+
+/* For tablets */
+@media screen and (max-width: 1024px) {
+  .my_farm_page {
+    padding: 0 50px 100px 0;
+  }
+
+  .my_farm_page .my_farm_products {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .my_farm_products .product > img {
+    width: 150px;
+  }
+
+  .product .my_product_details > div h2 {
+    font-size: 16px;
+  }
+
+  .product .my_product_details button {
+    font-size: 10px;
+  }
+}
+
+/* For mobile devices */
+@media screen and (max-width: 600px) {
+  .my_farm_page {
+    padding: 0 20px 80px 0;
+  }
+
+  .my_farm_page > h1 {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .my_farm_page .my_farm_products {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .my_farm_products .product {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .my_farm_products .product > img {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .product .my_product_details > div h2 {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .product .my_product_details button {
+    font-size: 10px;
+    padding: 10px;
+  }
+
+  .new_produce button {
+    font-size: 13px;
+    padding: 14px;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+
+  .pagination > div button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pagination span {
+    font-size: 16px;
+  }
+}

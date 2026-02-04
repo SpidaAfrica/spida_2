@@ -1,0 +1,52 @@
+.topbar {
+    height: 56px;
+    border-bottom: 1px solid #eef0f2;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+  }
+  
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #eef0f2;
+    background: #fff;
+    cursor: pointer;
+  }
+  
+  .icon-btn:hover {
+    background: #f5f7f9;
+  }
+  
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 10px;
+  }
+  
+  .topbar-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: #eef2f7;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+  }
+  
+  .topbar-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+  }
+  

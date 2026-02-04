@@ -1,0 +1,140 @@
+.weather_card {
+  border-radius: 45px;
+  box-shadow: 0px 7px 24px 0px #00000033;
+  backdrop-filter: blur(99.4px);
+  background: linear-gradient(180deg, rgba(72, 135, 70, 0.5) 0%, #ffffff 31.26%);
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.weather_card .location {
+  font-family: Montserrat;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+  margin-bottom: 1.5rem;
+}
+
+.weather_card .current_weather {
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.current_weather .temperature {
+  font-family: Montserrat;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--brand-primary);
+}
+
+.current_weather .description {
+  font-family: Montserrat;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.05em;
+  color: #333;
+}
+
+.current_weather img {
+  width: 120px;
+  height: 120px;
+}
+
+.forecast {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.forecast-item {
+  flex: 1 1 30%;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 15px;
+  min-width: 100px;
+}
+
+.forecast-item.active {
+  background: var(--brand-01A);
+}
+
+.forecast-item .time {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--brand-C6C);
+}
+
+.forecast-item > img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 1rem;
+}
+
+.forecast-item .temp {
+  font-family: "Inter";
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--brand-C6C);
+}
+
+/* chart_info */
+.chart_info {
+  margin: 2rem 0 0;
+}
+
+.chart_info > img {
+  width: 100%;
+  height: auto;
+  max-height: 127px;
+  object-fit: cover;
+  position: relative;
+  top: 2rem;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .weather_card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .forecast {
+    justify-content: center;
+  }
+  .location{
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .weather_card {
+    padding: 1rem;
+  }
+
+  .current_weather img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .forecast-item {
+    flex: 1 1 45%;
+  }
+
+  .current_weather .temperature {
+    font-size: 2.5rem;
+  }
+}
