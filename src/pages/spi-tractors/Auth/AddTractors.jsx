@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddTractors.css";
+import { spiTractorsApi } from "../api/spiTractorsApi";
 
 export default function AddTractor() {
   const navigate = useNavigate();
@@ -23,10 +24,19 @@ export default function AddTractor() {
 
   const pickFile = (ref) => ref?.current?.click();
 
-  const onSave = () => {
-    // TODO: send form + images to backend
-    // Next step page route can be changed
-    navigate("/tractor-capability");
+  const onSave = async () => {
+    try {
+      await spiTractorsApi.createTractor({
+        name: `${form.brand || "Tractor"} ${form.model || "Model"}`.trim(),
+        registration_id: form.tractorId,
+        model: form.model,
+        brand: form.brand,
+        base_rate_per_hour: 5000,
+      });
+      navigate("/Spi_Tractors-Tractor-Capability");
+    } catch (error) {
+      alert(error.message || "Unable to save tractor");
+    }
   };
 
   const onSkip = () => {
@@ -173,8 +183,7 @@ export default function AddTractor() {
         </div>
 
         {/* Actions */}
-        <button className="primary-btn" onClick={() => navigate("/Spi_Tractors-Tractor-Capability")
-}>
+        <button className="primary-btn" onClick={onSave}>
           Save &amp; Continue
         </button>
         <div className="secondary-btn" onClick={onSkip}>

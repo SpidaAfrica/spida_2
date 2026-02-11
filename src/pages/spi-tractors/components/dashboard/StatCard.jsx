@@ -1,11 +1,27 @@
+import { useEffect, useState } from "react";
 import "./stats.css";
+import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 export default function StatCards() {
-  const stats = [
-    { title: "Total Jobs to date", value: "567" },
-    { title: "Active Jobs", value: "3" },
-    { title: "Upcoming Job", value: "59" },
-  ];
+  const [stats, setStats] = useState([
+    { title: "Total Jobs to date", value: "0" },
+    { title: "Active Jobs", value: "0" },
+    { title: "Upcoming Job", value: "0" },
+  ]);
+
+  useEffect(() => {
+    spiTractorsApi
+      .ownerSummary()
+      .then((res) => {
+        const summary = res?.data || {};
+        setStats([
+          { title: "Total Jobs to date", value: String(summary.completed_jobs || 0) },
+          { title: "Active Jobs", value: String(summary.active_requests || 0) },
+          { title: "Upcoming Job", value: String(summary.tractors_count || 0) },
+        ]);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="stats-row">
