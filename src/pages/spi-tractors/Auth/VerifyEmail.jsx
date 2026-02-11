@@ -1,25 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./VerifyEmail.css";
 import img from "../../../assets/images/spitractors/sms-star.png";
+import { spiTractorsApi } from "../api/spiTractorsApi";
 
-type Props = {
-  email?: string;
-};
-
-export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) {
+export default function VerifyEmail() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email || "";
+
   const [code, setCode] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const inputsRef = useRef(new Array(4).fill(null));
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
   }, []);
 
-  const handleChange = (index: number, value: string) => {
-    // Allow only one digit
+  const handleChange = (index, value) => {
     const digit = value.replace(/\D/g, "").slice(0, 1);
-
     const next = [...code];
     next[index] = digit;
     setCode(next);
@@ -29,16 +29,14 @@ export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) 
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (index, e) => {
     if (e.key === "Backspace") {
       if (code[index]) {
-        // clear current
         const next = [...code];
         next[index] = "";
         setCode(next);
         return;
       }
-      // move back
       if (index > 0) {
         inputsRef.current[index - 1]?.focus();
       }
@@ -52,7 +50,7 @@ export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) 
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
     if (!pasted) return;
@@ -67,24 +65,35 @@ export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) 
     inputsRef.current[focusIndex]?.focus();
   };
 
-  const handleResend = () => {
-    // TODO: call backend resend endpoint
-    alert("Code resent (hook to backend).");
+  const handleResend = async () => {
+    try {
+      setSending(true);
+      const res = await spiTractorsApi.sendVerifyEmailCode();
+      alert(`Code sent. Demo token: ${res?.data?.token || "generated"}`);
+    } catch (error) {
+      alert(error.message || "Unable to resend code");
+    } finally {
+      setSending(false);
+    }
   };
 
-  /*const handleVerify = () => {
+  const handleVerify = async () => {
     const otp = code.join("");
     if (otp.length < 4) {
       alert("Please enter the 4-digit code.");
       return;
     }
 
-    // TODO: verify OTP with backend
-    alert(`Verifying: ${otp} (hook to backend)`);
-
-    // Example next route:
-    // navigate("/dashboard");
-  };*/
+    try {
+      setLoading(true);
+      await spiTractorsApi.confirmVerifyEmail(otp);
+      navigate("/Spi_Tractors-Email-Verified/", { state: { email } });
+    } catch (error) {
+      alert(error.message || "Verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="verify-page">
@@ -93,17 +102,14 @@ export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) 
       </div>
 
       <div className="verify-center">
-        {/* Icon */}
         <div className="verify-icon" aria-hidden="true">
-          <img src={img}/>
+          <img src={img} alt="verification" />
         </div>
 
         <p className="verify-text">
-          We have sent a code to{" "}
-          <span className="verify-email">{email}</span> to confirm the validity
+          We have sent a code to <span className="verify-email">{email || "your email"}</span> to confirm validity.
         </p>
 
-        {/* OTP boxes */}
         <div className="otp-row">
           {code.map((v, i) => (
             <input
@@ -122,11 +128,11 @@ export default function VerifyEmail({ email = "lovethstone@gmail.com" }: Props) 
         </div>
 
         <div className="resend" onClick={handleResend}>
-          Resend code
+          {sending ? "Sending..." : "Resend code"}
         </div>
 
-        <button className="verify-btn" onClick={navigate("/Spi_Tractors-Email-Verified/")}>
-          Verify Email
+        <button className="verify-btn" onClick={handleVerify} disabled={loading}>
+          {loading ? "Verifying..." : "Verify Email"}
         </button>
       </div>
     </div>

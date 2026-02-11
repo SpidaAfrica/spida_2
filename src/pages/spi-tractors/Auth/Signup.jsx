@@ -1,6 +1,7 @@
 import "./Signup.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { saveSession, spiTractorsApi } from "../api/spiTractorsApi";
 
 const Spi_Tractors_Signup = () => {
   const navigate = useNavigate();
@@ -20,49 +21,37 @@ const Spi_Tractors_Signup = () => {
   const handleSubmit = async () => {
     if (loading) return;
 
-    // Basic frontend validation
     if (!full_name || !email || !phone || !password) {
       alert("Please fill all required fields");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("full_name", full_name);
-    formData.append("date_of_birth", date_of_birth); // YYYY-MM-DD
-    formData.append("email", email);
-    formData.append("phone", phone);
-    formData.append("password", password);
-    formData.append("id_type", id_type);
-    formData.append("id_number", id_number);
-    formData.append("city", city);
-    formData.append("home_address", home_address);
-
-    if (utilityBill) {
-      formData.append("utility_bill", utilityBill);
-    }
-
     try {
       setLoading(true);
 
-      const res = await fetch(
-        "https://api.spida.africa/spi_tractors/signup.php",
-        {
-          method: "POST",
-          body: formData, // IMPORTANT: no headers here
-        }
-      );
+      const res = await spiTractorsApi.register({
+        email,
+        password,
+        role: "TRACTOR_OWNER",
+        full_name,
+        phone,
+        date_of_birth,
+        id_type,
+        id_number,
+        city,
+        home_address,
+        utility_bill_name: utilityBill?.name || "",
+      });
 
-      const data = await res.json();
+      const user = res?.data?.user;
+      const token = res?.data?.token;
+      saveSession(user, token);
 
-      if (data.success) {
-        navigate("/Spi_Tractors-Verify-Email/", {
-          state: { email: data.email },
-        });
-      } else {
-        alert(data.message);
-      }
+      navigate("/Spi_Tractors-Verify-Email/", {
+        state: { email: user?.email || email },
+      });
     } catch (err) {
-      alert("Network error. Please try again.");
+      alert(err.message || "Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +59,6 @@ const Spi_Tractors_Signup = () => {
 
   return (
     <div className="signup-page">
-      {/* Back Arrow */}
       <div className="back-btn" onClick={() => navigate(-1)}>←</div>
 
       <div className="signup-container">
@@ -83,48 +71,27 @@ const Spi_Tractors_Signup = () => {
           <div className="form-grid">
             <div className="form-group">
               <label>Full Name</label>
-              <input
-                value={full_name}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your Full Name"
-              />
+              <input value={full_name} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your Full Name" />
             </div>
 
             <div className="form-group">
               <label>Date of Birth</label>
-              <input
-                type="date"
-                value={date_of_birth}
-                onChange={(e) => setDob(e.target.value)}
-              />
+              <input type="date" value={date_of_birth} onChange={(e) => setDob(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label>Email Address</label>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your Email Address"
-              />
+              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" />
             </div>
 
             <div className="form-group">
               <label>Phone Number</label>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your Phone Number"
-              />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" />
             </div>
 
             <div className="form-group">
               <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
-              />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" />
             </div>
 
             <div className="form-group">
@@ -136,46 +103,29 @@ const Spi_Tractors_Signup = () => {
 
             <div className="form-group">
               <label>Identity Verification Number</label>
-              <input
-                value={id_number}
-                onChange={(e) => setIdNumber(e.target.value)}
-                placeholder="Enter Identification Number"
-              />
+              <input value={id_number} onChange={(e) => setIdNumber(e.target.value)} placeholder="Enter Identification Number" />
             </div>
 
             <div className="form-group">
               <label>Location (City)</label>
-              <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter your City"
-              />
+              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Enter your City" />
             </div>
 
             <div className="form-group">
               <label>Home Address</label>
-              <input
-                value={home_address}
-                onChange={(e) => setHomeAddress(e.target.value)}
-                placeholder="Enter Home Address"
-              />
+              <input value={home_address} onChange={(e) => setHomeAddress(e.target.value)} placeholder="Enter Home Address" />
             </div>
           </div>
 
-          {/* Upload */}
           <div className="upload-box">
             <label className="upload-label">
               Upload your Utility Bill
-              <input
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                onChange={(e) => setUtilityBill(e.target.files[0])}
-              />
+              <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setUtilityBill(e.target.files[0])} />
             </label>
             {utilityBill && <small>{utilityBill.name}</small>}
           </div>
 
-          <button className="submit-btn" type="button" onClick={handleSubmit}>
+          <button className="submit-btn" type="button" onClick={handleSubmit} disabled={loading}>
             {loading ? "Processing..." : "Save & Continue"}
           </button>
         </form>
