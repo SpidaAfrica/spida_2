@@ -81,7 +81,7 @@ export default function Spi_Tractors_Login() {
           <form className="login-card" onSubmit={onSubmit}>
             <h1 className="title">Welcome Back to <span>Spida!</span></h1>
             <p className="subtitle">Log in to continue boosting yields and improving profitability with mechanized farming.</p>
-
+            {/**
             <button className="social-btn" type="button">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
               <span style={{ color: "#000" }}>Sign up with Google</span>
@@ -91,9 +91,8 @@ export default function Spi_Tractors_Login() {
               <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" />
               <span style={{ color: "#000" }}>Sign up with Facebook</span>
             </button>
-
             <div className="divider"><span></span><p>OR</p><span></span></div>
-
+            **/}
             <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} />
             <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
