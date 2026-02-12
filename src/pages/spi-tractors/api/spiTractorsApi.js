@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL || "http://officialtransitapp.com/Spida_Api";
+const API_BASE_URL = process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL || "https://officialtransitapp.com/Spida_Api";
 const TOKEN_KEY = "spiTractorsToken";
 const USER_KEY = "spiTractorsUser";
 
