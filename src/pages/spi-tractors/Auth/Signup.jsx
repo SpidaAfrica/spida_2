@@ -18,40 +18,87 @@ const Spi_Tractors_Signup = () => {
   const [utilityBill, setUtilityBill] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const onPickFile = (e) => {
+    const f = e.target.files?.[0] || null;
+    if (!f) {
+      setUtilityBill(null);
+      return;
+    }
+
+    const allowed = ["image/jpeg", "image/png", "application/pdf"];
+    if (!allowed.includes(f.type)) {
+      alert("Utility bill must be JPG, PNG, or PDF.");
+      e.target.value = "";
+      setUtilityBill(null);
+      return;
+    }
+
+    // optional: 5MB limit
+    const maxBytes = 5 * 1024 * 1024;
+    if (f.size > maxBytes) {
+      alert("Utility bill must be 5MB or less.");
+      e.target.value = "";
+      setUtilityBill(null);
+      return;
+    }
+
+    setUtilityBill(f);
+  };
+
   const handleSubmit = async () => {
     if (loading) return;
 
+    // required fields (matches backend)
     if (!full_name || !email || !phone || !password) {
       alert("Please fill all required fields");
       return;
     }
 
+    // if you want to force file upload, uncomment:
+    // if (!utilityBill) { alert("Please upload your utility bill"); return; }
+
     try {
       setLoading(true);
 
-      const res = await spiTractorsApi.register({
-        email,
-        password,
-        role: "TRACTOR_OWNER",
-        full_name,
-        phone,
-        date_of_birth,
-        id_type,
-        id_number,
-        city,
-        home_address,
-        utility_bill_name: utilityBill?.name || "",
-      });
+      // Create FormData to upload file + fields
+      const form = new FormData();
+      form.append("email", email.trim());
+      form.append("password", password);
+      form.append("role", "TRACTOR_OWNER");
+      form.append("full_name", full_name.trim());
+      form.append("phone", phone.trim());
 
-      const user = res?.data?.user;
-      const token = res?.data?.token;
+      // optional fields
+      if (date_of_birth) form.append("date_of_birth", date_of_birth);
+      if (id_type) form.append("id_type", id_type);
+      if (id_number) form.append("id_number", id_number.trim());
+      if (city) form.append("city", city.trim());
+      if (home_address) form.append("home_address", home_address.trim());
+
+      // IMPORTANT: backend expects field name "utility_bill"
+      if (utilityBill) form.append("utility_bill", utilityBill);
+
+      const res = await spiTractorsApi.register(form);
+
+      // backend returns: { success, data: { user, token, email_verification_token } }
+      const user = res?.data?.data?.user;
+      const token = res?.data?.data?.token;
+
+      if (!user || !token) {
+        throw new Error(res?.data?.message || "Registration failed.");
+      }
+
       saveSession(user, token);
 
       navigate("/Spi_Tractors-Verify-Email/", {
-        state: { email: user?.email || email },
+        state: { email: user?.email || email.trim() },
       });
     } catch (err) {
-      alert(err.message || "Network error. Please try again.");
+      const apiMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Network error. Please try again.";
+      alert(apiMsg);
     } finally {
       setLoading(false);
     }
@@ -59,7 +106,9 @@ const Spi_Tractors_Signup = () => {
 
   return (
     <div className="signup-page">
-      <div className="back-btn" onClick={() => navigate(-1)}>←</div>
+      <div className="back-btn" onClick={() => navigate(-1)}>
+        ←
+      </div>
 
       <div className="signup-container">
         <h1>Create Your Spida Account</h1>
@@ -70,28 +119,50 @@ const Spi_Tractors_Signup = () => {
         <form className="signup-form" onSubmit={(e) => e.preventDefault()}>
           <div className="form-grid">
             <div className="form-group">
-              <label>Full Name</label>
-              <input value={full_name} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your Full Name" />
+              <label>Full Name *</label>
+              <input
+                value={full_name}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your Full Name"
+              />
             </div>
 
             <div className="form-group">
               <label>Date of Birth</label>
-              <input type="date" value={date_of_birth} onChange={(e) => setDob(e.target.value)} />
+              <input
+                type="date"
+                value={date_of_birth}
+                onChange={(e) => setDob(e.target.value)}
+              />
             </div>
 
             <div className="form-group">
-              <label>Email Address</label>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your Email Address" />
+              <label>Email Address *</label>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your Email Address"
+                type="email"
+              />
             </div>
 
             <div className="form-group">
-              <label>Phone Number</label>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Enter your Phone Number" />
+              <label>Phone Number *</label>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your Phone Number"
+              />
             </div>
 
             <div className="form-group">
-              <label>Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" />
+              <label>Password *</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
+              />
             </div>
 
             <div className="form-group">
@@ -103,29 +174,57 @@ const Spi_Tractors_Signup = () => {
 
             <div className="form-group">
               <label>Identity Verification Number</label>
-              <input value={id_number} onChange={(e) => setIdNumber(e.target.value)} placeholder="Enter Identification Number" />
+              <input
+                value={id_number}
+                onChange={(e) => setIdNumber(e.target.value)}
+                placeholder="Enter Identification Number"
+              />
             </div>
 
             <div className="form-group">
               <label>Location (City)</label>
-              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Enter your City" />
+              <input
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter your City"
+              />
             </div>
 
             <div className="form-group">
               <label>Home Address</label>
-              <input value={home_address} onChange={(e) => setHomeAddress(e.target.value)} placeholder="Enter Home Address" />
+              <input
+                value={home_address}
+                onChange={(e) => setHomeAddress(e.target.value)}
+                placeholder="Enter Home Address"
+              />
             </div>
           </div>
 
           <div className="upload-box">
             <label className="upload-label">
-              Upload your Utility Bill
-              <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setUtilityBill(e.target.files[0])} />
+              Upload your Utility Bill (JPG/PNG/PDF)
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.pdf"
+                onChange={onPickFile}
+              />
             </label>
-            {utilityBill && <small>{utilityBill.name}</small>}
+
+            {utilityBill ? (
+              <small>
+                {utilityBill.name} • {(utilityBill.size / 1024 / 1024).toFixed(2)}MB
+              </small>
+            ) : (
+              <small>No file selected</small>
+            )}
           </div>
 
-          <button className="submit-btn" type="button" onClick={handleSubmit} disabled={loading}>
+          <button
+            className="submit-btn"
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading ? "Processing..." : "Save & Continue"}
           </button>
         </form>
