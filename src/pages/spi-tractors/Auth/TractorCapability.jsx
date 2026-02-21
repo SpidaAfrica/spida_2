@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./TractorCapability.css";
+import { spiTractorsApi } from "../api/spiTractorsApi";
 
 export default function TractorCapability() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const tractorIdFromState = location.state?.tractorId;
+  const tractorIdFromStorage = localStorage.getItem("spiLastTractorId");
+  const tractorId = Number(tractorIdFromState || tractorIdFromStorage || 0);
+
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     taskRate: "",
@@ -12,11 +20,37 @@ export default function TractorCapability() {
     travelCost: "",
   });
 
-  const onChange = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
+  const onChange = (key) => (e) =>
+    setForm((p) => ({ ...p, [key]: e.target.value }));
 
-  const onSave = () => {
-    // TODO: send to backend
-    navigate("/Spi_Tractors-Tractor-Availability/");
+  const onSave = async () => {
+    if (!tractorId) {
+      alert("Missing tractor ID. Please go back and add tractor again.");
+      return;
+    }
+
+    if (!form.taskRate || !form.workRate || !form.dailyCapacity || !form.travelCost) {
+      alert("Please complete all fields.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await spiTractorsApi.updateTractorCapability({
+        tractor_id: tractorId,
+        task_rate_label: form.taskRate,
+        work_rate: form.workRate,
+        daily_capacity: form.dailyCapacity,
+        travel_cost: form.travelCost,
+      });
+
+      navigate("/Spi_Tractors-Tractor-Availability/", { state: { tractorId } });
+    } catch (e) {
+      alert(e?.message || "Unable to save capability");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,13 +128,13 @@ export default function TractorCapability() {
             <input
               value={form.travelCost}
               onChange={onChange("travelCost")}
-              placeholder="e.g ₦2,000 km/h"
+              placeholder="e.g ₦2,000 per trip"
             />
           </div>
         </div>
 
-        <button className="cap-btn" onClick={onSave}>
-          Save &amp; Continue
+        <button className="cap-btn" onClick={onSave} disabled={loading}>
+          {loading ? "Saving..." : "Save & Continue"}
         </button>
       </div>
     </div>
