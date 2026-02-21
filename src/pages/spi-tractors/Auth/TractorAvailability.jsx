@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./TractorAvailability.css";
+import { spiTractorsApi } from "../api/spiTractorsApi";
 
 export default function TractorAvailability() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const tractorIdFromState = location.state?.tractorId;
+  const tractorIdFromStorage = localStorage.getItem("spiLastTractorId");
+  const tractorId = Number(tractorIdFromState || tractorIdFromStorage || 0);
+
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     preferredDays: "",
@@ -12,12 +20,38 @@ export default function TractorAvailability() {
     endTime: "",
   });
 
-  const onChange = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
+  const onChange = (key) => (e) =>
+    setForm((p) => ({ ...p, [key]: e.target.value }));
 
-  const onSave = () => {
-    // TODO: send to backend
-    // Next page can be dashboard or tractor list
-    navigate("/Spi_Tractors-AddPaymentMethod/");
+  const onSave = async () => {
+    if (!tractorId) {
+      alert("Missing tractor ID. Please go back and add tractor again.");
+      return;
+    }
+
+    // Optional validation (you can loosen it if you want)
+    if (!form.preferredDays || !form.dailyStart || !form.endTime) {
+      alert("Please enter Preferred Days, Daily Start, and End Time.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await spiTractorsApi.updateTractorAvailability({
+        tractor_id: tractorId,
+        preferred_days: form.preferredDays,
+        restricted_days: form.restrictedDays,
+        daily_start: form.dailyStart,
+        end_time: form.endTime,
+      });
+
+      navigate("/Spi_Tractors-AddPaymentMethod/", { state: { tractorId } });
+    } catch (e) {
+      alert(e?.message || "Unable to save availability");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,7 +62,6 @@ export default function TractorAvailability() {
           Sign up to access affordable mechanization services and optimize your farming.
         </p>
 
-        {/* Stepper */}
         <div className="avail-stepper">
           <div className="avail-stepper-top">
             <div className="avail-step">
@@ -96,9 +129,9 @@ export default function TractorAvailability() {
           </div>
         </div>
 
-        <div className="avail-btn" onClick={onSave}>
-          Save &amp; Continue
-        </div>
+        <button className="avail-btn" onClick={onSave} disabled={loading}>
+          {loading ? "Saving..." : "Save & Continue"}
+        </button>
       </div>
     </div>
   );
