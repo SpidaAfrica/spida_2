@@ -1,19 +1,19 @@
 const RAW_BASE =
-  process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL ||
-  "https://api.spida.africa";
+  process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL || "https://api.spida.africa";
 
-// our PHP endpoints live in /api/*.php
-const API_BASE_URL = RAW_BASE.replace(/\/$/, "") + "/api";
+// PHP endpoints live in /api/*.php
+export const API_BASE_URL = RAW_BASE.replace(/\/$/, "") + "/api";
 
-const TOKEN_KEY = "spiTractorsToken";
-const USER_KEY = "spiTractorsUser";
-const VERIFY_TOKEN_KEY = "spiTractorsEmailVerifyToken";
-function getToken() {
+export const TOKEN_KEY = "spiTractorsToken";
+export const USER_KEY = "spiTractorsUser";
+export const VERIFY_TOKEN_KEY = "spiTractorsEmailVerifyToken";
+
+export function getCurrentToken() {
   return localStorage.getItem(TOKEN_KEY) || "";
 }
 
 function getAuthHeaders() {
-  const token = getToken();
+  const token = getCurrentToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -21,10 +21,7 @@ function isFormData(val) {
   return typeof FormData !== "undefined" && val instanceof FormData;
 }
 
-async function request(
-  path,
-  { method = "GET", body, auth = false } = {}
-) {
+async function request(path, { method = "GET", body, auth = false } = {}) {
   const url = `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
 
   const headers = {
@@ -32,27 +29,20 @@ async function request(
     ...(auth ? getAuthHeaders() : {}),
   };
 
-  // If body is FormData, DO NOT set Content-Type (browser sets boundary)
-  // If body is plain object, send JSON.
   let payload;
   if (body !== undefined && body !== null) {
     if (isFormData(body)) {
-      payload = body;
+      payload = body; // don't set content-type
     } else {
       headers["Content-Type"] = "application/json";
       payload = JSON.stringify(body);
     }
   }
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: payload,
-  });
-
+  const res = await fetch(url, { method, headers, body: payload });
   const data = await res.json().catch(() => ({}));
 
-  // Our backend returns { success: true/false, message, data }
+  // Expected: { success: true/false, message, data }
   if (!res.ok || data?.success === false) {
     throw new Error(
       data?.error || data?.message || `Request failed: ${res.status}`
@@ -61,6 +51,12 @@ async function request(
 
   return data;
 }
+
+/** Optional: if you ever want to inspect raw response quickly */
+export async function requestRaw(path, opts = {}) {
+  return request(path, opts);
+}
+
 export function saveSession(user, token, emailVerifyToken) {
   localStorage.setItem(USER_KEY, JSON.stringify(user || {}));
   localStorage.setItem(TOKEN_KEY, token || "");
@@ -68,6 +64,10 @@ export function saveSession(user, token, emailVerifyToken) {
   if (emailVerifyToken) {
     localStorage.setItem(VERIFY_TOKEN_KEY, emailVerifyToken);
   }
+}
+
+export function setEmailVerifyToken(emailVerifyToken) {
+  if (emailVerifyToken) localStorage.setItem(VERIFY_TOKEN_KEY, emailVerifyToken);
 }
 
 export function getEmailVerifyToken() {
@@ -89,38 +89,35 @@ export function getCurrentUser() {
   }
 }
 
-
 /**
- * API methods mapped to our current PHP endpoints.
- * (Only register.php exists for sure based on what we’ve built so far.)
+ * API methods mapped to PHP endpoints
  */
 export const spiTractorsApi = {
   baseUrl: API_BASE_URL,
 
-  // Optional: create api/health.php later if you want
   health: () => request("/health.php"),
 
-  /**
-   * ✅ REGISTER (multipart/form-data supported)
-   * - pass FormData from the refactored Signup
-   */
+  // ✅ REGISTER (supports FormData for utility_bill)
   register: (formDataOrObject) =>
     request("/register.php", { method: "POST", body: formDataOrObject }),
 
-  /**
-   * The ones below are placeholders until you create them in PHP.
-   * If you want, I can generate each corresponding PHP file.
-   */
+  // placeholders (create in PHP when ready)
   login: (payload) => request("/login.php", { method: "POST", body: payload }),
   me: () => request("/me.php", { auth: true }),
 
+  // resend verify code (if you build it)
   sendVerifyEmailCode: () =>
     request("/verify_email_send.php", { method: "POST", auth: true }),
 
+  /**
+   * ✅ Confirm verify email
+   * I’m sending { token } because that's what we discussed.
+   * If you later change backend to accept plain string, just change body to token.
+   */
   confirmVerifyEmail: (token) =>
     request("/verify_email_confirm.php", {
       method: "POST",
-      body: { token },
+      body: { token: String(token || "").trim() },
       auth: true,
     }),
 
@@ -130,7 +127,7 @@ export const spiTractorsApi = {
   resetPassword: (payload) =>
     request("/password_reset.php", { method: "POST", body: payload }),
 
-  // domain features (create these PHP endpoints when ready)
+  // domain features placeholders
   createRequest: (payload) =>
     request("/requests_create.php", { method: "POST", body: payload, auth: true }),
 
