@@ -149,6 +149,9 @@ export const spiTractorsApi = {
 
   paymentIntent: (payload) =>
     request("/payments_intent.php", { method: "POST", body: payload, auth: true }),
+  
+  paymentVerify: (reference) =>
+    request("/payments_verify.php", { method: "POST", body: { reference }, auth: true }),
 
   paymentWebhookDemo: (payload) =>
     request("/webhooks_payments.php", { method: "POST", body: payload }),
