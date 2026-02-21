@@ -1,35 +1,58 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddPaymentMethod.css";
+import { spiTractorsApi } from "../api/spiTractorsApi";
 
 export default function AddPaymentMethod() {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     accountName: "",
-    bank: "",
+    bankName: "",
+    bankCode: "",       // ✅ paystack bank code (optional but recommended)
     accountNumber: "",
     bvn: "",
-    releaseYear: "",
   });
 
-  const onChange = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
+  const onChange = (key) => (e) =>
+    setForm((p) => ({ ...p, [key]: e.target.value }));
 
-  const onSave = () => {
-    // TODO: send to backend
-    navigate("/Spi_Tractors-Dashboard"); // change to next onboarding page
+  const onSave = async () => {
+    if (loading) return;
+
+    if (!form.accountName.trim() || !form.bankName.trim() || !form.accountNumber.trim()) {
+      alert("Account Name, Bank, and Account Number are required.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await spiTractorsApi.savePayoutMethod({
+        account_name: form.accountName.trim(),
+        bank_name: form.bankName.trim(),
+        bank_code: form.bankCode.trim(), // if empty, backend won't call paystack
+        account_number: form.accountNumber.trim(),
+        bvn: form.bvn.trim(),
+      });
+
+      navigate("/Spi_Tractors-Dashboard");
+    } catch (e) {
+      alert(e?.message || "Unable to save payment method");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onSkip = () => {
-    navigate("/Spi_Tractors-Dashboard"); // change to next onboarding page
-  };
+  const onSkip = () => navigate("/Spi_Tractors-Dashboard");
 
   return (
     <div className="apm-page">
       <div className="apm-container">
         <h1 className="apm-title">Add Payment method</h1>
         <p className="apm-subtitle">
-          Sign up to access affordable mechanization services and optimize your farming.
+          Add your payout details so you can receive payments.
         </p>
 
         <h2 className="apm-section">Payment Details:</h2>
@@ -45,12 +68,24 @@ export default function AddPaymentMethod() {
           </div>
 
           <div className="apm-field">
-            <label>Bank</label>
+            <label>Bank Name</label>
             <input
-              value={form.bank}
-              onChange={onChange("bank")}
-              placeholder="e.g Spida Bank"
+              value={form.bankName}
+              onChange={onChange("bankName")}
+              placeholder="e.g Access Bank"
             />
+          </div>
+
+          <div className="apm-field">
+            <label>Bank Code (Paystack)</label>
+            <input
+              value={form.bankCode}
+              onChange={onChange("bankCode")}
+              placeholder="e.g 044"
+            />
+            <small style={{ opacity: 0.8 }}>
+              Optional, but recommended. If provided, we create a Paystack transfer recipient.
+            </small>
           </div>
 
           <div className="apm-field">
@@ -58,35 +93,27 @@ export default function AddPaymentMethod() {
             <input
               value={form.accountNumber}
               onChange={onChange("accountNumber")}
-              placeholder="e.g 238985409"
+              placeholder="e.g 0123456789"
+              inputMode="numeric"
             />
           </div>
 
           <div className="apm-field">
-            <label>BVN</label>
+            <label>BVN (Optional)</label>
             <input
               value={form.bvn}
               onChange={onChange("bvn")}
-              placeholder="e.g 43798325235"
-            />
-          </div>
-
-          {/* Full width row */}
-          <div className="apm-field full">
-            <label>Release Year</label>
-            <input
-              value={form.releaseYear}
-              onChange={onChange("releaseYear")}
-              placeholder="e.g 2020"
+              placeholder="e.g 22123456789"
+              inputMode="numeric"
             />
           </div>
         </div>
 
-        <button className="apm-primary" onClick={onSave}>
-          Save &amp; Continue
+        <button className="apm-primary" onClick={onSave} disabled={loading}>
+          {loading ? "Saving..." : "Save & Continue"}
         </button>
 
-        <button className="apm-secondary" onClick={onSkip}>
+        <button className="apm-secondary" onClick={onSkip} disabled={loading}>
           Skip
         </button>
       </div>
