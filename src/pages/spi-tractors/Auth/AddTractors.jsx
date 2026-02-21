@@ -99,7 +99,9 @@ export default function AddTractor() {
 
       if (!res?.success) throw new Error(res?.message || "Unable to save tractor");
 
-      navigate("/Spi_Tractors-Tractor-Capability");
+      const tractorId = res?.data?.tractor?.id; // adjust if your response differs
+      localStorage.setItem("spiLastTractorId", String(tractorId || ""));
+      navigate("/Spi_Tractors-Tractor-Capability", { state: { tractorId } });
     } catch (error) {
       alert(error?.message || "Unable to save tractor");
     } finally {
