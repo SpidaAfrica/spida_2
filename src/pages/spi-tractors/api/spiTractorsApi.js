@@ -149,7 +149,8 @@ updateTractorCapability: (payload) =>
     request("/payout_method_save.php", { method: "POST", body: payload, auth: true }),
   paymentEstimate: (payload) =>
     request("/payments_estimate.php", { method: "POST", body: payload, auth: true }),
-
+  getPaystackBanks: () =>
+    request("/paystack_banks.php", { method: "GET" }),
   paymentIntent: (payload) =>
     request("/payments_intent.php", { method: "POST", body: payload, auth: true }),
   
