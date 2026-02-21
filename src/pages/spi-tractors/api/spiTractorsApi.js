@@ -145,7 +145,8 @@ updateTractorCapability: (payload) =>
   updateTractorAvailability: (payload) =>
     request("/tractors_availability_update.php", { method: "POST", body: payload, auth: true }),
   ownerSummary: () => request("/dashboard_owner_summary.php", { auth: true }),
-
+  savePayoutMethod: (payload) =>
+    request("/payout_method_save.php", { method: "POST", body: payload, auth: true }),
   paymentEstimate: (payload) =>
     request("/payments_estimate.php", { method: "POST", body: payload, auth: true }),
 
