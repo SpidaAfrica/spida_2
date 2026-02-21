@@ -7,7 +7,7 @@ const API_BASE_URL = RAW_BASE.replace(/\/$/, "") + "/api";
 
 const TOKEN_KEY = "spiTractorsToken";
 const USER_KEY = "spiTractorsUser";
-
+const VERIFY_TOKEN_KEY = "spiTractorsEmailVerifyToken";
 function getToken() {
   return localStorage.getItem(TOKEN_KEY) || "";
 }
@@ -61,10 +61,23 @@ async function request(
 
   return data;
 }
-
-export function saveSession(user, token) {
+export function saveSession(user, token, emailVerifyToken) {
   localStorage.setItem(USER_KEY, JSON.stringify(user || {}));
   localStorage.setItem(TOKEN_KEY, token || "");
+
+  if (emailVerifyToken) {
+    localStorage.setItem(VERIFY_TOKEN_KEY, emailVerifyToken);
+  }
+}
+
+export function getEmailVerifyToken() {
+  return localStorage.getItem(VERIFY_TOKEN_KEY) || "";
+}
+
+export function clearSession() {
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(VERIFY_TOKEN_KEY);
 }
 
 export function getCurrentUser() {
@@ -76,10 +89,6 @@ export function getCurrentUser() {
   }
 }
 
-export function clearSession() {
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(TOKEN_KEY);
-}
 
 /**
  * API methods mapped to our current PHP endpoints.
