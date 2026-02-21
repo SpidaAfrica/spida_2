@@ -45,64 +45,53 @@ const Spi_Tractors_Signup = () => {
     setUtilityBill(f);
   };
 
-  const handleSubmit = async () => {
-    if (loading) return;
+const handleSubmit = async () => {
+  if (loading) return;
 
-    // required fields (matches backend)
-    if (!full_name || !email || !phone || !password) {
-      alert("Please fill all required fields");
-      return;
+  if (!full_name || !email || !phone || !password) {
+    alert("Please fill all required fields");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const form = new FormData();
+    form.append("email", email.trim());
+    form.append("password", password);
+    form.append("role", "TRACTOR_OWNER");
+    form.append("full_name", full_name.trim());
+    form.append("phone", phone.trim());
+
+    if (date_of_birth) form.append("date_of_birth", date_of_birth);
+    if (id_type) form.append("id_type", id_type);
+    if (id_number) form.append("id_number", id_number.trim());
+    if (city) form.append("city", city.trim());
+    if (home_address) form.append("home_address", home_address.trim());
+
+    if (utilityBill) form.append("utility_bill", utilityBill);
+
+    const res = await spiTractorsApi.register(form);
+
+    const user = res?.data?.user;
+    const token = res?.data?.token;
+    const emailVerifyToken = res?.data?.email_verification_token;
+
+    if (!res?.success || !user || !token) {
+      throw new Error(res?.message || "Registration failed.");
     }
 
-    // if you want to force file upload, uncomment:
-    // if (!utilityBill) { alert("Please upload your utility bill"); return; }
+    saveSession(user, token, emailVerifyToken);
 
-    try {
-      setLoading(true);
-
-      // Create FormData to upload file + fields
-      const form = new FormData();
-      form.append("email", email.trim());
-      form.append("password", password);
-      form.append("role", "TRACTOR_OWNER");
-      form.append("full_name", full_name.trim());
-      form.append("phone", phone.trim());
-
-      // optional fields
-      if (date_of_birth) form.append("date_of_birth", date_of_birth);
-      if (id_type) form.append("id_type", id_type);
-      if (id_number) form.append("id_number", id_number.trim());
-      if (city) form.append("city", city.trim());
-      if (home_address) form.append("home_address", home_address.trim());
-
-      // IMPORTANT: backend expects field name "utility_bill"
-      if (utilityBill) form.append("utility_bill", utilityBill);
-
-      const res = await spiTractorsApi.register(form);
-
-      // backend returns: { success, data: { user, token, email_verification_token } }
-      const user = res?.data?.data?.user;
-      const token = res?.data?.data?.token;
-
-      if (!user || !token) {
-        throw new Error(res?.data?.message || "Registration failed.");
-      }
-
-      saveSession(user, token);
-
-      navigate("/Spi_Tractors-Verify-Email/", {
-        state: { email: user?.email || email.trim() },
-      });
-    } catch (err) {
-      const apiMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Network error. Please try again.";
-      alert(apiMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
+    navigate("/Spi_Tractors-Verify-Email/", {
+      state: { email: user?.email || email.trim() },
+    });
+  } catch (err) {
+    alert(err?.message || "Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="signup-page">
