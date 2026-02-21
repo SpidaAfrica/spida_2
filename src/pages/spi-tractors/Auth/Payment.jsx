@@ -43,7 +43,7 @@ export default function Payment() {
         }
 
         // Go to success page
-        navigate("/Spi_Tractors-Subscription-Success/", {
+        navigate("/Spi_Tractors-Subscription-Sucess/", {
           replace: true,
           state: { email, reference, plan: res?.data?.plan || plan },
         });
