@@ -96,11 +96,22 @@ export default function AddTractor() {
       if (photos.condition) fd.append("photo_condition", photos.condition);
 
       const res = await spiTractorsApi.createTractor(fd);
-
+      
       if (!res?.success) throw new Error(res?.message || "Unable to save tractor");
-
-      const tractorId = res?.data?.tractor?.id; // adjust if your response differs
-      localStorage.setItem("spiLastTractorId", String(tractorId || ""));
+      
+      // ✅ based on your response structure
+      const tractorId = res?.data?.tractor?.id;
+      
+      if (!tractorId) {
+        console.log("Create tractor response:", res);
+        throw new Error("Tractor created but ID missing in response.");
+      }
+      
+      localStorage.setItem("spiLastTractorId", String(tractorId));
+      
+      console.log("Saved tractorId:", tractorId);
+      console.log("LS spiLastTractorId:", localStorage.getItem("spiLastTractorId"));
+      
       navigate("/Spi_Tractors-Tractor-Capability", { state: { tractorId } });
     } catch (error) {
       alert(error?.message || "Unable to save tractor");
