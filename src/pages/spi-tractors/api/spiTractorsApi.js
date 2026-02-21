@@ -137,8 +137,8 @@ export const spiTractorsApi = {
   requestTracking: (requestId) =>
     request(`/requests_${requestId}_tracking.php`, { auth: true }),
 
-  createTractor: (payload) =>
-    request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
+createTractor: (payload) =>
+  request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
 
   myTractors: () => request("/tractors_me.php", { auth: true }),
 
@@ -155,7 +155,7 @@ export const spiTractorsApi = {
 
   paymentWebhookDemo: (payload) =>
     request("/webhooks_payments.php", { method: "POST", body: payload }),
-
+  
   walletMe: () => request("/wallet_me.php", { auth: true }),
   myNotifications: () => request("/notifications_me.php", { auth: true }),
   adminUsers: () => request("/admin_users.php", { auth: true }),
