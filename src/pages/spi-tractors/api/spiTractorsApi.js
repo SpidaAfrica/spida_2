@@ -139,7 +139,8 @@ export const spiTractorsApi = {
 
 createTractor: (payload) =>
   request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
-
+updateTractorCapability: (payload) =>
+  request("/tractors_capability_update.php", { method: "POST", body: payload, auth: true }),
   myTractors: () => request("/tractors_me.php", { auth: true }),
 
   ownerSummary: () => request("/dashboard_owner_summary.php", { auth: true }),
