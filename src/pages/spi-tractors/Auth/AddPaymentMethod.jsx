@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddPaymentMethod.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
@@ -7,10 +7,12 @@ export default function AddPaymentMethod() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [banks, setBanks] = useState([]);
+
   const [form, setForm] = useState({
     accountName: "",
     bankName: "",
-    bankCode: "",       // ✅ paystack bank code (optional but recommended)
+    bankCode: "",
     accountNumber: "",
     bvn: "",
   });
@@ -18,11 +20,34 @@ export default function AddPaymentMethod() {
   const onChange = (key) => (e) =>
     setForm((p) => ({ ...p, [key]: e.target.value }));
 
+  // 🔥 Fetch Paystack banks
+  useEffect(() => {
+    const loadBanks = async () => {
+      try {
+        const res = await spiTractorsApi.getPaystackBanks();
+        setBanks(res?.data?.banks || []);
+      } catch (e) {
+        alert("Unable to load banks");
+      }
+    };
+    loadBanks();
+  }, []);
+
+  const onBankSelect = (e) => {
+    const code = e.target.value;
+    const bank = banks.find((b) => b.code === code);
+    setForm((p) => ({
+      ...p,
+      bankCode: code,
+      bankName: bank?.name || "",
+    }));
+  };
+
   const onSave = async () => {
     if (loading) return;
 
-    if (!form.accountName.trim() || !form.bankName.trim() || !form.accountNumber.trim()) {
-      alert("Account Name, Bank, and Account Number are required.");
+    if (!form.accountName || !form.bankCode || !form.accountNumber) {
+      alert("Please fill Account Name, Bank, and Account Number.");
       return;
     }
 
@@ -31,8 +56,8 @@ export default function AddPaymentMethod() {
 
       await spiTractorsApi.savePayoutMethod({
         account_name: form.accountName.trim(),
-        bank_name: form.bankName.trim(),
-        bank_code: form.bankCode.trim(), // if empty, backend won't call paystack
+        bank_name: form.bankName,
+        bank_code: form.bankCode,
         account_number: form.accountNumber.trim(),
         bvn: form.bvn.trim(),
       });
@@ -68,24 +93,15 @@ export default function AddPaymentMethod() {
           </div>
 
           <div className="apm-field">
-            <label>Bank Name</label>
-            <input
-              value={form.bankName}
-              onChange={onChange("bankName")}
-              placeholder="e.g Access Bank"
-            />
-          </div>
-
-          <div className="apm-field">
-            <label>Bank Code (Paystack)</label>
-            <input
-              value={form.bankCode}
-              onChange={onChange("bankCode")}
-              placeholder="e.g 044"
-            />
-            <small style={{ opacity: 0.8 }}>
-              Optional, but recommended. If provided, we create a Paystack transfer recipient.
-            </small>
+            <label>Bank</label>
+            <select value={form.bankCode} onChange={onBankSelect}>
+              <option value="">Select your bank</option>
+              {banks.map((b) => (
+                <option key={b.code} value={b.code}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="apm-field">
@@ -113,7 +129,7 @@ export default function AddPaymentMethod() {
           {loading ? "Saving..." : "Save & Continue"}
         </button>
 
-        <button className="apm-secondary" onClick={onSkip} disabled={loading}>
+        <button className="apm-secondary" onClick={onSkip}>
           Skip
         </button>
       </div>
