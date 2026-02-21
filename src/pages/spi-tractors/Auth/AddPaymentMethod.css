@@ -47,7 +47,7 @@
     margin: 0 0 8px;
   }
   
-  .apm-field input {
+  .apm-field input, .apm-field select {
     width: 100%;
     padding: 14px 16px;
     border-radius: 12px;
