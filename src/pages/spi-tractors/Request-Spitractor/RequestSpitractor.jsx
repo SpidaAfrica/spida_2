@@ -53,7 +53,17 @@ const [form, setForm] = useState({
   const onSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+    const token = localStorage.getItem("spiTractorsToken") || "";
 
+    // 🟡 Not logged in → go to phone capture
+    if (!token) {
+      navigate("/Spi_Tractors-Guest-Login/", {
+        state: {
+          requestDraft: form, // so they don't refill later
+        },
+      });
+      return;
+    }
     if (!form.farmAddress.trim()) {
       alert("Farm Address is required.");
       return;
