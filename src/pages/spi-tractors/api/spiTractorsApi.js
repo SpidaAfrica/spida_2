@@ -128,11 +128,11 @@ export const spiTractorsApi = {
     request("/password_reset.php", { method: "POST", body: payload }),
 
   // domain features placeholders
-  createRequest: (payload) =>
-    request("/requests_create.php", { method: "POST", body: payload, auth: true }),
+createRequest: (payload) =>
+  request("/requests_create.php", { method: "POST", body: payload, auth: true }),
 
-  searchRequestMatches: (requestId) =>
-    request(`/requests_${requestId}_search.php`, { method: "POST", auth: true }),
+searchRequestMatches: (requestId) =>
+  request("/requests_search.php", { method: "POST", body: { request_id: requestId }, auth: true }),
 
   requestTracking: (requestId) =>
     request(`/requests_${requestId}_tracking.php`, { auth: true }),
