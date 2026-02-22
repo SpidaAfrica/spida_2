@@ -108,7 +108,8 @@ export const spiTractorsApi = {
   // resend verify code (if you build it)
   sendVerifyEmailCode: () =>
     request("/verify_email_send.php", { method: "POST", auth: true }),
-
+otpSend: (payload) => request("/otp_send.php", { method: "POST", body: payload }),
+otpVerify: (payload) => request("/otp_verify.php", { method: "POST", body: payload }),
   /**
    * ✅ Confirm verify email
    * I’m sending { token } because that's what we discussed.
