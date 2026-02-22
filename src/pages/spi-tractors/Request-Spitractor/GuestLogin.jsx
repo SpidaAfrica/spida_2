@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./VerifyEmail.css"; // reuse same OTP styling
+import "../Auth/VerifyEmail.css"; // reuse same OTP styling
 
 export default function GuestLogin() {
   const navigate = useNavigate();
