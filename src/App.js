@@ -61,7 +61,7 @@ import RequestSpiTractor from "./pages/spi-tractors/Request-Spitractor/RequestSp
 import ChooseRole from "./pages/spi-tractors/Request-Spitractor/ChooseRole";
 import SpiTractorsPayAndEta from "./pages/spi-tractors/Request-Spitractor/PayAndEta";
 import TrackRequest from "./pages/spi-tractors/Request-Spitractor/TrackRequest";
-
+import GuestLogin from "./pages/spi-tractors/Request-Spitractor/GuestLogin";
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -271,7 +271,7 @@ function App() {
           <Route path="/marketplace/:type" element={<Marketplace />} />
 
           {/*Spitractors app*/}
-          <Route path="/Spi_Tractors/" element={<ChooseRole/>} />
+          <Route path="/Spi_Tractors/" element={<ChooseRole/>} /> <Route path="/Spi_Tractors-Guest-Login/" element={<GuestLogin/>} />
           <Route path="/SpiTractorsPayAndEta/" element={<SpiTractorsPayAndEta/>} />
           <Route path="/SpiTractorsTrackRequest/" element={<TrackRequest/>} />
           <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} />
