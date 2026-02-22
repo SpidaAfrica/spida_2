@@ -6,13 +6,15 @@ import { spiTractorsApi } from "../api/spiTractorsApi";
 export default function RequestSpiTractor() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    farmAddress: "",
-    farmCity: "",
-    farmSize: "",
-    service: "",
-    preferredDate: "",
-  });
+const [form, setForm] = useState({
+  fullName: "",
+  farmName: "",
+  farmAddress: "",
+  farmCity: "",
+  farmSize: "",
+  service: "",
+  preferredDate: "",
+});
 
   const [gps, setGps] = useState({ lat: null, lng: null });
   const [loading, setLoading] = useState(false);
@@ -70,11 +72,13 @@ export default function RequestSpiTractor() {
 
       // 1) Create request (now includes city + gps)
       const createRes = await spiTractorsApi.createRequest({
+        full_name: form.fullName,
+        farm_name: form.farmName,
         service: (form.service || "PLOUGHING").toUpperCase(),
-        farm_address: form.farmAddress.trim(),
-        farm_city: form.farmCity.trim(),
-        farm_size_acres: farmSize,
-        preferred_date: form.preferredDate ? form.preferredDate : null, // YYYY-MM-DD
+        farm_address: form.farmAddress,
+        farm_city: form.farmCity,
+        farm_size_acres: Number(form.farmSize) || 1,
+        preferred_date: form.preferredDate || null,
         farm_lat: gps.lat,
         farm_lng: gps.lng,
         notes: "Created from SpiTractors frontend",
@@ -101,7 +105,8 @@ export default function RequestSpiTractor() {
 
       navigate("/SpiTractorsPayAndEta/", {
         state: {
-          job: {
+          job: {full_name: form.fullName,
+            farm_name: form.farmName,
             requestId: createRes?.data?.request_code || "REQ-0000",
             requestUuid: requestId,
             service: form.service || "Ploughing",
@@ -147,7 +152,23 @@ export default function RequestSpiTractor() {
             </h1>
           </div>
 
-          <form className="rt-form" onSubmit={onSubmit}>
+          <form className="rt-form" onSubmit={onSubmit}><label className="rt-label">Full Name</label>
+            <input
+              className="rt-input"
+              placeholder="e.g. Adisa Jairo Yusuf"
+              name="fullName"
+              value={form.fullName}
+              onChange={onChange}
+            />
+            
+            <label className="rt-label">Farm Name</label>
+            <input
+              className="rt-input"
+              placeholder="e.g. Jairo Farms Ltd"
+              name="farmName"
+              value={form.farmName}
+              onChange={onChange}
+            />
             <label className="rt-label">Farm Address</label>
             <input
               className="rt-input"
