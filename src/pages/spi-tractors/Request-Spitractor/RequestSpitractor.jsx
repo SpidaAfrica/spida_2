@@ -1,24 +1,28 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./RequestSpitractor.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 
 export default function RequestSpiTractor() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-const [form, setForm] = useState({
-  fullName: "",
-  farmName: "",
-  farmAddress: "",
-  farmCity: "",
-  farmSize: "",
-  service: "",
-  preferredDate: "",
-});
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+    farmName: "",
+    farmAddress: "",
+    farmCity: "",
+    farmSize: "",
+    service: "",
+    preferredDate: "",
+  });
 
   const [gps, setGps] = useState({ lat: null, lng: null });
   const [loading, setLoading] = useState(false);
   const [gettingGps, setGettingGps] = useState(false);
+
+  const token = localStorage.getItem("spiTractorsToken") || "";
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -35,11 +39,7 @@ const [form, setForm] = useState({
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setGps({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-        alert("Location captured ✅");
+        setGps({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGettingGps(false);
       },
       () => {
@@ -50,80 +50,149 @@ const [form, setForm] = useState({
     );
   };
 
+  const cleanFarmSize = (v) =>
+    Number(String(v).replace(/[^\d.]/g, "")) || 1;
+
+  const buildDraftPayload = (srcForm) => ({
+    full_name: (srcForm.fullName || "").trim(),
+    farm_name: (srcForm.farmName || "").trim(),
+    service: (srcForm.service || "PLOUGHING").toUpperCase(),
+    farm_address: (srcForm.farmAddress || "").trim(),
+    farm_city: (srcForm.farmCity || "").trim(),
+    farm_size_acres: cleanFarmSize(srcForm.farmSize),
+    preferred_date: srcForm.preferredDate || null,
+    farm_lat: gps.lat,
+    farm_lng: gps.lng,
+    notes: "Created from SpiTractors frontend",
+  });
+
+  // ✅ AUTO SUBMIT after OTP returns here with requestDraft
+  useEffect(() => {
+    const draft = location.state?.requestDraft;
+    if (!draft) return;
+
+    // prevent auto-submit loop on refresh/back
+    window.history.replaceState({}, document.title);
+
+    (async () => {
+      try {
+        setLoading(true);
+
+        const createRes = await spiTractorsApi.createRequest(draft);
+        const requestId = createRes?.data?.id;
+
+        if (!requestId) throw new Error("Request created but request id missing.");
+
+        const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
+        const matches = matchRes?.data?.matches || [];
+        const firstTractor = matches[0] || {};
+
+        if (!firstTractor?.id) {
+          alert("No tractors found near you yet. Try again later.");
+          return;
+        }
+
+        const distanceKm = Number(firstTractor?.distance_km) || 0;
+        const etaMinutes = Number(firstTractor?.eta_minutes) || 0;
+
+        navigate("/SpiTractorsPayAndEta/", {
+          state: {
+            job: {
+              full_name: draft.full_name,
+              farm_name: draft.farm_name,
+              requestId: createRes?.data?.request_code || "REQ-0000",
+              requestUuid: requestId,
+              service: draft.service,
+              farmAddress: draft.farm_address,
+              farmCity: draft.farm_city,
+              farmSize: draft.farm_size_acres,
+              preferredDate: draft.preferred_date,
+
+              tractorId: firstTractor?.id,
+              tractorName: firstTractor?.name,
+              tractorRegId: firstTractor?.registration_id,
+
+              distanceKm,
+              etaMinutes,
+
+              ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
+              estimatedHours: 6,
+              travelFee: Number(firstTractor?.travel_cost) || 2000,
+            },
+          },
+        });
+      } catch (e) {
+        alert(e?.message || "Unable to create request after login");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [location.state, navigate]);
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    const token = localStorage.getItem("spiTractorsToken") || "";
 
-    // 🟡 Not logged in → go to phone capture
+    // validations
+    if (!form.fullName.trim()) return alert("Full Name is required.");
+    if (!form.farmName.trim()) return alert("Farm Name is required.");
+    if (!form.farmAddress.trim()) return alert("Farm Address is required.");
+    if (!form.farmCity.trim())
+      return alert("Farm City is required (fallback when GPS isn't available).");
+    if (!form.farmSize.trim()) return alert("Farm Size is required.");
+    if (!form.service.trim()) return alert("Service is required.");
+
+    // ✅ guest flow: send to OTP page and return here for auto-submit
     if (!token) {
-      navigate("/Spi_Tractors-Guest-Login/", {
+      if (!form.phone.trim()) return alert("Phone Number is required.");
+
+      const requestDraft = buildDraftPayload(form);
+
+      navigate("/Spi_Tractors-Otp/", {
         state: {
-          requestDraft: form, // so they don't refill later
+          phone: form.phone.trim(),
+          full_name: form.fullName.trim(),
+          next: "/Spi_Tractors-Request/",
+          requestDraft,
         },
       });
       return;
     }
-    if (!form.farmAddress.trim()) {
-      alert("Farm Address is required.");
-      return;
-    }
 
-    // City is strongly recommended (fallback when GPS not available)
-    if (!form.farmCity.trim()) {
-      alert("Farm City is required (used for matching if GPS is not available).");
-      return;
-    }
-
-    const farmSize = Number(String(form.farmSize).replace(/[^\d.]/g, "")) || 1;
-
+    // ✅ logged-in flow: submit directly
     try {
       setLoading(true);
 
-      // 1) Create request (now includes city + gps)
-      const createRes = await spiTractorsApi.createRequest({
-        full_name: form.fullName,
-        farm_name: form.farmName,
-        service: (form.service || "PLOUGHING").toUpperCase(),
-        farm_address: form.farmAddress,
-        farm_city: form.farmCity,
-        farm_size_acres: Number(form.farmSize) || 1,
-        preferred_date: form.preferredDate || null,
-        farm_lat: gps.lat,
-        farm_lng: gps.lng,
-        notes: "Created from SpiTractors frontend",
-      });
+      const draft = buildDraftPayload(form);
+      const createRes = await spiTractorsApi.createRequest(draft);
 
       const requestId = createRes?.data?.id;
-      if (!requestId) {
-        throw new Error("Request created but request id missing.");
-      }
+      if (!requestId) throw new Error("Request created but request id missing.");
 
-      // 2) Search matches near-me (30km default)
       const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
       const matches = matchRes?.data?.matches || [];
       const firstTractor = matches[0] || {};
 
       if (!firstTractor?.id) {
-        alert("No tractors found near you yet. Try increasing radius or try again later.");
+        alert("No tractors found near you yet. Try again later.");
         return;
       }
 
-      // Use backend-calculated values if present
       const distanceKm = Number(firstTractor?.distance_km) || 0;
       const etaMinutes = Number(firstTractor?.eta_minutes) || 0;
 
       navigate("/SpiTractorsPayAndEta/", {
         state: {
-          job: {full_name: form.fullName,
-            farm_name: form.farmName,
+          job: {
+            full_name: draft.full_name,
+            farm_name: draft.farm_name,
             requestId: createRes?.data?.request_code || "REQ-0000",
             requestUuid: requestId,
-            service: form.service || "Ploughing",
-            farmAddress: form.farmAddress,
-            farmCity: form.farmCity,
-            farmSize: farmSize,
-            preferredDate: form.preferredDate,
+            service: draft.service,
+            farmAddress: draft.farm_address,
+            farmCity: draft.farm_city,
+            farmSize: draft.farm_size_acres,
+            preferredDate: draft.preferred_date,
 
             tractorId: firstTractor?.id,
             tractorName: firstTractor?.name,
@@ -146,7 +215,9 @@ const [form, setForm] = useState({
   };
 
   const gpsLabel =
-    gps.lat && gps.lng ? `GPS: ${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}` : "No GPS captured";
+    gps.lat && gps.lng
+      ? `GPS: ${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`
+      : "No GPS captured";
 
   return (
     <div className="rt-page">
@@ -162,42 +233,53 @@ const [form, setForm] = useState({
             </h1>
           </div>
 
-          <form className="rt-form" onSubmit={onSubmit}><label className="rt-label">Full Name</label>
+          <form className="rt-form" onSubmit={onSubmit}>
+            <label className="rt-label">Full Name</label>
             <input
               className="rt-input"
-              placeholder="e.g. Adisa Jairo Yusuf"
               name="fullName"
               value={form.fullName}
               onChange={onChange}
+              placeholder="e.g. Adisa Jairo Yusuf"
             />
-            
+
+            <label className="rt-label">Phone Number</label>
+            <input
+              className="rt-input"
+              name="phone"
+              value={form.phone}
+              onChange={onChange}
+              placeholder="e.g. 08012345678"
+              inputMode="tel"
+            />
+
             <label className="rt-label">Farm Name</label>
             <input
               className="rt-input"
-              placeholder="e.g. Jairo Farms Ltd"
               name="farmName"
               value={form.farmName}
               onChange={onChange}
+              placeholder="e.g. Jairo Farms Ltd"
             />
+
             <label className="rt-label">Farm Address</label>
             <input
               className="rt-input"
-              placeholder="e.g. 123 Farm Lane, Lagos Nigeria"
               name="farmAddress"
               value={form.farmAddress}
               onChange={onChange}
+              placeholder="e.g. 123 Farm Lane, Lagos Nigeria"
             />
 
             <label className="rt-label">Farm City</label>
             <input
               className="rt-input"
-              placeholder="e.g. Lagos"
               name="farmCity"
               value={form.farmCity}
               onChange={onChange}
+              placeholder="e.g. Lagos"
             />
 
-            {/* GPS capture */}
             <div style={{ display: "flex", gap: 10, alignItems: "center", margin: "10px 0" }}>
               <button
                 type="button"
@@ -214,10 +296,10 @@ const [form, setForm] = useState({
             <label className="rt-label">Farm Size (acres)</label>
             <input
               className="rt-input"
-              placeholder="e.g 2"
               name="farmSize"
               value={form.farmSize}
               onChange={onChange}
+              placeholder="e.g 2"
               inputMode="decimal"
             />
 
