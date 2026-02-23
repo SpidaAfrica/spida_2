@@ -122,7 +122,7 @@ export default function OtpLogin() {
         localStorage.setItem("spiRequestDraft", JSON.stringify(draft));
       }
       
-      navigate("/Spi_Tractors-Request/", {
+      navigate("/Spi_Tractors_Request/", {
         replace: true,
         state: { requestDraft: draft },
       });
