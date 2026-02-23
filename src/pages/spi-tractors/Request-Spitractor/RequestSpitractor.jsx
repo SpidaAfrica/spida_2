@@ -88,7 +88,29 @@ export default function RequestSpiTractor() {
         const firstTractor = matches[0] || {};
 
         if (!firstTractor?.id) {
-          alert("No tractors found near you yet. Try again later.");
+          navigate("/SpiTractorsPayAndEta/", {
+            state: {
+              job: {
+                full_name: draft.full_name,
+                farm_name: draft.farm_name,
+                requestId: createRes?.data?.request_code || "REQ-0000",
+                requestUuid: requestId,
+                service: draft.service,
+                farmAddress: draft.farm_address,
+                farmCity: draft.farm_city,
+                farmSize: draft.farm_size_acres,
+                preferredDate: draft.preferred_date,
+                tractorId: null,
+                tractorName: "Searching...",
+                tractorRegId: "",
+                distanceKm: 0,
+                etaMinutes: 0,
+                ratePerHour: 5000,
+                estimatedHours: 6,
+                travelFee: 0,
+              },
+            },
+          });
           return;
         }
 
