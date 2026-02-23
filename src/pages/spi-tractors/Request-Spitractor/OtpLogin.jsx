@@ -114,8 +114,12 @@ export default function OtpLogin() {
       }
 
       saveSession(user, token);
-
-      navigate(next, { replace: true });
+      // after saveSession(user, token);
+      const draft = location.state?.requestDraft || null;
+      navigate("/Spi_Tractors-Request/", {
+        replace: true,
+        state: { requestDraft: draft },
+      });
     } catch (e) {
       alert(e?.message || "Verification failed");
     } finally {
