@@ -159,7 +159,7 @@ export default function RequestSpiTractor() {
         state: {
           phone: form.phone.trim(),
           full_name: form.fullName.trim(),
-          next: "/Spi_Tractors-Request/",
+          next: "/Spi_Tractors_Request/",
           requestDraft,
         },
       });
