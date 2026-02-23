@@ -67,52 +67,71 @@ export default function RequestSpiTractor() {
   });
 
   // ✅ AUTO SUBMIT after OTP returns here with requestDraft
-  useEffect(() => {
-    const draft = location.state?.requestDraft;
-    if (!draft) return;
+ useEffect(() => {
+  const draftFromState = location.state?.requestDraft || null;
 
-    // prevent auto-submit loop on refresh/back
-    window.history.replaceState({}, document.title);
+  let draft = draftFromState;
+  if (!draft) {
+    // ✅ fallback if router state got lost
+    try {
+      draft = JSON.parse(localStorage.getItem("spiRequestDraft") || "null");
+    } catch {
+      draft = null;
+    }
+  }
 
-    (async () => {
-      try {
-        setLoading(true);
+  if (!draft) return;
 
-        const createRes = await spiTractorsApi.createRequest(draft);
-        const requestId = createRes?.data?.id;
+  // ✅ consume draft so it doesn't loop
+  localStorage.removeItem("spiRequestDraft");
+  window.history.replaceState({}, document.title);
 
-        if (!requestId) throw new Error("Request created but request id missing.");
+  (async () => {
+    try {
+      setLoading(true);
 
-        const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
-        const matches = matchRes?.data?.matches || [];
-        const firstTractor = matches[0] || {};
+      const createRes = await spiTractorsApi.createRequest(draft);
+      const requestId = createRes?.data?.id;
+      if (!requestId) throw new Error("Request created but request id missing.");
 
-        if (!firstTractor?.id) {
-          navigate("/SpiTractorsPayAndEta/", {
-            state: {
-              job: {
-                full_name: draft.full_name,
-                farm_name: draft.farm_name,
-                requestId: createRes?.data?.request_code || "REQ-0000",
-                requestUuid: requestId,
-                service: draft.service,
-                farmAddress: draft.farm_address,
-                farmCity: draft.farm_city,
-                farmSize: draft.farm_size_acres,
-                preferredDate: draft.preferred_date,
-                tractorId: null,
-                tractorName: "Searching...",
-                tractorRegId: "",
-                distanceKm: 0,
-                etaMinutes: 0,
-                ratePerHour: 5000,
-                estimatedHours: 6,
-                travelFee: 0,
-              },
-            },
-          });
-          return;
-        }
+      const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
+      const matches = matchRes?.data?.matches || [];
+      const firstTractor = matches[0] || {};
+
+      // ✅ even if no tractor found, still go PayAndEta
+      navigate("/SpiTractorsPayAndEta/", {
+        state: {
+          job: {
+            full_name: draft.full_name,
+            farm_name: draft.farm_name,
+            requestId: createRes?.data?.request_code || "REQ-0000",
+            requestUuid: requestId,
+            service: draft.service,
+            farmAddress: draft.farm_address,
+            farmCity: draft.farm_city,
+            farmSize: draft.farm_size_acres,
+            preferredDate: draft.preferred_date,
+
+            tractorId: firstTractor?.id || null,
+            tractorName: firstTractor?.name || "Searching...",
+            tractorRegId: firstTractor?.registration_id || "",
+
+            distanceKm: Number(firstTractor?.distance_km) || 0,
+            etaMinutes: Number(firstTractor?.eta_minutes) || 0,
+
+            ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
+            estimatedHours: 6,
+            travelFee: Number(firstTractor?.travel_cost) || 0,
+          },
+        },
+      });
+    } catch (e) {
+      alert(e?.message || "Unable to create request after login");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [location.state, navigate]);
 
         const distanceKm = Number(firstTractor?.distance_km) || 0;
         const etaMinutes = Number(firstTractor?.eta_minutes) || 0;
