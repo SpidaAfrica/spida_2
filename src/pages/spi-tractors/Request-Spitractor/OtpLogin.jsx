@@ -115,7 +115,7 @@ export default function OtpLogin() {
 
       saveSession(user, token);
       // after saveSession(user, token);
-      const draft = location.state?.requestDraft || null;
+      const draft = location.state?.requestDraft || null; console.log("AUTO-SUBMIT draft:", draft);
       navigate("/Spi_Tractors-Request/", {
         replace: true,
         state: { requestDraft: draft },
