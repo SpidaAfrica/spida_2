@@ -50,8 +50,7 @@ export default function RequestSpiTractor() {
     );
   };
 
-  const cleanFarmSize = (v) =>
-    Number(String(v).replace(/[^\d.]/g, "")) || 1;
+  const cleanFarmSize = (v) => Number(String(v).replace(/[^\d.]/g, "")) || 1;
 
   const buildDraftPayload = (srcForm) => ({
     full_name: (srcForm.fullName || "").trim(),
@@ -67,27 +66,111 @@ export default function RequestSpiTractor() {
   });
 
   // ✅ AUTO SUBMIT after OTP returns here with requestDraft
-useEffect(() => {
-  const draftFromState = location.state?.requestDraft || null;
+  useEffect(() => {
+    const draftFromState = location.state?.requestDraft || null;
 
-  let draft = draftFromState;
-  if (!draft) {
-    try {
-      draft = JSON.parse(localStorage.getItem("spiRequestDraft") || "null");
-    } catch {
-      draft = null;
+    let draft = draftFromState;
+    if (!draft) {
+      try {
+        draft = JSON.parse(localStorage.getItem("spiRequestDraft") || "null");
+      } catch {
+        draft = null;
+      }
     }
-  }
 
-  if (!draft) return;
+    if (!draft) return;
 
-  // consume so it doesn't loop
-  localStorage.removeItem("spiRequestDraft");
-  window.history.replaceState({}, document.title);
+    // consume so it doesn't loop
+    localStorage.removeItem("spiRequestDraft");
+    window.history.replaceState({}, document.title);
 
-  const submitDraft = async () => {
+    const submitDraft = async () => {
+      try {
+        setLoading(true);
+
+        const createRes = await spiTractorsApi.createRequest(draft);
+        const requestId = createRes?.data?.id;
+
+        if (!requestId) throw new Error("Request created but request id missing.");
+
+        const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
+        const matches = matchRes?.data?.matches || [];
+        const firstTractor = matches[0] || {};
+
+        navigate("/SpiTractorsPayAndEta/", {
+          state: {
+            job: {
+              full_name: draft.full_name,
+              farm_name: draft.farm_name,
+              requestId: createRes?.data?.request_code || "REQ-0000",
+              requestUuid: requestId,
+              service: draft.service,
+              farmAddress: draft.farm_address,
+              farmCity: draft.farm_city,
+              farmSize: draft.farm_size_acres,
+              preferredDate: draft.preferred_date,
+
+              tractorId: firstTractor?.id || null,
+              tractorName: firstTractor?.name || "Searching...",
+              tractorRegId: firstTractor?.registration_id || "",
+
+              distanceKm: Number(firstTractor?.distance_km) || 0,
+              etaMinutes: Number(firstTractor?.eta_minutes) || 0,
+
+              ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
+              estimatedHours: 6,
+              travelFee: Number(firstTractor?.travel_cost) || 0,
+            },
+          },
+        });
+      } catch (e) {
+        alert(e?.message || "Unable to create request after login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    submitDraft();
+  }, [location.state, navigate]);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+
+    // validations
+    if (!form.fullName.trim()) return alert("Full Name is required.");
+    if (!form.farmName.trim()) return alert("Farm Name is required.");
+    if (!form.farmAddress.trim()) return alert("Farm Address is required.");
+    if (!form.farmCity.trim())
+      return alert("Farm City is required (fallback when GPS isn't available).");
+    if (!String(form.farmSize).trim()) return alert("Farm Size is required.");
+    if (!form.service.trim()) return alert("Service is required.");
+
+    // ✅ guest flow: send to OTP page and return here for auto-submit
+    if (!token) {
+      if (!form.phone.trim()) return alert("Phone Number is required.");
+
+      const requestDraft = buildDraftPayload(form);
+
+      // ✅ backup so we don't lose it if router state drops
+      localStorage.setItem("spiRequestDraft", JSON.stringify(requestDraft));
+
+      navigate("/Spi_Tractors-Otp/", {
+        state: {
+          phone: form.phone.trim(),
+          full_name: form.fullName.trim(),
+          next: "/Spi_Tractors-Request/",
+          requestDraft,
+        },
+      });
+      return;
+    }
+
+    // ✅ logged-in flow: submit directly
     try {
       setLoading(true);
+
+      const draft = buildDraftPayload(form);
 
       const createRes = await spiTractorsApi.createRequest(draft);
       const requestId = createRes?.data?.id;
@@ -121,134 +204,6 @@ useEffect(() => {
             ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
             estimatedHours: 6,
             travelFee: Number(firstTractor?.travel_cost) || 0,
-          },
-        },
-      });
-    } catch (e) {
-      alert(e?.message || "Unable to create request after login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  submitDraft();
-}, [location.state, navigate]);
-
-        const distanceKm = Number(firstTractor?.distance_km) || 0;
-        const etaMinutes = Number(firstTractor?.eta_minutes) || 0;
-
-        navigate("/SpiTractorsPayAndEta/", {
-          state: {
-            job: {
-              full_name: draft.full_name,
-              farm_name: draft.farm_name,
-              requestId: createRes?.data?.request_code || "REQ-0000",
-              requestUuid: requestId,
-              service: draft.service,
-              farmAddress: draft.farm_address,
-              farmCity: draft.farm_city,
-              farmSize: draft.farm_size_acres,
-              preferredDate: draft.preferred_date,
-
-              tractorId: firstTractor?.id,
-              tractorName: firstTractor?.name,
-              tractorRegId: firstTractor?.registration_id,
-
-              distanceKm,
-              etaMinutes,
-
-              ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
-              estimatedHours: 6,
-              travelFee: Number(firstTractor?.travel_cost) || 2000,
-            },
-          },
-        });
-      } catch (e) {
-        alert(e?.message || "Unable to create request after login");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [location.state, navigate]);
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return;
-
-    // validations
-    if (!form.fullName.trim()) return alert("Full Name is required.");
-    if (!form.farmName.trim()) return alert("Farm Name is required.");
-    if (!form.farmAddress.trim()) return alert("Farm Address is required.");
-    if (!form.farmCity.trim())
-      return alert("Farm City is required (fallback when GPS isn't available).");
-    if (!form.farmSize.trim()) return alert("Farm Size is required.");
-    if (!form.service.trim()) return alert("Service is required.");
-
-    // ✅ guest flow: send to OTP page and return here for auto-submit
-    if (!token) {
-      if (!form.phone.trim()) return alert("Phone Number is required.");
-    
-      const requestDraft = buildDraftPayload(form);
-    
-      // ✅ backup so we don't lose it if router state drops
-      localStorage.setItem("spiRequestDraft", JSON.stringify(requestDraft));
-    
-      navigate("/Spi_Tractors-Otp/", {
-        state: {
-          phone: form.phone.trim(),
-          full_name: form.fullName.trim(),
-          next: "/Spi_Tractors-Request/",
-          requestDraft,
-        },
-      });
-      return;
-    }
-
-    // ✅ logged-in flow: submit directly
-    try {
-      setLoading(true);
-
-      const draft = buildDraftPayload(form);
-      const createRes = await spiTractorsApi.createRequest(draft);
-
-      const requestId = createRes?.data?.id;
-      if (!requestId) throw new Error("Request created but request id missing.");
-
-      const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
-      const matches = matchRes?.data?.matches || [];
-      const firstTractor = matches[0] || {};
-
-      if (!firstTractor?.id) {
-        alert("No tractors found near you yet. Try again later.");
-        return;
-      }
-
-      const distanceKm = Number(firstTractor?.distance_km) || 0;
-      const etaMinutes = Number(firstTractor?.eta_minutes) || 0;
-
-      navigate("/SpiTractorsPayAndEta/", {
-        state: {
-          job: {
-            full_name: draft.full_name,
-            farm_name: draft.farm_name,
-            requestId: createRes?.data?.request_code || "REQ-0000",
-            requestUuid: requestId,
-            service: draft.service,
-            farmAddress: draft.farm_address,
-            farmCity: draft.farm_city,
-            farmSize: draft.farm_size_acres,
-            preferredDate: draft.preferred_date,
-
-            tractorId: firstTractor?.id,
-            tractorName: firstTractor?.name,
-            tractorRegId: firstTractor?.registration_id,
-
-            distanceKm,
-            etaMinutes,
-
-            ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
-            estimatedHours: 6,
-            travelFee: Number(firstTractor?.travel_cost) || 2000,
           },
         },
       });
