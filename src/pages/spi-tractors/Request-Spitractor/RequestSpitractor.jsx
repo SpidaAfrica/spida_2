@@ -167,9 +167,12 @@ export default function RequestSpiTractor() {
     // ✅ guest flow: send to OTP page and return here for auto-submit
     if (!token) {
       if (!form.phone.trim()) return alert("Phone Number is required.");
-
+    
       const requestDraft = buildDraftPayload(form);
-
+    
+      // ✅ backup so we don't lose it if router state drops
+      localStorage.setItem("spiRequestDraft", JSON.stringify(requestDraft));
+    
       navigate("/Spi_Tractors-Otp/", {
         state: {
           phone: form.phone.trim(),
