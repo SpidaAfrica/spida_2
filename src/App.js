@@ -62,7 +62,7 @@ import ChooseRole from "./pages/spi-tractors/Request-Spitractor/ChooseRole";
 import SpiTractorsPayAndEta from "./pages/spi-tractors/Request-Spitractor/PayAndEta";
 import TrackRequest from "./pages/spi-tractors/Request-Spitractor/TrackRequest";
 import GuestLogin from "./pages/spi-tractors/Request-Spitractor/GuestLogin";import OtpLogin from "./pages/spi-tractors/Request-Spitractor/OtpLogin";
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true; import SpiTractorsPayCallback from "./pages/spi-tractors/Request-Spitractor/SpiTractorsPayCallback";
 
 function App() {
   return (
@@ -273,7 +273,7 @@ function App() {
           {/*Spitractors app*/}
           <Route path="/Spi_Tractors/" element={<ChooseRole/>} /> <Route path="/Spi_Tractors-Guest-Login/" element={<GuestLogin/>} />
           <Route path="/SpiTractorsPayAndEta/" element={<SpiTractorsPayAndEta/>} /> <Route path="/Spi_Tractors-Otp/" element={<OtpLogin/>} />
-          <Route path="/SpiTractorsTrackRequest/" element={<TrackRequest/>} />
+          <Route path="/SpiTractorsTrackRequest/" element={<TrackRequest/>} /> <Route path="/SpiTractorsPayCallback/" element={<SpiTractorsPayCallback/>} />
           <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} />
           <Route path="/Spi_Tractors_Login/" element={<Spi_Tractors_Login />} />
           <Route path="/Spi_Tractors_Signup/" element={<Spi_Tractors_Signup />} />
