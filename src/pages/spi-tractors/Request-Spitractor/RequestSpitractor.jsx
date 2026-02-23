@@ -67,12 +67,11 @@ export default function RequestSpiTractor() {
   });
 
   // ✅ AUTO SUBMIT after OTP returns here with requestDraft
- useEffect(() => {
+useEffect(() => {
   const draftFromState = location.state?.requestDraft || null;
 
   let draft = draftFromState;
   if (!draft) {
-    // ✅ fallback if router state got lost
     try {
       draft = JSON.parse(localStorage.getItem("spiRequestDraft") || "null");
     } catch {
@@ -82,23 +81,23 @@ export default function RequestSpiTractor() {
 
   if (!draft) return;
 
-  // ✅ consume draft so it doesn't loop
+  // consume so it doesn't loop
   localStorage.removeItem("spiRequestDraft");
   window.history.replaceState({}, document.title);
 
-  (async () => {
+  const submitDraft = async () => {
     try {
       setLoading(true);
 
       const createRes = await spiTractorsApi.createRequest(draft);
       const requestId = createRes?.data?.id;
+
       if (!requestId) throw new Error("Request created but request id missing.");
 
       const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
       const matches = matchRes?.data?.matches || [];
       const firstTractor = matches[0] || {};
 
-      // ✅ even if no tractor found, still go PayAndEta
       navigate("/SpiTractorsPayAndEta/", {
         state: {
           job: {
@@ -130,7 +129,9 @@ export default function RequestSpiTractor() {
     } finally {
       setLoading(false);
     }
-  })();
+  };
+
+  submitDraft();
 }, [location.state, navigate]);
 
         const distanceKm = Number(firstTractor?.distance_km) || 0;
