@@ -154,7 +154,8 @@ updateTractorCapability: (payload) =>
     request("/paystack_banks.php", { method: "GET" }),
   paymentIntent: (payload) =>
     request("/payments_intent.php", { method: "POST", body: payload, auth: true }),
-  
+ paystackInitialize: (payload) =>
+  request("/paystack_intent.php", { method: "POST", body: payload, auth: true }),
   paymentVerify: (reference) =>
     request("/payments_verify.php", { method: "POST", body: { reference }, auth: true }),
 
