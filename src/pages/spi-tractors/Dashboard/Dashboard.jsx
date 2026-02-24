@@ -7,19 +7,50 @@ import JobRequestPanel from "../components/dashboard/JobRequestPanel";
 import Upcoming from "../components/dashboard/Upcoming";
 import EarningsOverview from "../components/dashboard/EarningsOverview";
 import "./dashboard.css";
-import { clearSession, spiTractorsApi } from "../api/spiTractorsApi";
+import { clearSession, getCurrentUser, spiTractorsApi } from "../api/spiTractorsApi";
+import { useNavigate } from "react-router-dom";
 
 export default function SpiTractorDashboard() {
-  const [userEmail, setUserEmail] = useState("Sanusi");
+  const navigate = useNavigate();
+
+  const [userEmail, setUserEmail] = useState(() => {
+    const u = getCurrentUser();
+    return u?.email || "Sanusi";
+  });
 
   useEffect(() => {
+    const token = localStorage.getItem("spiTractorsToken") || "";
+
+    // if no token, send user to login (or request)
+    if (!token) {
+      navigate("/Spi_Tractors-Login/", { replace: true });
+      return;
+    }
+
     spiTractorsApi
       .me()
-      .then((res) => setUserEmail(res?.data?.email || "Sanusi"))
-      .catch(() => {
-        clearSession();
+      .then((res) => {
+        const email = res?.data?.email;
+        if (email) setUserEmail(email);
+      })
+      .catch((err) => {
+        // ✅ Only clear session if backend actually says Unauthorized
+        const msg = String(err?.message || "");
+        const isUnauthorized =
+          msg.toLowerCase().includes("unauthorized") ||
+          msg.toLowerCase().includes("missing authorization") ||
+          msg.toLowerCase().includes("session expired");
+
+        if (isUnauthorized) {
+          clearSession();
+          navigate("/Spi_Tractors-Request/", { replace: true });
+          return;
+        }
+
+        // ❌ don't clear session on random failures
+        console.log("me() failed but session kept:", err);
       });
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="dash-shell">
@@ -31,11 +62,18 @@ export default function SpiTractorDashboard() {
         <div className="dash-content">
           <div className="dash-head">
             <div>
-              <h1 className="dash-title">Good Morning, {userEmail.split("@")[0]}! <span className="wave">👋</span></h1>
+              <h1 className="dash-title">
+                Good Morning, {String(userEmail).split("@")[0]}!{" "}
+                <span className="wave">👋</span>
+              </h1>
 
               <div className="dash-filters">
-                <button className="chip">Today <span className="chev">▾</span></button>
-                <button className="chip">Thursday, August 22, 2024 <span className="chev">▾</span></button>
+                <button className="chip">
+                  Today <span className="chev">▾</span>
+                </button>
+                <button className="chip">
+                  Thursday, August 22, 2024 <span className="chev">▾</span>
+                </button>
               </div>
             </div>
 
