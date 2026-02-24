@@ -137,7 +137,13 @@ searchRequestMatches: (requestId) =>
 
  requestTracking: (requestId) =>
   request(`/requests_tracking.php?request_id=${requestId}`, { auth: true }),
+ongoingRequests: () => request("/requests_ongoing.php", { auth: true }),
 
+requestSetStatus: (payload) =>
+  request("/requests_set_status.php", { method: "POST", body: payload, auth: true }),
+
+requestCancel: (payload) =>
+  request("/requests_cancel.php", { method: "POST", body: payload, auth: true }),
 createTractor: (payload) =>
   request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
 updateTractorCapability: (payload) =>
