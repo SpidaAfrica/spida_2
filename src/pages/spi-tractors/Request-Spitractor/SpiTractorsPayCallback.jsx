@@ -14,17 +14,26 @@ export default function SpiTractorsPayCallback() {
         const url = new URL(window.location.href);
         const reference = url.searchParams.get("reference");
 
-        const pending = JSON.parse(localStorage.getItem(PENDING_PAY_KEY) || "null");
+        const pending = JSON.parse(
+          localStorage.getItem(PENDING_PAY_KEY) || "null"
+        );
 
         const ref = reference || pending?.reference;
+
         if (!ref) throw new Error("Missing Paystack reference.");
 
-        // verify on backend
-        const verifyRes = await spiTractorsApi.paystackVerify(referenceString);
+        console.log("Verifying reference:", ref);
 
-        if (!verifyRes?.success) throw new Error(verifyRes?.message || "Payment verification failed");
+        // ✅ VERIFY ON BACKEND (USE ref, NOT referenceString)
+        const verifyRes = await spiTractorsApi.paystackVerify(ref);
 
-        // clean pending
+        if (!verifyRes?.success) {
+          throw new Error(
+            verifyRes?.message || "Payment verification failed"
+          );
+        }
+
+        // cleanup
         localStorage.removeItem(PENDING_PAY_KEY);
 
         // go to tracking
@@ -41,6 +50,7 @@ export default function SpiTractorsPayCallback() {
           },
         });
       } catch (e) {
+        console.error("Verify error:", e);
         setMsg(e?.message || "Unable to verify payment.");
       }
     };
