@@ -158,8 +158,12 @@ updateTractorCapability: (payload) =>
   request("/paystack_initialize.php", { method: "POST", body: payload, auth: true }),
   paymentVerify: (reference) =>
     request("/payments_verify.php", { method: "POST", body: { reference }, auth: true }),
-  paystackVerify: (reference) =>
-    request("/paystack_verify.php", { method: "POST", body: { reference }, auth: true }),
+ paystackVerify: (reference) =>
+  request("/paystack_verify.php", {
+    method: "POST",
+    auth: true,
+    body: typeof reference === "string" ? { reference } : reference,
+  }),
   paymentWebhookDemo: (payload) =>
     request("/webhooks_payments.php", { method: "POST", body: payload }),
   
