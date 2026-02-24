@@ -158,12 +158,20 @@ updateTractorCapability: (payload) =>
   request("/paystack_initialize.php", { method: "POST", body: payload, auth: true }),
   paymentVerify: (reference) =>
     request("/payments_verify.php", { method: "POST", body: { reference }, auth: true }),
- paystackVerify: (reference) =>
-  request("/paystack_verify.php", {
+paystackVerify: async (reference) => {
+  const res = await fetch(`${API_BASE_URL}/paystack_verify.php`, {
     method: "POST",
-    auth: true,
-    body: typeof reference === "string" ? { reference } : reference,
-  }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("spiTractorsToken") || ""}`,
+    },
+    body: JSON.stringify({ reference }),
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.message || "Verification failed");
+  return json;
+},
   paymentWebhookDemo: (payload) =>
     request("/webhooks_payments.php", { method: "POST", body: payload }),
   
