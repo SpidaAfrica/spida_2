@@ -20,7 +20,7 @@ export default function SpiTractorsPayCallback() {
         if (!ref) throw new Error("Missing Paystack reference.");
 
         // verify on backend
-        const verifyRes = await spiTractorsApi.paystackVerify({ reference: ref });
+        const verifyRes = await spiTractorsApi.paystackVerify(referenceString);
 
         if (!verifyRes?.success) throw new Error(verifyRes?.message || "Payment verification failed");
 
