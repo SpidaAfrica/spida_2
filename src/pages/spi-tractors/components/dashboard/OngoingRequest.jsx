@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./ongoing.css";
-import { spiTractorsApi } from "../api/spiTractorsApi";
+import { spiTractorsApi } from "./../api/spiTractorsApi";
 
 const STEP_LABELS = ["Tractor Travel", "Task Execution", "Payment"];
 
