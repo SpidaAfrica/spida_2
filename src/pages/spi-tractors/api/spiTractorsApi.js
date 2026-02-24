@@ -135,8 +135,8 @@ createRequest: (payload) =>
 searchRequestMatches: (requestId) =>
   request("/requests_search.php", { method: "POST", body: { request_id: requestId }, auth: true }),
 
-  requestTracking: (requestId) =>
-    request(`/requests_${requestId}_tracking.php`, { auth: true }),
+ requestTracking: (requestId) =>
+  request(`/requests_tracking.php?request_id=${requestId}`, { auth: true }),
 
 createTractor: (payload) =>
   request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
