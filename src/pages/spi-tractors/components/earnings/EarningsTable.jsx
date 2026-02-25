@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import "./earningsTable.css"; // create or reuse your css
 import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 function initials(name) {
