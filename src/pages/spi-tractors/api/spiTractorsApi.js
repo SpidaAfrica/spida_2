@@ -130,7 +130,7 @@ createRequest: (payload) =>
 
 searchRequestMatches: (requestId) =>
   request("/requests_search.php", { method: "POST", body: { request_id: requestId }, auth: true }),
-
+ownerEarningsRecent: () => request("/dashboard_owner_earnings_recent.php", { auth: true }),
  requestTracking: (requestId) =>
   request(`/requests_tracking.php?request_id=${requestId}`, { auth: true }),
 ongoingRequests: () => request("/requests_ongoing.php", { auth: true }),
