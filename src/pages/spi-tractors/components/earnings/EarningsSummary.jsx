@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./earningsSummary.css";
 import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 function formatMoney(n) {
