@@ -7,7 +7,7 @@ import JobRequestPanel from "../components/dashboard/JobRequestPanel";
 import Upcoming from "../components/dashboard/Upcoming";
 import EarningsOverview from "../components/dashboard/EarningsOverview";
 import "./dashboard.css";
-import { clearSession, getCurrentUser, spiTractorsApi } from "../api/spiTractorsApi";
+import { clearSession, getCurrentUser, spiTractorsApi } from "../../api/spiTractorsApi";
 import { useNavigate } from "react-router-dom";
 
 export default function SpiTractorDashboard() {
