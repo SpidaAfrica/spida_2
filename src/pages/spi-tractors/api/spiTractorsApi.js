@@ -121,12 +121,8 @@ otpVerify: (payload) => request("/otp_verify.php", { method: "POST", body: paylo
       body: { token: String(token || "").trim() },
       auth: true,
     }),
-
-  forgotPassword: (email) =>
-    request("/password_forgot.php", { method: "POST", body: { email } }),
-
-  resetPassword: (payload) =>
-    request("/password_reset.php", { method: "POST", body: payload }),
+forgotPassword: (payload) => request("/forgot_password.php", { method: "POST", body: payload }),
+resetPassword: (payload) => request("/reset_password.php", { method: "POST", body: payload }),
 
   // domain features placeholders
 createRequest: (payload) =>
