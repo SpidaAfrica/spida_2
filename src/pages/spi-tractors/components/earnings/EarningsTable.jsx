@@ -91,7 +91,7 @@ export default function EarningsTable() {
     <div className="er-table-wrap">
       <div className="er-table-head">
         <div className="er-table-title">
-          Recent Transactions <span className="er-info" title="Owner earnings (90% of paid amount)">ⓘ</span>
+          Recent Transactions <span className="er-info" title="Owner earnings">ⓘ</span>
         </div>
         <button className="er-seeall" type="button" onClick={() => fetchRows()}>
           Refresh
