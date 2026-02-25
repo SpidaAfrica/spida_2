@@ -23,7 +23,7 @@ export default function SpiTractorDashboard() {
 
     // if no token, send user to login (or request)
     if (!token) {
-      navigate("/Spi_Tractors-Login/", { replace: true });
+      navigate("/Spi_Tractors_Login/", { replace: true });
       return;
     }
 
@@ -43,7 +43,7 @@ export default function SpiTractorDashboard() {
 
         if (isUnauthorized) {
           clearSession();
-          navigate("/Spi_Tractors-Request/", { replace: true });
+          navigate("/Spi_Tractors_Login/", { replace: true });
           return;
         }
 
