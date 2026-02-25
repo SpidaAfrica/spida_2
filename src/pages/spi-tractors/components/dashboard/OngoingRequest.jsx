@@ -8,16 +8,13 @@ function workflowToStep(workflowStatus, requestStatus) {
   const wf = String(workflowStatus || "").toUpperCase();
   const rs = String(requestStatus || "").toLowerCase();
 
-  // if request cancelled/completed at table level
   if (rs === "cancelled") return 2;
   if (rs === "completed") return 2;
 
-  // workflow steps
   if (["MATCHED", "ACCEPTED", "EN_ROUTE", "ARRIVED"].includes(wf)) return 0;
   if (["WORK_STARTED", "IN_PROGRESS"].includes(wf)) return 1;
   if (["PAYMENT_PENDING", "PAID", "COMPLETED"].includes(wf)) return 2;
 
-  // fallback for your current enum statuses (pending/matched)
   if (rs === "pending") return 0;
   if (rs === "matched") return 0;
 
@@ -32,6 +29,14 @@ function prettyService(serviceRaw) {
 function initials(name) {
   const n = String(name || "").trim();
   return n ? n[0].toUpperCase() : "?";
+}
+
+function normalizePhone(phoneRaw) {
+  // Keep digits + leading +
+  const p = String(phoneRaw || "").trim();
+  if (!p) return "";
+  const cleaned = p.replace(/[^\d+]/g, "");
+  return cleaned;
 }
 
 export default function OngoingRequests() {
@@ -70,6 +75,18 @@ export default function OngoingRequests() {
       const depart = x?.meta?.departure_time ? `Departure Time: ${x.meta.departure_time}` : "";
       const eta = x?.meta?.eta_time ? `Estimated Arrival Time: ${x.meta.eta_time}` : "";
 
+      const wf = String(x.workflow_status || "").toUpperCase();
+      const rs = String(x.request_status || "").toLowerCase();
+
+      const canStart = wf === "ACCEPTED";
+      const canComplete =
+        rs !== "completed" &&
+        rs !== "cancelled" &&
+        ["WORK_STARTED", "IN_PROGRESS", "ARRIVED", "EN_ROUTE", "ACCEPTED"].includes(wf);
+
+      const farmerPhone = normalizePhone(x?.farmer_phone);
+      const canCall = !!farmerPhone;
+
       const onStart = async () => {
         try {
           await spiTractorsApi.requestSetStatus({
@@ -77,11 +94,25 @@ export default function OngoingRequests() {
             to_status: "WORK_STARTED",
             note: "Work started",
             tractor_id: x.tractor_id || 0,
-            owner_user_id: x?.meta?.owner_user_id || 0,
           });
           fetchOngoing();
         } catch (e) {
           alert(e?.message || "Unable to start request");
+        }
+      };
+
+      const onComplete = async () => {
+        if (!window.confirm("Mark this request as COMPLETED?")) return;
+        try {
+          await spiTractorsApi.requestSetStatus({
+            request_id: x.request_id,
+            to_status: "COMPLETED",
+            note: "Job completed by tractor owner",
+            tractor_id: x.tractor_id || 0,
+          });
+          fetchOngoing();
+        } catch (e) {
+          alert(e?.message || "Unable to complete request");
         }
       };
 
@@ -95,8 +126,6 @@ export default function OngoingRequests() {
         }
       };
 
-      const canStart = String(x.workflow_status || "").toUpperCase() === "ACCEPTED";
-
       return (
         <div className="ongoing-item" key={x.request_id}>
           <div className="ongoing-top">
@@ -108,16 +137,52 @@ export default function OngoingRequests() {
                   Farm Name: <span>{x.farm_name || "-"}</span> &nbsp; Service Needed:{" "}
                   <span>{prettyService(x.service)}</span>
                 </div>
+                {farmerPhone ? (
+                  <div className="meta" style={{ marginTop: 4 }}>
+                    Phone: <span>{farmerPhone}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
 
             <div className="ongoing-actions">
               {canStart ? (
-                <button className="start-btn" onClick={onStart}>Start Request</button>
+                <button className="start-btn" onClick={onStart}>
+                  Start Request
+                </button>
               ) : (
                 <>
-                  <button className="mini-ic" title="Call" onClick={() => alert("Call (demo)")}>📞</button>
-                  <button className="mini-ic danger" title="Cancel" onClick={onCancel}>✖</button>
+                  {/* 📞 REAL CALL */}
+                  <a
+                    className={`mini-ic ${canCall ? "" : "disabled"}`}
+                    title={canCall ? "Call farmer" : "No phone number"}
+                    href={canCall ? `tel:${farmerPhone}` : undefined}
+                    onClick={(e) => {
+                      if (!canCall) e.preventDefault();
+                    }}
+                    style={{ textDecoration: "none" }}
+                  >
+                    📞
+                  </a>
+
+                  {/* ✅ COMPLETED */}
+                  <button
+                    className="mini-ic"
+                    title="Mark completed"
+                    onClick={onComplete}
+                    disabled={!canComplete}
+                    style={{
+                      opacity: canComplete ? 1 : 0.45,
+                      cursor: canComplete ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    ✅
+                  </button>
+
+                  {/* ✖ CANCEL */}
+                  <button className="mini-ic danger" title="Cancel" onClick={onCancel}>
+                    ✖
+                  </button>
                 </>
               )}
             </div>
@@ -152,7 +217,9 @@ export default function OngoingRequests() {
     <div className="card-block">
       <div className="block-head">
         <div className="block-title">Ongoing requests</div>
-        <div className="info" onClick={fetchOngoing} title="Refresh">ⓘ</div>
+        <div className="info" onClick={fetchOngoing} title="Refresh">
+          ⓘ
+        </div>
       </div>
 
       <div className="ongoing-list">{content}</div>
