@@ -137,7 +137,7 @@ ongoingRequests: () => request("/requests_ongoing.php", { auth: true }),
 
 requestSetStatus: (payload) =>
   request("/requests_set_status.php", { method: "POST", body: payload, auth: true }),
-
+ownerEarnings: () => request("/dashboard_owner_earnings.php", { auth: true }),
 requestCancel: (payload) =>
   request("/requests_cancel.php", { method: "POST", body: payload, auth: true }),
 createTractor: (payload) =>
