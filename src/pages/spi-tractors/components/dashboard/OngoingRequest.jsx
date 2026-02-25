@@ -117,7 +117,6 @@ export default function OngoingRequests() {
               ) : (
                 <>
                   <button className="mini-ic" title="Call" onClick={() => alert("Call (demo)")}>📞</button>
-                  <button className="mini-ic" title="Chat" onClick={() => alert("Chat (demo)")}>💬</button>
                   <button className="mini-ic danger" title="Cancel" onClick={onCancel}>✖</button>
                 </>
               )}
