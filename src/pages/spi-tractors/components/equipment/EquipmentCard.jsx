@@ -15,7 +15,7 @@ export default function EquipmentCard({ item, onSaved }) {
     setStatus(newStatus); // optimistic UI
     try {
       setSaving(true);
-      await spiTractorsApi.updateTractorAvailability({
+      await spiTractorsApi.updateTractorAvailable({
         tractor_id: item.id,
         availability_status: newStatus,
       });
