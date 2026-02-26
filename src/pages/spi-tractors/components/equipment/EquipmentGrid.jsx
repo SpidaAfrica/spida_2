@@ -55,4 +55,4 @@ const EquipmentGrid = forwardRef((props, ref) => {
       ))}
     </div>
   );
-}export default EquipmentGrid;
+};export default EquipmentGrid;
