@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { spiTractorsApi } from "../../api/spiTractorsApi";
 
-export default function EquipmentCard({ item }) {
-  const [status, setStatus] = useState(item.status);
+export default function EquipmentCard({ item, onSaved }) {
+  const [status, setStatus] = useState(item.status || "Available");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setStatus(item.status || "Available");
+  }, [item.status]);
 
   const isMaintenance = status === "Under maintenance";
+
+  const onChangeStatus = async (newStatus) => {
+    setStatus(newStatus); // optimistic UI
+    try {
+      setSaving(true);
+      await spiTractorsApi.updateTractorAvailability({
+        tractor_id: item.id,
+        availability_status: newStatus,
+      });
+      onSaved?.();
+    } catch (e) {
+      alert(e?.message || "Unable to update tractor status");
+      setStatus(item.status || "Available"); // rollback
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="eq-card">
@@ -24,7 +47,8 @@ export default function EquipmentCard({ item }) {
             <select
               className="eq-select"
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              disabled={saving}
+              onChange={(e) => onChangeStatus(e.target.value)}
             >
               <option value="Available">Available</option>
               <option value="Under maintenance">Under maintenance</option>
@@ -34,7 +58,7 @@ export default function EquipmentCard({ item }) {
           </div>
 
           <button className="eq-details" type="button">
-            Tractor Details
+            {saving ? "Saving..." : "Tractor Details"}
           </button>
         </div>
       </div>
