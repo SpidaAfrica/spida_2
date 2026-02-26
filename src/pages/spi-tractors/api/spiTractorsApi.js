@@ -104,7 +104,9 @@ export const spiTractorsApi = {
   // placeholders (create in PHP when ready)
   login: (payload) => request("/login.php", { method: "POST", body: payload }),
   me: () => request("/me.php", { auth: true }),
-
+  ownerNewRequests: () => request("/requests_owner_new.php", { auth: true }),
+  ownerRequestAction: (payload) =>
+    request("/requests_owner_action.php", { method: "POST", body: payload, auth: true }),
   // resend verify code (if you build it)
   sendVerifyEmailCode: () =>
     request("/verify_email_send.php", { method: "POST", auth: true }),
