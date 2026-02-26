@@ -43,11 +43,6 @@ export default function RequestList() {
         </div>
 
         <div className="req-list-actions">
-          <div className="req-search">
-            <input placeholder="Search" disabled />
-            <span className="req-search-ic">🔎</span>
-          </div>
-
           <div className="req-new-badge">{countLabel}</div>
         </div>
       </div>
