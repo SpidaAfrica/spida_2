@@ -1,46 +1,39 @@
+import { useEffect, useMemo, useState } from "react";
 import BookingColumn from "./BookingColumn";
-
-const columns = [
-  {
-    title: "January 20-26",
-    items: [
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-    ],
-  },
-  {
-    title: "January 27-February 2",
-    items: [
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-    ],
-  },
-  {
-    title: "February 3-9",
-    items: [
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-    ],
-  },
-  {
-    title: "February 10-16",
-    items: [
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-      { id: "Req02837", farmers: "3 Farmer", location: "12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)", service: "Ploughing", tag: "January 20 - 21", time: "08:00 AM - 5:00 PM" },
-    ],
-  },
-];
+import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 export default function BookingBoard() {
-  return (
-    <div className="bk-board">
-      {columns.map((c) => (
-        <BookingColumn key={c.title} title={c.title} items={c.items} />
-      ))}
-    </div>
-  );
+  const [loading, setLoading] = useState(false);
+  const [columns, setColumns] = useState([]);
+  const [err, setErr] = useState("");
+
+  const load = async () => {
+    try {
+      setErr("");
+      setLoading(true);
+      const res = await spiTractorsApi.ownerUpcomingBookings();
+      setColumns(Array.isArray(res?.data?.columns) ? res.data.columns : []);
+    } catch (e) {
+      setErr(e?.message || "Unable to load bookings");
+      setColumns([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const content = useMemo(() => {
+    if (loading && columns.length === 0) return <div style={{ padding: 12 }}>Loading...</div>;
+    if (err) return <div style={{ padding: 12 }}>{err}</div>;
+    if (!columns.length) return <div style={{ padding: 12 }}>No upcoming bookings.</div>;
+
+    return columns.map((c) => (
+      <BookingColumn key={c.title} title={c.title} items={c.items || []} />
+    ));
+  }, [loading, err, columns]);
+
+  return <div className="bk-board">{content}</div>;
 }
