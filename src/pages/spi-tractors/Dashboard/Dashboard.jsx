@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/dashboard/Sidebar";
 import Topbar from "../components/dashboard/Topbar";
-import StatCards from "../components/dashboard/StatCard";
+import RequestsStats from "../components/requests/RequestsStats";
 import OngoingRequests from "../components/dashboard/OngoingRequest";
 import RequestList from "../components/requests/RequestList";
 import Upcoming from "../components/dashboard/Upcoming";
@@ -80,7 +80,7 @@ export default function SpiTractorDashboard() {
 
           <div className="dash-grid">
             <section className="dash-left">
-              <StatCards />
+              <RequestsStats />
               <OngoingRequests />
               <Upcoming />
               <EarningsOverview />
