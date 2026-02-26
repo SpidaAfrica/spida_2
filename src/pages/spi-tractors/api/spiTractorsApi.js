@@ -127,7 +127,8 @@ resetPassword: (payload) => request("/reset_password.php", { method: "POST", bod
   // domain features placeholders
 createRequest: (payload) =>
   request("/requests_create.php", { method: "POST", body: payload, auth: true }),
-
+addTractor: (payload) =>
+  request("/add_tractor.php", { method: "POST", body: payload, auth: true }),
 searchRequestMatches: (requestId) =>
   request("/requests_search.php", { method: "POST", body: { request_id: requestId }, auth: true }),
 ownerEarningsRecent: () => request("/dashboard_owner_earnings_recent.php", { auth: true }),
