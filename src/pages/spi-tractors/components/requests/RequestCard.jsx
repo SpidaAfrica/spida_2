@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { spiTractorsApi } from "../api/spiTractorsApi"; // adjust path if needed
+import { spiTractorsApi } from "../../api/spiTractorsApi"; // adjust path if needed
 
 function prettyService(serviceRaw) {
   const s = String(serviceRaw || "").toLowerCase();
