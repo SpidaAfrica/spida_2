@@ -123,7 +123,7 @@ otpVerify: (payload) => request("/otp_verify.php", { method: "POST", body: paylo
     }),
 forgotPassword: (payload) => request("/forgot_password.php", { method: "POST", body: payload }),
 resetPassword: (payload) => request("/reset_password.php", { method: "POST", body: payload }),
-
+ownerUpcomingBookings: () => request("/dashboard_owner_bookings.php", { auth: true }),
   // domain features placeholders
 createRequest: (payload) =>
   request("/requests_create.php", { method: "POST", body: payload, auth: true }),
