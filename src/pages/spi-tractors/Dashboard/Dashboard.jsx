@@ -3,7 +3,7 @@ import Sidebar from "../components/dashboard/Sidebar";
 import Topbar from "../components/dashboard/Topbar";
 import StatCards from "../components/dashboard/StatCard";
 import OngoingRequests from "../components/dashboard/OngoingRequest";
-import JobRequestPanel from "../components/requests/RequestList";
+import RequestList from "../components/requests/RequestList";
 import Upcoming from "../components/dashboard/Upcoming";
 import EarningsOverview from "../components/dashboard/EarningsOverview";
 import "./dashboard.css";
