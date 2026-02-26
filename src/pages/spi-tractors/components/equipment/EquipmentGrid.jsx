@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+whats wrong here in the syntax import { useEffect, useMemo, useState } from "react";
 import EquipmentCard from "./EquipmentCard";
 import img1 from "../../../../assets/images/spitractors/image 1.png";
 import img2 from "../../../../assets/images/spitractors/image 4.png";
@@ -55,4 +55,4 @@ const EquipmentGrid = forwardRef((props, ref) => {
       ))}
     </div>
   );
-};export default EquipmentGrid;
+} export default EquipmentGrid;
