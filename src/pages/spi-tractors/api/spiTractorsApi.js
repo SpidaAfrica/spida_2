@@ -144,7 +144,9 @@ createTractor: (payload) =>
   request("/tractors_create.php", { method: "POST", body: payload, auth: true }),
 updateTractorCapability: (payload) =>
   request("/tractors_capability_update.php", { method: "POST", body: payload, auth: true }),
-  myTractors: () => request("/tractors_me.php", { auth: true }),
+  updateTractorAvailable: (payload) =>
+  request("/tractors_update_availability.php", { method: "POST", body: payload, auth: true }),
+myTractors: () => request("/tractors_me.php", { auth: true }),
   updateTractorAvailability: (payload) =>
     request("/tractors_availability_update.php", { method: "POST", body: payload, auth: true }),
   ownerSummary: () => request("/dashboard_owner_summary.php", { auth: true }),
