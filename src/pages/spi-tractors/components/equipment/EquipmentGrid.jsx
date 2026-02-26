@@ -12,30 +12,41 @@ const fallbackImages = [img1, img2, img3, img4, img5, img6];
 
 export default function EquipmentGrid() {
   const [equipment, setEquipment] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      const res = await spiTractorsApi.myTractors();
+      setEquipment(Array.isArray(res?.data) ? res.data : []);
+    } catch {
+      setEquipment([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    spiTractorsApi
-      .myTractors()
-      .then((res) => {
-        setEquipment(res?.data || []);
-      })
-      .catch(() => setEquipment([]));
+    load();
   }, []);
 
   const mapped = useMemo(() => {
     return equipment.map((e, idx) => ({
+      id: e.id,
       name: e.name,
       reg: e.registration_id,
-      completed: 0,
-      status: e.status,
+      completed: Number(e.completed_jobs || 0),
+      status: e.availability_status || "Available",
       image: fallbackImages[idx % fallbackImages.length],
     }));
   }, [equipment]);
 
+  if (loading && mapped.length === 0) return <div style={{ padding: 12 }}>Loading...</div>;
+
   return (
     <div className="eq-grid">
       {mapped.map((e) => (
-        <EquipmentCard key={e.reg} item={e} />
+        <EquipmentCard key={e.reg} item={e} onSaved={load} />
       ))}
     </div>
   );
