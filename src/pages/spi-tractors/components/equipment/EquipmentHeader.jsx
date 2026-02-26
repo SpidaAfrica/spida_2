@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { spiTractorsApi } from "../../api/spiTractorsApi";
-
+import "./EquipmentHeader.css";
 export default function EquipmentHeader({ onCreated }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
