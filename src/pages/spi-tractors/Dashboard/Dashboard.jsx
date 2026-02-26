@@ -3,7 +3,7 @@ import Sidebar from "../components/dashboard/Sidebar";
 import Topbar from "../components/dashboard/Topbar";
 import StatCards from "../components/dashboard/StatCard";
 import OngoingRequests from "../components/dashboard/OngoingRequest";
-import JobRequestPanel from "../components/dashboard/JobRequestPanel";
+import JobRequestPanel from "../components/requests/RequestList";
 import Upcoming from "../components/dashboard/Upcoming";
 import EarningsOverview from "../components/dashboard/EarningsOverview";
 import "./dashboard.css";
@@ -92,7 +92,7 @@ export default function SpiTractorDashboard() {
             </section>
 
             <aside className="dash-right">
-              <JobRequestPanel />
+              <RequestList />
             </aside>
           </div>
         </div>
