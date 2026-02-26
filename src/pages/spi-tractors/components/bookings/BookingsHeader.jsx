@@ -10,14 +10,9 @@ export default function BookingsHeader() {
             </button>
   
             <button className="bk-chip">
-              January 20-26 - February 10-16 <span className="bk-chev">▾</span>
+              January 01-26 - March 31-26 <span className="bk-chev">▾</span>
             </button>
           </div>
-  
-          <button className="bk-action">
-            <span className="bk-gear">⚙</span>
-            Set Operation Hours
-          </button>
         </div>
       </div>
     );
