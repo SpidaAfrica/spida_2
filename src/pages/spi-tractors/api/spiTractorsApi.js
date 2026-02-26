@@ -181,7 +181,7 @@ paystackVerify: async (reference) => {
 },
   paymentWebhookDemo: (payload) =>
     request("/webhooks_payments.php", { method: "POST", body: payload }),
-  
+  ownerRequestStats: () => request("/requests_owner_stats.php", { auth: true }),
   walletMe: () => request("/wallet_me.php", { auth: true }),
   myNotifications: () => request("/notifications_me.php", { auth: true }),
   adminUsers: () => request("/admin_users.php", { auth: true }),
