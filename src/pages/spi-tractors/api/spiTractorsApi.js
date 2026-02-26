@@ -100,7 +100,7 @@ export const spiTractorsApi = {
   // ✅ REGISTER (supports FormData for utility_bill)
   register: (formDataOrObject) =>
     request("/register.php", { method: "POST", body: formDataOrObject }),
-
+  ownerInbox: () => request("/requests_owner_inbox.php", { auth: true }),
   // placeholders (create in PHP when ready)
   login: (payload) => request("/login.php", { method: "POST", body: payload }),
   me: () => request("/me.php", { auth: true }),
