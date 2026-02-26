@@ -10,7 +10,12 @@ import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 const fallbackImages = [img1, img2, img3, img4, img5, img6];
 
-export default function EquipmentGrid() {
+import { forwardRef, useImperativeHandle } from "react";
+
+const EquipmentGrid = forwardRef((props, ref) => {
+  useImperativeHandle(ref, () => ({
+    reload: load,
+  }));
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -50,4 +55,4 @@ export default function EquipmentGrid() {
       ))}
     </div>
   );
-}
+}export default EquipmentGrid;
