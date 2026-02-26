@@ -65,7 +65,7 @@ export default function EquipmentHeader({ onCreated }) {
     try {
       setLoading(true);
 
-      await spiTractorsApi.createTractor({
+      await spiTractorsApi.addTractor({
         ...form,
         base_rate_per_hour: Number(form.base_rate_per_hour || 0),
         lat: form.lat ? Number(form.lat) : null,
@@ -94,7 +94,7 @@ export default function EquipmentHeader({ onCreated }) {
               Week <span className="eq-chev">▾</span>
             </button>
             <button className="eq-chip" type="button">
-              January 20-26 - February 10-16 <span className="eq-chev">▾</span>
+              January 01-26 - March 31-26 <span className="eq-chev">▾</span>
             </button>
           </div>
 
