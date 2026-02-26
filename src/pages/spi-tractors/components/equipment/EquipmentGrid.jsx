@@ -1,4 +1,4 @@
-whats wrong here in the syntax import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from "react";
 import EquipmentCard from "./EquipmentCard";
 import img1 from "../../../../assets/images/spitractors/image 1.png";
 import img2 from "../../../../assets/images/spitractors/image 4.png";
@@ -10,12 +10,8 @@ import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 const fallbackImages = [img1, img2, img3, img4, img5, img6];
 
-import { forwardRef, useImperativeHandle } from "react";
-
 const EquipmentGrid = forwardRef((props, ref) => {
-  useImperativeHandle(ref, () => ({
-    reload: load,
-  }));
+
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -30,6 +26,11 @@ const EquipmentGrid = forwardRef((props, ref) => {
       setLoading(false);
     }
   };
+
+  // 👇 NOW load exists before we use it
+  useImperativeHandle(ref, () => ({
+    reload: load,
+  }));
 
   useEffect(() => {
     load();
@@ -46,7 +47,8 @@ const EquipmentGrid = forwardRef((props, ref) => {
     }));
   }, [equipment]);
 
-  if (loading && mapped.length === 0) return <div style={{ padding: 12 }}>Loading...</div>;
+  if (loading && mapped.length === 0)
+    return <div style={{ padding: 12 }}>Loading...</div>;
 
   return (
     <div className="eq-grid">
@@ -55,4 +57,6 @@ const EquipmentGrid = forwardRef((props, ref) => {
       ))}
     </div>
   );
-} export default EquipmentGrid;
+});
+
+export default EquipmentGrid;
