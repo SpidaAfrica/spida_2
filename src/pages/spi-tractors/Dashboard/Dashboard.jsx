@@ -76,11 +76,6 @@ export default function SpiTractorDashboard() {
                 </button>
               </div>
             </div>
-
-            <div className="dash-search">
-              <input placeholder="Search" />
-              <span className="search-ic">🔎</span>
-            </div>
           </div>
 
           <div className="dash-grid">
