@@ -1,59 +1,68 @@
+import { useEffect, useMemo, useState } from "react";
 import RequestCard from "./RequestCard";
-
-const requests = [
-  {
-    id: "Req4567",
-    farmersCount: "3 Farmers",
-    farmers: ["Richard Okoye", "Wasiu Alabi", "Wasiu Alabi"],
-    service: "Ploughing",
-    farmName: "Green Valley Farms",
-    farmLocation:
-      "Green Valley Farms, 12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)",
-    farmSize: "10 acres",
-    preferredDates: "January Saturday 25th – Thursday 30th",
-    timeRange: "08:00 AM to 09:00 PM",
-    paymentMethod: "Spida Wallet",
-    totalAmount: "₦100,000",
-  },
-  {
-    id: "Req7841",
-    farmersCount: "1 Farmer",
-    farmers: ["Dada Dimeji"],
-    service: "Ploughing",
-    farmName: "Green Valley Farms",
-    farmLocation:
-      "Green Valley Farms, 12 Banana Street, Lekki, Lagos, Nigeria (6.4423° N, 3.3892° E)",
-    farmSize: "10 acres",
-    preferredDates: "January Saturday 25th – Thursday 30th",
-    timeRange: "08:00 AM to 09:00 PM",
-    paymentMethod: "Spida Wallet",
-    totalAmount: "₦100,000",
-  },
-];
+import { spiTractorsApi } from "../../api/spiTractorsApi"; // adjust path if needed
 
 export default function RequestList() {
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([]);
+  const [err, setErr] = useState("");
+
+  const load = async () => {
+    try {
+      setErr("");
+      setLoading(true);
+      const res = await spiTractorsApi.ownerNewRequests();
+      setRows(Array.isArray(res?.data) ? res.data : []);
+    } catch (e) {
+      setErr(e?.message || "Unable to load requests");
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 10000);
+    return () => clearInterval(t);
+  }, []);
+
+  const countLabel = useMemo(() => {
+    const n = rows.length;
+    return `${n} New Job request${n === 1 ? "" : "s"}`;
+  }, [rows.length]);
+
   return (
     <div className="req-list-wrap">
       <div className="req-list-top">
         <div className="req-list-title">
           <span>New Request</span>
-          <span className="req-info">ⓘ</span>
+          <span className="req-info" title="Refresh" onClick={load} style={{ cursor: "pointer" }}>
+            ⓘ
+          </span>
         </div>
 
         <div className="req-list-actions">
           <div className="req-search">
-            <input placeholder="Search" />
+            <input placeholder="Search" disabled />
             <span className="req-search-ic">🔎</span>
           </div>
 
-          <div className="req-new-badge">135 New Job request</div>
+          <div className="req-new-badge">{countLabel}</div>
         </div>
       </div>
 
+      {loading && rows.length === 0 && <div style={{ padding: 12 }}>Loading...</div>}
+      {err && <div style={{ padding: 12 }}>{err}</div>}
+
       <div className="req-list">
-        {requests.map((r) => (
-          <RequestCard key={r.id} data={r} />
+        {rows.map((r) => (
+          <RequestCard key={r.request_id} data={r} onChanged={load} />
         ))}
+
+        {!loading && !err && rows.length === 0 && (
+          <div style={{ padding: 12 }}>No new requests right now.</div>
+        )}
       </div>
     </div>
   );
