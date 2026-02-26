@@ -16,7 +16,6 @@ export default function RequestCard({ data }) {
   
             <div className="req-contact">
               <button className="req-ic" title="Call">📞</button>
-              <button className="req-ic" title="Chat">💬</button>
             </div>
           </div>
   
