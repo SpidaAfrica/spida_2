@@ -15,8 +15,8 @@ export default function SpiTractorManageEquipment() {
         <Topbar />
 
         <div className="eq-content">
-          <EquipmentHeader />
-          <EquipmentGrid />
+          <EquipmentHeader onCreated={() => gridRef.current?.reload()} />
+          <EquipmentGrid ref={gridRef} />
         </div>
       </main>
     </div>
