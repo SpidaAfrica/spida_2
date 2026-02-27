@@ -91,7 +91,7 @@
   }
   
   .dash-right {
-    min-width: 0;
+    min-width: 0; height: auto;
   }
   
   /* Responsive */
