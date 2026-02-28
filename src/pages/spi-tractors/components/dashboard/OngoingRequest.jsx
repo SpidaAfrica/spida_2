@@ -94,6 +94,7 @@ export default function OngoingRequests() {
             to_status: "WORK_STARTED",
             note: "Work started",
             tractor_id: x.tractor_id || 0,
+            owner_user_id: x?.meta?.owner_user_id || 0,
           });
           fetchOngoing();
         } catch (e) {
@@ -104,12 +105,13 @@ export default function OngoingRequests() {
       const onComplete = async () => {
         if (!window.confirm("Mark this request as COMPLETED?")) return;
         try {
-          await spiTractorsApi.requestSetStatus({
-            request_id: x.request_id,
-            to_status: "COMPLETED",
-            note: "Job completed by tractor owner",
-            tractor_id: x.tractor_id || 0,
-          });
+        await spiTractorsApi.requestSetStatus({
+          request_id: x.request_id,
+          to_status: "COMPLETED",
+          note: "Job completed by tractor owner",
+          tractor_id: x.tractor_id || 0,
+          owner_user_id: x?.meta?.owner_user_id || 0,
+        });
           fetchOngoing();
         } catch (e) {
           alert(e?.message || "Unable to complete request");
