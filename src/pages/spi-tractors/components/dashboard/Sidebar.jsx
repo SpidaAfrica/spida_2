@@ -39,11 +39,15 @@ export default function Sidebar() {
   }, [displayName]);
 
   const onLogout = async () => {
-    // if you later add /logout.php, call it here; for now just clear local storage
-    clearSession();
+  try {
+    await spiTractorsApi.logout();   // 🔥 revoke in DB
+  } catch (e) {
+    // ignore, we still clear local session
+  } finally {
+    clearSession();                  // remove from localStorage
     navigate("/Spi_Tractors_Login");
-  };
-
+  }
+};
   return (
     <aside className="sidebar">
       <div className="sidebar-brand" onClick={() => navigate("/Spi_Tractors-Dashboard")} role="button" tabIndex={0}>
