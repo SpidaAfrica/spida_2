@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/dashboard/Sidebar";
 import Topbar from "../components/dashboard/Topbar";
 import RequestsStats from "../components/requests/RequestsStats";
@@ -18,24 +18,46 @@ export default function SpiTractorDashboard() {
     return u?.email || "Sanusi";
   });
 
+  const [todayLabel, setTodayLabel] = useState("");
+  const [greeting, setGreeting] = useState("Good Morning");
+
+  // 🔥 Handle greeting + date
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+
+      // Greeting logic
+      if (hours < 12) setGreeting("Good Morning");
+      else if (hours < 17) setGreeting("Good Afternoon");
+      else setGreeting("Good Evening");
+
+      // Date formatting
+      setTodayLabel(
+        now.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      );
+    };
+
+    updateDateTime();
+
+    // Update every minute (handles midnight rollover)
+    const interval = setInterval(updateDateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 🔥 Session validation
   useEffect(() => {
     const token = localStorage.getItem("spiTractorsToken") || "";
 
-    // if no token, send user to login (or request)
     if (!token) {
       navigate("/Spi_Tractors_Login/", { replace: true });
       return;
     }
-    const todayLabel = useMemo(() => {
-    const now = new Date();
-
-    return now.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }, []);
 
     spiTractorsApi
       .me()
@@ -44,21 +66,18 @@ export default function SpiTractorDashboard() {
         if (email) setUserEmail(email);
       })
       .catch((err) => {
-        // ✅ Only clear session if backend actually says Unauthorized
-        const msg = String(err?.message || "");
+        const msg = String(err?.message || "").toLowerCase();
         const isUnauthorized =
-          msg.toLowerCase().includes("unauthorized") ||
-          msg.toLowerCase().includes("missing authorization") ||
-          msg.toLowerCase().includes("session expired");
+          msg.includes("unauthorized") ||
+          msg.includes("missing authorization") ||
+          msg.includes("session expired");
 
         if (isUnauthorized) {
           clearSession();
           navigate("/Spi_Tractors_Login/", { replace: true });
-          return;
+        } else {
+          console.log("me() failed but session kept:", err);
         }
-
-        // ❌ don't clear session on random failures
-        console.log("me() failed but session kept:", err);
       });
   }, [navigate]);
 
@@ -73,7 +92,8 @@ export default function SpiTractorDashboard() {
           <div className="dash-head">
             <div>
               <h1 className="dash-title">
-                Good Morning, {String(userEmail).split("@")[0]}!{" "}
+                {greeting},{" "}
+                {String(userEmail).split("@")[0]}!{" "}
                 <span className="wave">👋</span>
               </h1>
 
@@ -81,8 +101,9 @@ export default function SpiTractorDashboard() {
                 <button className="chip">
                   Today <span className="chev">▾</span>
                 </button>
+
                 <button className="chip">
-                   {todayLabel} <span className="chev">▾</span>
+                  {todayLabel} <span className="chev">▾</span>
                 </button>
               </div>
             </div>
