@@ -96,7 +96,9 @@ export const spiTractorsApi = {
   baseUrl: API_BASE_URL,
 
   health: () => request("/health.php"),
-
+  settingsGet: () => request("/settings_get.php", { auth: true }),
+  settingsUpdateProfile: (payload) => request("/settings_profile_update.php", { method: "POST", body: payload, auth: true }),
+  settingsChangePassword: (payload) => request("/settings_password_change.php", { method: "POST", body: payload, auth: true }),
   // ✅ REGISTER (supports FormData for utility_bill)
   register: (formDataOrObject) =>
     request("/register.php", { method: "POST", body: formDataOrObject }),
