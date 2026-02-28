@@ -51,8 +51,8 @@ import SubscriptionSuccess from "./pages/spi-tractors/Auth/SubscriptionSuccess";
 import AddTractor from "./pages/spi-tractors/Auth/AddTractors";
 import TractorCapability from "./pages/spi-tractors/Auth/TractorCapability";
 import TractorAvailability from "./pages/spi-tractors/Auth/TractorAvailability";
-import AddPaymentMethod from "./pages/spi-tractors/Auth/AddPaymentMethod";
-import SpiTractorDashboard from "./pages/spi-tractors/Dashboard/Dashboard";
+import AddPaymentMethod from "./pages/spi-tractors/Auth/AddPaymentMethod";Spi_Tractors-Settings
+import SpiTractorDashboard from "./pages/spi-tractors/Dashboard/Dashboard";import SpiTractorsSettings from "./pages/spi-tractors/Dashboard/SpiTractorsSettings";
 import SpiTractorsRequests from "./pages/spi-tractors/Dashboard/Requests";
 import SpiTractorBookings from "./pages/spi-tractors/Dashboard/Bookings";
 import SpiTractorEarnings from "./pages/spi-tractors/Dashboard/Earnings";
@@ -274,7 +274,7 @@ function App() {
           <Route path="/Spi_Tractors/" element={<ChooseRole/>} /> <Route path="/Spi_Tractors-Guest-Login/" element={<GuestLogin/>} />
           <Route path="/SpiTractorsPayAndEta/" element={<SpiTractorsPayAndEta/>} /> <Route path="/Spi_Tractors-Otp/" element={<OtpLogin/>} />
           <Route path="/SpiTractorsTrackRequest/" element={<TrackRequest/>} /> <Route path="/SpiTractorsPayCallback/" element={<SpiTractorsPayCallback/>} />
-          <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} />
+          <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} /><Route path="/Spi_Tractors_Settings/" element={<SpiTractorsSettings/>} />
           <Route path="/Spi_Tractors_Login/" element={<Spi_Tractors_Login />} />
           <Route path="/Spi_Tractors_Signup/" element={<Spi_Tractors_Signup />} />
           <Route path="/Spi_Tractors-Verify-Email/" element={<VerifyEmail />} />
