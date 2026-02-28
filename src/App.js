@@ -51,7 +51,7 @@ import SubscriptionSuccess from "./pages/spi-tractors/Auth/SubscriptionSuccess";
 import AddTractor from "./pages/spi-tractors/Auth/AddTractors";
 import TractorCapability from "./pages/spi-tractors/Auth/TractorCapability";
 import TractorAvailability from "./pages/spi-tractors/Auth/TractorAvailability";
-import AddPaymentMethod from "./pages/spi-tractors/Auth/AddPaymentMethod";Spi_Tractors-Settings
+import AddPaymentMethod from "./pages/spi-tractors/Auth/AddPaymentMethod";
 import SpiTractorDashboard from "./pages/spi-tractors/Dashboard/Dashboard";import SpiTractorsSettings from "./pages/spi-tractors/Dashboard/SpiTractorsSettings";
 import SpiTractorsRequests from "./pages/spi-tractors/Dashboard/Requests";
 import SpiTractorBookings from "./pages/spi-tractors/Dashboard/Bookings";
