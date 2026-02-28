@@ -1,0 +1,81 @@
+.stg-page {
+  padding: 24px;
+}
+
+.stg-title {
+  margin: 0 0 16px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stg-card {
+  background: #fff;
+  border: 1px solid #eef0f2;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.stg-card h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.stg-card label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.stg-card input,
+.stg-card select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+}
+
+.stg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stg-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+}
+
+.stg-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.stg-span {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .stg-grid {
+    grid-template-columns: 1fr;
+  }
+  .stg-span {
+    grid-column: auto;
+  }
+  .stg-row {
+    grid-template-columns: 1fr;
+  }
+}
