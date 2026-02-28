@@ -26,8 +26,6 @@ export default function Topbar() {
       <div className="topbar-spacer" />
 
       <div className="topbar-actions">
-        <button className="icon-btn" title="Rewards">🏅</button>
-        <button className="icon-btn" title="Search">🔎</button>
         <button className="icon-btn" title="Notifications">🔔 {notifCount > 0 ? `(${notifCount})` : ""}</button>
 
         <div className="topbar-user">
