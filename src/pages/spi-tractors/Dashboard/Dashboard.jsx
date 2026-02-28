@@ -26,6 +26,16 @@ export default function SpiTractorDashboard() {
       navigate("/Spi_Tractors_Login/", { replace: true });
       return;
     }
+    const todayLabel = useMemo(() => {
+    const now = new Date();
+
+    return now.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, []);
 
     spiTractorsApi
       .me()
@@ -72,7 +82,7 @@ export default function SpiTractorDashboard() {
                   Today <span className="chev">▾</span>
                 </button>
                 <button className="chip">
-                  Thursday, August 22, 2024 <span className="chev">▾</span>
+                   {todayLabel} <span className="chev">▾</span>
                 </button>
               </div>
             </div>
