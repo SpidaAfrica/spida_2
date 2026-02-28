@@ -94,7 +94,7 @@ export function getCurrentUser() {
  */
 export const spiTractorsApi = {
   baseUrl: API_BASE_URL,
-
+  logout: () => request("/logout.php", { method: "POST", auth: true }),
   health: () => request("/health.php"),
   settingsGet: () => request("/settings_get.php", { auth: true }),
   settingsUpdateProfile: (payload) => request("/settings_profile_update.php", { method: "POST", body: payload, auth: true }),
