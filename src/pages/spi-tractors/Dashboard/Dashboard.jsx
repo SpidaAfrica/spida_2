@@ -87,7 +87,7 @@ export default function SpiTractorDashboard() {
             </section>
 
             <aside className="dash-right">
-              <RequestList />
+              <JobRequestPanel />
             </aside>
           </div>
         </div>
