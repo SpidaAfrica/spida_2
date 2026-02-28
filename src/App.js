@@ -274,7 +274,7 @@ function App() {
           <Route path="/Spi_Tractors/" element={<ChooseRole/>} /> <Route path="/Spi_Tractors-Guest-Login/" element={<GuestLogin/>} />
           <Route path="/SpiTractorsPayAndEta/" element={<SpiTractorsPayAndEta/>} /> <Route path="/Spi_Tractors-Otp/" element={<OtpLogin/>} />
           <Route path="/SpiTractorsTrackRequest/" element={<TrackRequest/>} /> <Route path="/SpiTractorsPayCallback/" element={<SpiTractorsPayCallback/>} />
-          <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} /><Route path="/Spi_Tractors_Settings/" element={<SpiTractorsSettings/>} />
+          <Route path="/Spi_Tractors_Request/" element={<RequestSpiTractor/>} /><Route path="/Spi_Tractors-Settings/" element={<SpiTractorsSettings/>} />
           <Route path="/Spi_Tractors_Login/" element={<Spi_Tractors_Login />} />
           <Route path="/Spi_Tractors_Signup/" element={<Spi_Tractors_Signup />} />
           <Route path="/Spi_Tractors-Verify-Email/" element={<VerifyEmail />} />
