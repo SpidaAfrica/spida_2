@@ -40,7 +40,6 @@ export default function RequestsStats() {
           </div>
 
           <div className="req-stat-value">{s.value}</div>
-          <button className="req-link">See full details</button>
         </div>
       ))}
     </div>
