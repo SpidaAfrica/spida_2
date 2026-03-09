@@ -1,0 +1,84 @@
+.email-verified-page {
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    position: relative;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  
+  .email-verified-back {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    color: black;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  
+  .email-verified-center {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  
+  .email-verified-icon {
+    width: 120px;
+    height: 120px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+  }
+  
+  .email-verified-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #111;
+    margin: 8px 0 12px;
+  }
+  
+  .email-verified-text {
+    max-width: 520px;
+    font-size: 13px;
+    color: #444;
+    margin: 0 0 26px 0;
+    line-height: 1.4;
+  }
+  
+  .email-verified-email {
+    color: #22c55e;
+    font-weight: 500;
+  }
+  
+  .email-verified-btn {
+    border: none;
+    background: #4caf50;
+    color: #ffffff;
+    padding: 14px 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    min-width: 280px;
+    font-size: 14px;
+  }
+  
+  .email-verified-btn:hover {
+    background: #3e9d45;
+  }
+  
+  /* Mobile */
+  @media (max-width: 420px) {
+    .email-verified-back {
+      top: 18px;
+      left: 18px;
+    }
+  
+    .email-verified-btn {
+      min-width: 240px;
+    }
+  }
+  

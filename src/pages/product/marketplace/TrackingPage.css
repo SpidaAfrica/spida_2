@@ -1,0 +1,70 @@
+.tracking_section {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .progress_container {
+    height: 20px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  
+  .progress_bar {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.5s ease;
+  }
+  
+  .status_labels {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .status_labels li {
+    color: #aaa;
+  }
+  
+  .status_labels li.active {
+    color: #4caf50;
+    font-weight: bold;
+  }
+
+  .status_labels {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .status_labels li {
+    border-left: 5px solid #ddd;
+    padding-left: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .status_labels li.active {
+    border-color: #4caf50;
+  }
+  
+  .status_labels h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .status_description {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  

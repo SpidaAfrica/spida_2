@@ -1,0 +1,100 @@
+  button {
+    background-color: green;
+    color: white;
+    padding: 8px 12px;
+    margin-right: 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  button:hover {
+    background-color: darkgreen;
+  }
+  .cart-buttons{
+    margin-top: 10px;
+  }
+  .cart-buttons .delete{
+    background-color: #c82333;
+  }
+  
+  @media (max-width: 600px) {
+    .cart-item {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .details {
+      text-align: center;
+      padding-left: 0;
+    }
+  }
+  .cart-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .cart-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+  }
+  
+  .cart-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 15px;
+    border-radius: 5px;
+  }
+  
+  .details {
+    flex-grow: 1;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+  }
+  
+  .quantity-controls button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .quantity-controls button:hover {
+    background-color: #218838;
+  }
+  
+  .quantity-controls input {
+    width: 50px;
+    text-align: center;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  .delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 5px;
+    border-radius: 3px;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c82333;
+  }
+  

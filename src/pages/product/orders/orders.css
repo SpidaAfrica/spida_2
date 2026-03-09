@@ -1,0 +1,439 @@
+.ordersTabs {
+  padding: 0 0 30px;
+}
+
+.orders_page {
+  width: 100%;
+  /* background: green; */
+  overflow: hidden;
+}
+
+.orders_page .ordersTabs .item_tab.active h2 {
+  background: var(--brand-primary);
+  color: var(--brand-white);
+}
+
+.orders_page .pickup_items {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.orders_page .pickup_items .pickup_item {
+  padding: 30px 20px;
+  border-radius: 12px;
+  background: var(--brand-2f2);
+  box-shadow: 0px 7px 20px 0px var(--brand-A33);
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  gap: 30px;
+  align-items: stretch;
+}
+
+.orders_page .pickup_items .pickup_item > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.pickup_item .pickup_details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.pickup_item .pickup_details > div {
+  border-bottom: 0.5px solid var(--brand-A80);
+  padding: 0 0 15px;
+}
+
+.pickup_item .pickup_details .order_id h3 {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.05em;
+  margin: 0 0 10px;
+}
+
+.pickup_item .pickup_details .order_id h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: -0.05em;
+}
+
+.pickup_item .pickup_details .pickup_location {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1.2fr;
+  gap: 22px;
+  align-items: center;
+}
+
+.pickup_item .pickup_details .pickup_location p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.05em;
+  margin: 0 0 10px;
+}
+
+.pickup_item .pickup_details .pickup_location h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: -0.05em;
+}
+
+.pickup_item .pickup_details .pickup_location .pickup_imgs {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.pickup_item .pickup_details .item_details {
+  display: flex;
+  justify-content: space-between;
+  /* gap: 13px; */
+}
+
+.pickup_item .pickup_details .item_details p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.05em;
+}
+
+.pickup_item .pickup_details .item_details h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+}
+
+.pickup_item .pickup_details button {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  padding: 26px 0;
+  border: none;
+  border-radius: 12px;
+  text-transform: uppercase;
+  color: var(--brand-white);
+  background: var(--brand-primary);
+}
+
+/* pickup_summaries  */
+.pickup_summaries {
+  padding: 30px 0;
+}
+
+.pickup_summaries > h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 29.26px;
+  margin: 0 0 30px;
+}
+
+.recent_orders.pickup_summaries .items_body ul {
+  background: transparent;
+  color: var(--brand-primary);
+  border: none;
+  border-radius: 0;
+  border-bottom: 0.5px solid #0c420a;
+}
+
+.all_orders_page_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 30px;
+}
+
+.all_orders_page_header h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 29.26px;
+  letter-spacing: 0.01em;
+  color: var(--brand-primary);
+}
+
+.all_orders_page_header h3 {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 13.5px;
+  letter-spacing: 0.01em;
+  color: var(--brand-primary);
+}
+
+.all_orders_page_header h3 select {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 13.5px;
+  letter-spacing: 0.01em;
+  color: var(--brand-primary);
+  border: none;
+  outline: none;
+}
+
+/* ongoing_delivery_page */
+
+.ongoing_delivery_page {
+  max-width: 100%;
+  /* background: red; */
+  /* overflow-x: scroll; */
+}
+
+.ongoing_delivery_page > h1 {
+  font-family: Montserrat;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 29.26px;
+  letter-spacing: 0.01em;
+  color: var(--brand-primary);
+  margin: 0 0 30px;
+  max-width: 100%;
+  /* background: blue; */
+}
+
+.ongoing_delivery_page .delivery_items {
+  display: flex;
+  gap: 30px;
+  margin: 10px 0 30px;
+
+  max-width: 100%;
+  overflow-x: auto;          /* enable horizontal scrolling */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  scroll-behavior: smooth;
+
+  /* Optional: hide scrollbar */
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.ongoing_delivery_page .delivery_items::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+}
+
+.logistics_ongoing_delivery_page .delivery_items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+  gap: 30px;
+}
+
+.ongoing_delivery_page .delivery_item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 390px;
+  gap: 24px;
+  box-shadow: 0px 20px 50px 0px #dce0f980;
+  padding: 22px 20px;
+  border-radius: 12px;
+}
+
+.ongoing_delivery_page .delivery_item > div {
+  padding: 0 0 18px;
+  width: 100%;
+  border-bottom: 1px solid #ececec;
+}
+
+.ongoing_delivery_page .delivery_item .shipment_info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ongoing_delivery_page .delivery_item .shipment_info > div h4 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 17.01px;
+  letter-spacing: 0.01em;
+  color: var(--brand-aaa);
+  margin: 0 0 6px;
+}
+
+.ongoing_delivery_page .delivery_item .shipment_info > div h1 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24.3px;
+  letter-spacing: 0.01em;
+  margin: 0 0 9px;
+}
+
+.ongoing_delivery_page .delivery_item .shipment_info > div p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  letter-spacing: 0.01em;
+  color: #484a58;
+}
+
+.ongoing_delivery_page .delivery_item .locations {
+  display: flex;
+  flex-direction: column;
+}
+
+.ongoing_delivery_page .delivery_item .locations > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ongoing_delivery_page .delivery_item .locations > div h3 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21.6px;
+  letter-spacing: 0.01em;
+}
+
+.ongoing_delivery_page .delivery_item .locations > div p {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16.2px;
+  letter-spacing: 0.01em;
+  color: #b0b0b0;
+}
+
+.ongoing_delivery_page .delivery_item .owner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ongoing_delivery_page .delivery_item .owner > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ongoing_delivery_page .delivery_item .owner > div h3 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 17.01px;
+  letter-spacing: 0.01em;
+  color: #b0b0b0;
+  margin: 0 0 4px;
+}
+
+.ongoing_delivery_page .delivery_item .owner > div h1 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21.6px;
+  letter-spacing: 0.01em;
+}
+
+.ongoing_delivery_page .delivery_item .owner > div p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  letter-spacing: 0.01em;
+  color: #484a58;
+}
+
+.ongoing_delivery_page .map {
+  width: 100%;
+  height: 700px;
+}
+
+.ongoing_delivery_page .map iframe {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  border: none;
+}
+
+.ongoing_delivery_page .recent_orders .items_head ul {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.ongoing_delivery_page .recent_orders .items_body .item ul {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* tracking_numbers */
+
+.tracking_numbers {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  padding: 30px 0 60px;
+}
+
+.tracking_numbers .ids {
+  background: var(--brand-2f2);
+  box-shadow: 0px 7px 25px 0px #0c420a33;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.tracking_numbers .ids h1 {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: -0.05em;
+  margin-bottom: 10px;
+  color: var(--brand-primary);
+}
+
+.tracking_numbers .ids .ids_details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* color: var(--brand-primary); */
+}
+
+.tracking_numbers .ids .ids_details > div{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 0 15px;
+  border-bottom: 0.5px solid var(--brand-A80);
+  /* color: var(--brand-primary); */
+}
+
+.tracking_numbers .ids .ids_details > div h3{
+font-size: 20px;
+font-weight: 500;
+line-height: 28px;
+letter-spacing: -0.05em;
+  color: var(--brand-primary);
+}
+
+.tracking_numbers .ids .ids_details > div button{
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: -0.05em;
+  color: var(--brand-primary);
+  padding: 4px 20px;
+  border-radius: 6px;
+  background-color: var(--brand-white);
+  border: 0.5px solid var(--brand-primary);
+  color: var(--brand-06F);
+}
+
+.tracking_numbers .pickup_items {
+  background-color: var(--brand-primary);
+  border-radius: 12px;
+  padding: 30px;
+  color: var(--brand-white);
+}
+
+.tracking_numbers .pickup_items .pickup_details button {
+  background-color: var(--brand-white);
+  border-radius: 12px;
+  padding: 30px;
+  color: var(--brand-primary);
+}
+
+.tracking_numbers .pickup_items .pickup_details .item_details h2 {
+  color: var(--brand-white);
+}

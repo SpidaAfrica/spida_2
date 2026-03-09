@@ -1,0 +1,398 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  LoadScript,
+  GoogleMap,
+  Marker,
+  DirectionsRenderer,
+} from "@react-google-maps/api";
+import "./PayAndEta.css";
+import { spiTractorsApi } from "../api/spiTractorsApi";
+import tractorIcon from "../../../assets/images/Group (11).png";
+const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
+const PENDING_PAY_KEY = "spiPendingPaystackPayment";
+
+const mapContainerStyle = {
+  width: "100%",
+  height: "320px",
+};
+
+const defaultCenter = {
+  lat: 6.5244,
+  lng: 3.3792,
+};
+
+export default function SpiTractorsPayAndEta() {
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const mapRef = useRef(null);
+
+  const job = useMemo(() => {
+    return (
+      state?.job || {
+        requestId: "REQ-4567",
+        requestUuid: "",
+        service: "Ploughing",
+        farmAddress: "12 Banana Street, Lekki, Lagos, Nigeria",
+        farmCity: "Lagos",
+        farmSize: 10,
+        tractorId: "",
+        tractorName: "Greenfield 6060X",
+        tractorRegId: "ABC-456ZT",
+        distanceKm: 6.4,
+        etaMinutes: 18,
+        ratePerHour: 5000,
+        estimatedHours: 6,
+        travelFee: 2000,
+        full_name: "",
+        farm_name: "",
+      }
+    );
+  }, [state]);
+
+  const [loading, setLoading] = useState(false);
+  const [estimate, setEstimate] = useState(null);
+
+  const [farmerLocation, setFarmerLocation] = useState(null);
+  const [tractorLocation, setTractorLocation] = useState(null);
+  const [directions, setDirections] = useState(null);
+  const [routeInfo, setRouteInfo] = useState({
+    distanceKm: Number(job.distanceKm) || 0,
+    etaMinutes: Number(job.etaMinutes) || 0,
+  });
+
+  const mapCenter = useMemo(() => {
+    if (farmerLocation) return farmerLocation;
+    if (tractorLocation) return tractorLocation;
+    return defaultCenter;
+  }, [farmerLocation, tractorLocation]);
+
+  const farmerIcon = useMemo(() => {
+    if (!window.google?.maps) {
+      return { url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png" };
+    }
+
+    return {
+      url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+      scaledSize: new window.google.maps.Size(42, 42),
+    };
+  }, []);
+
+  const tractorIcon = useMemo(() => {
+    if (!window.google?.maps) return undefined;
+
+    return {
+      url: tractorIcon,
+      scaledSize: new window.google.maps.Size(42, 42),
+      anchor: new window.google.maps.Point(21, 21),
+    };
+  }, []);
+
+  useEffect(() => {
+    const runEstimate = async () => {
+      try {
+        const res = await spiTractorsApi.paymentEstimate({
+          rate_per_hour: job.ratePerHour,
+          estimated_hours: job.estimatedHours,
+          travel_fee: job.travelFee,
+        });
+
+        setEstimate(res?.data || null);
+      } catch {
+        setEstimate(null);
+      }
+    };
+
+    runEstimate();
+  }, [job.estimatedHours, job.ratePerHour, job.travelFee]);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFarmerLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+      },
+      (error) => {
+        console.log("Unable to get farmer location:", error);
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!job.tractorId) return;
+
+    const fetchTractorLocation = async () => {
+      try {
+        const res = await spiTractorsApi.getTractorLocation(job.tractorId);
+
+        setTractorLocation({
+          lat: parseFloat(res?.data?.lat),
+          lng: parseFloat(res?.data?.lng),
+        });
+      } catch (err) {
+        console.log("Unable to get tractor location:", err);
+      }
+    };
+
+    fetchTractorLocation();
+    const interval = setInterval(fetchTractorLocation, 5000);
+
+    return () => clearInterval(interval);
+  }, [job.tractorId]);
+
+  useEffect(() => {
+    if (!window.google?.maps || !farmerLocation || !tractorLocation) return;
+
+    const directionsService = new window.google.maps.DirectionsService();
+
+    directionsService.route(
+      {
+        origin: tractorLocation,
+        destination: farmerLocation,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === "OK" && result?.routes?.[0]?.legs?.[0]) {
+          setDirections(result);
+
+          const leg = result.routes[0].legs[0];
+          setRouteInfo({
+            distanceKm: Number(leg.distance?.value || 0) / 1000,
+            etaMinutes: Math.round(Number(leg.duration?.value || 0) / 60),
+          });
+        } else {
+          setDirections(null);
+        }
+      }
+    );
+  }, [farmerLocation, tractorLocation]);
+
+  useEffect(() => {
+    if (!mapRef.current || !window.google?.maps) return;
+    if (!farmerLocation && !tractorLocation) return;
+
+    const bounds = new window.google.maps.LatLngBounds();
+
+    if (farmerLocation) bounds.extend(farmerLocation);
+    if (tractorLocation) bounds.extend(tractorLocation);
+
+    if (farmerLocation || tractorLocation) {
+      mapRef.current.fitBounds(bounds);
+
+      if (farmerLocation && tractorLocation) return;
+      mapRef.current.setZoom(14);
+    }
+  }, [farmerLocation, tractorLocation, directions]);
+
+  const total = useMemo(() => {
+    if (estimate?.total) return Number(estimate.total) || 0;
+
+    return (
+      Number(job.ratePerHour) * Number(job.estimatedHours) +
+      Number(job.travelFee)
+    );
+  }, [estimate, job]);
+
+  const formatMoney = (n) => `₦${Number(n || 0).toLocaleString()}`;
+
+  const handlePay = async () => {
+    if (loading) return;
+
+    if (!job.requestUuid) {
+      alert("Missing request ID.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const amountKobo = Math.round(Number(total) * 100);
+      const callbackUrl = `${window.location.origin}/SpiTractorsPayCallback`;
+
+      const initRes = await spiTractorsApi.paystackInitialize({
+        job_request_id: job.requestUuid,
+        amount_kobo: amountKobo,
+        callback_url: callbackUrl,
+        meta: {
+          request_code: job.requestId,
+          tractor_id: job.tractorId,
+          service: job.service,
+          farm_city: job.farmCity,
+          farm_address: job.farmAddress,
+          full_name: job.full_name,
+          farm_name: job.farm_name,
+        },
+      });
+
+      const authorizationUrl = initRes?.data?.authorization_url;
+      const reference = initRes?.data?.reference;
+
+      if (!authorizationUrl || !reference) {
+        throw new Error("Unable to start payment.");
+      }
+
+      localStorage.setItem(
+        PENDING_PAY_KEY,
+        JSON.stringify({
+          reference,
+          requestUuid: job.requestUuid,
+          tractorName: job.tractorName,
+        })
+      );
+
+      window.location.href = authorizationUrl;
+    } catch (error) {
+      alert(error?.message || "Payment failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="pay-page">
+      <button className="pay-back" onClick={() => navigate(-1)}>
+        ←
+      </button>
+
+      <div className="pay-shell">
+        <header className="pay-head">
+          <h1 className="pay-title">Payment & ETA</h1>
+          <p className="pay-subtitle">Track tractor arrival in real time.</p>
+        </header>
+
+        <div className="pay-grid">
+          <div className="pay-card">
+            <div className="pay-rowTop">
+              <div>
+                <div className="pay-chip">{job.requestId}</div>
+                <h2 className="pay-h2">{job.service}</h2>
+                <p className="pay-muted">{job.farmAddress}</p>
+              </div>
+
+              <div className="pay-tractor">
+                <div className="pay-tractorName">{job.tractorName}</div>
+                <div className="pay-tractorMeta">Reg. ID: {job.tractorRegId}</div>
+              </div>
+            </div>
+
+            <div className="pay-mapWrap">
+              <LoadScript googleMapsApiKey={GOOGLE_KEY}>
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={mapCenter}
+                  zoom={13}
+                  onLoad={(map) => {
+                    mapRef.current = map;
+                  }}
+                  options={{
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: true,
+                  }}
+                >
+                  {farmerLocation && (
+                    <Marker
+                      position={farmerLocation}
+                      icon={farmerIcon}
+                      title="Farmer"
+                    />
+                  )}
+
+                  {tractorLocation && (
+                    <Marker
+                      position={tractorLocation}
+                      icon={tractorIcon}
+                      title={job.tractorName || "Chosen Tractor"}
+                    />
+                  )}
+
+                  {directions && (
+                    <DirectionsRenderer
+                      directions={directions}
+                      options={{
+                        suppressMarkers: true,
+                        polylineOptions: {
+                          strokeColor: "#1A73E8",
+                          strokeOpacity: 0.9,
+                          strokeWeight: 5,
+                        },
+                      }}
+                    />
+                  )}
+                </GoogleMap>
+              </LoadScript>
+
+              <div className="pay-etaCard">
+                <div className="pay-etaItem">
+                  <div className="pay-etaLabel">Distance</div>
+                  <div className="pay-etaValue">
+                    {routeInfo.distanceKm?.toFixed(1)} km
+                  </div>
+                </div>
+
+                <div className="pay-etaItem">
+                  <div className="pay-etaLabel">Arrival</div>
+                  <div className="pay-etaValue">{routeInfo.etaMinutes} mins</div>
+                </div>
+
+                <div className="pay-etaItem">
+                  <div className="pay-etaLabel">Est. Job Time</div>
+                  <div className="pay-etaValue">{job.estimatedHours} hrs</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pay-section">
+              <h3 className="pay-sectionTitle">Pricing</h3>
+
+              <div className="pay-breakdown">
+                <div className="pay-line">
+                  <span>Hourly rate</span>
+                  <b>{formatMoney(job.ratePerHour)}/hr</b>
+                </div>
+                <div className="pay-line">
+                  <span>Estimated duration</span>
+                  <b>{job.estimatedHours} hrs</b>
+                </div>
+                <div className="pay-line">
+                  <span>Work cost</span>
+                  <b>{formatMoney(job.ratePerHour * job.estimatedHours)}</b>
+                </div>
+                <div className="pay-line">
+                  <span>Travel fee</span>
+                  <b>{formatMoney(job.travelFee)}</b>
+                </div>
+                <div className="pay-divider" />
+                <div className="pay-total">
+                  <span>Total</span>
+                  <b>{formatMoney(total)}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pay-card pay-right">
+            <h3 className="pay-sectionTitle">Payment</h3>
+
+            <div className="pay-total">
+              Total: <b>{formatMoney(total)}</b>
+            </div>
+
+            <button className="pay-btn" onClick={handlePay} disabled={loading}>
+              {loading ? "Redirecting..." : "Make Payment"}
+            </button>
+
+            <button className="pay-secondary" onClick={() => navigate(-1)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

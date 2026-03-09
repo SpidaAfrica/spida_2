@@ -1,0 +1,124 @@
+/*.farmer-orders {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .farmer-orders h2 {
+    margin-bottom: 15px;
+  }
+  
+  .farmer-orders table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .farmer-orders th,
+  .farmer-orders td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .farmer-orders th {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .farmer-orders tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .status {
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  .status.pending {
+    color: orange;
+  }
+  
+  .status.processing {
+    color: blue;
+  }
+  
+  .status.shipped {
+    color: purple;
+  }
+  
+  .status.completed {
+    color: green;
+  }
+  
+  .status.cancelled {
+    color: red;
+  }
+  
+  select {
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 600px) {
+    .farmer-orders table {
+      font-size: 12px;
+    }
+    .farmer-orders th, .farmer-orders td {
+      padding: 5px;
+    }
+  }*/
+
+
+
+  .order_cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+  
+  .order_card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .order_card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  }
+  
+  .order_card strong {
+    color: var(--brand-primary);
+    min-width: 80px;
+    display: inline-block;
+  }
+  @media screen and (max-width: 1000px) {
+    .order_card {
+      font-size: 13px;
+      padding: 16px;
+      display: flex;
+    }
+    .items_head{
+      display: none;
+    }
+    .items_body .item{
+      display: none;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .order_card {
+      font-size: 13px;
+      padding: 16px;
+    }
+  }
+  
+  
