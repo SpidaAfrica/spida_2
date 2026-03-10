@@ -4,13 +4,15 @@ import {
   LoadScript,
   GoogleMap,
   Marker,
-  DirectionsRenderer,
+  Polyline,
 } from "@react-google-maps/api";
 import "./PayAndEta.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
-import tractorIcon from "../../../assets/images/Group (11).png";
+import tractorMarkerImage from "../../../assets/images/Group (11).png";
+
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
+const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
 
 const mapContainerStyle = {
   width: "100%",
@@ -21,6 +23,42 @@ const defaultCenter = {
   lat: 6.5244,
   lng: 3.3792,
 };
+
+function toNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function isValidLatLng(coords) {
+  return (
+    coords &&
+    Number.isFinite(coords.lat) &&
+    Number.isFinite(coords.lng)
+  );
+}
+
+function calculateDistanceKm(origin, destination) {
+  if (!isValidLatLng(origin) || !isValidLatLng(destination)) return 0;
+
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+
+  const dLat = toRad(destination.lat - origin.lat);
+  const dLng = toRad(destination.lng - origin.lng);
+
+  const lat1 = toRad(origin.lat);
+  const lat2 = toRad(destination.lat);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) *
+      Math.cos(lat2) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+}
 
 export default function SpiTractorsPayAndEta() {
   const navigate = useNavigate();
@@ -55,15 +93,14 @@ export default function SpiTractorsPayAndEta() {
 
   const [farmerLocation, setFarmerLocation] = useState(null);
   const [tractorLocation, setTractorLocation] = useState(null);
-  const [directions, setDirections] = useState(null);
   const [routeInfo, setRouteInfo] = useState({
     distanceKm: Number(job.distanceKm) || 0,
     etaMinutes: Number(job.etaMinutes) || 0,
   });
 
   const mapCenter = useMemo(() => {
-    if (farmerLocation) return farmerLocation;
-    if (tractorLocation) return tractorLocation;
+    if (isValidLatLng(farmerLocation)) return farmerLocation;
+    if (isValidLatLng(tractorLocation)) return tractorLocation;
     return defaultCenter;
   }, [farmerLocation, tractorLocation]);
 
@@ -78,15 +115,25 @@ export default function SpiTractorsPayAndEta() {
     };
   }, []);
 
-  const tractorIcon = useMemo(() => {
-    if (!window.google?.maps) return undefined;
+  const tractorMarkerIcon = useMemo(() => {
+    if (!window.google?.maps) {
+      return { url: tractorMarkerImage };
+    }
 
     return {
-      url: tractorIcon,
+      url: tractorMarkerImage,
       scaledSize: new window.google.maps.Size(42, 42),
       anchor: new window.google.maps.Point(21, 21),
     };
   }, []);
+
+  const linePath = useMemo(() => {
+    if (!isValidLatLng(farmerLocation) || !isValidLatLng(tractorLocation)) {
+      return [];
+    }
+
+    return [tractorLocation, farmerLocation];
+  }, [farmerLocation, tractorLocation]);
 
   useEffect(() => {
     const runEstimate = async () => {
@@ -107,20 +154,21 @@ export default function SpiTractorsPayAndEta() {
   }, [job.estimatedHours, job.ratePerHour, job.travelFee]);
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    try {
+      const savedGps = JSON.parse(
+        localStorage.getItem(FARM_GPS_STORAGE_KEY) || "null"
+      );
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setFarmerLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-      },
-      (error) => {
-        console.log("Unable to get farmer location:", error);
-      },
-      { enableHighAccuracy: true, timeout: 12000 }
-    );
+      const lat = toNumber(savedGps?.lat);
+      const lng = toNumber(savedGps?.lng);
+
+      if (lat !== null && lng !== null) {
+        setFarmerLocation({ lat, lng });
+      }
+    } catch (error) {
+      console.log("Unable to read farmer location from localStorage:", error);
+      setFarmerLocation(null);
+    }
   }, []);
 
   useEffect(() => {
@@ -130,10 +178,12 @@ export default function SpiTractorsPayAndEta() {
       try {
         const res = await spiTractorsApi.getTractorLocation(job.tractorId);
 
-        setTractorLocation({
-          lat: parseFloat(res?.data?.lat),
-          lng: parseFloat(res?.data?.lng),
-        });
+        const lat = toNumber(res?.data?.lat);
+        const lng = toNumber(res?.data?.lng);
+
+        if (lat !== null && lng !== null) {
+          setTractorLocation({ lat, lng });
+        }
       } catch (err) {
         console.log("Unable to get tractor location:", err);
       }
@@ -146,48 +196,37 @@ export default function SpiTractorsPayAndEta() {
   }, [job.tractorId]);
 
   useEffect(() => {
-    if (!window.google?.maps || !farmerLocation || !tractorLocation) return;
+    if (!isValidLatLng(farmerLocation) || !isValidLatLng(tractorLocation)) {
+      return;
+    }
 
-    const directionsService = new window.google.maps.DirectionsService();
+    const distanceKm = calculateDistanceKm(tractorLocation, farmerLocation);
 
-    directionsService.route(
-      {
-        origin: tractorLocation,
-        destination: farmerLocation,
-        travelMode: window.google.maps.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === "OK" && result?.routes?.[0]?.legs?.[0]) {
-          setDirections(result);
+    // Simple ETA estimate fallback
+    // Assumes average driving speed of ~30km/h
+    const etaMinutes = distanceKm > 0 ? Math.max(1, Math.round((distanceKm / 30) * 60)) : 0;
 
-          const leg = result.routes[0].legs[0];
-          setRouteInfo({
-            distanceKm: Number(leg.distance?.value || 0) / 1000,
-            etaMinutes: Math.round(Number(leg.duration?.value || 0) / 60),
-          });
-        } else {
-          setDirections(null);
-        }
-      }
-    );
+    setRouteInfo({
+      distanceKm,
+      etaMinutes,
+    });
   }, [farmerLocation, tractorLocation]);
 
   useEffect(() => {
     if (!mapRef.current || !window.google?.maps) return;
-    if (!farmerLocation && !tractorLocation) return;
+    if (!isValidLatLng(farmerLocation) && !isValidLatLng(tractorLocation)) return;
 
     const bounds = new window.google.maps.LatLngBounds();
 
-    if (farmerLocation) bounds.extend(farmerLocation);
-    if (tractorLocation) bounds.extend(tractorLocation);
+    if (isValidLatLng(farmerLocation)) bounds.extend(farmerLocation);
+    if (isValidLatLng(tractorLocation)) bounds.extend(tractorLocation);
 
-    if (farmerLocation || tractorLocation) {
-      mapRef.current.fitBounds(bounds);
+    mapRef.current.fitBounds(bounds);
 
-      if (farmerLocation && tractorLocation) return;
+    if (!(isValidLatLng(farmerLocation) && isValidLatLng(tractorLocation))) {
       mapRef.current.setZoom(14);
     }
-  }, [farmerLocation, tractorLocation, directions]);
+  }, [farmerLocation, tractorLocation]);
 
   const total = useMemo(() => {
     if (estimate?.total) return Number(estimate.total) || 0;
@@ -295,7 +334,7 @@ export default function SpiTractorsPayAndEta() {
                     fullscreenControl: true,
                   }}
                 >
-                  {farmerLocation && (
+                  {isValidLatLng(farmerLocation) && (
                     <Marker
                       position={farmerLocation}
                       icon={farmerIcon}
@@ -303,24 +342,21 @@ export default function SpiTractorsPayAndEta() {
                     />
                   )}
 
-                  {tractorLocation && (
+                  {isValidLatLng(tractorLocation) && (
                     <Marker
                       position={tractorLocation}
-                      icon={tractorIcon}
+                      icon={tractorMarkerIcon}
                       title={job.tractorName || "Chosen Tractor"}
                     />
                   )}
 
-                  {directions && (
-                    <DirectionsRenderer
-                      directions={directions}
+                  {linePath.length === 2 && (
+                    <Polyline
+                      path={linePath}
                       options={{
-                        suppressMarkers: true,
-                        polylineOptions: {
-                          strokeColor: "#1A73E8",
-                          strokeOpacity: 0.9,
-                          strokeWeight: 5,
-                        },
+                        strokeColor: "#1A73E8",
+                        strokeOpacity: 0.9,
+                        strokeWeight: 5,
                       }}
                     />
                   )}
@@ -331,7 +367,7 @@ export default function SpiTractorsPayAndEta() {
                 <div className="pay-etaItem">
                   <div className="pay-etaLabel">Distance</div>
                   <div className="pay-etaValue">
-                    {routeInfo.distanceKm?.toFixed(1)} km
+                    {Number(routeInfo.distanceKm || 0).toFixed(1)} km
                   </div>
                 </div>
 
