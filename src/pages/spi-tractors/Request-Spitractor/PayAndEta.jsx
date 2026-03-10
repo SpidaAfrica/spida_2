@@ -30,11 +30,7 @@ function toNumber(value) {
 }
 
 function isValidLatLng(coords) {
-  return (
-    coords &&
-    Number.isFinite(coords.lat) &&
-    Number.isFinite(coords.lng)
-  );
+  return !!coords && Number.isFinite(coords.lat) && Number.isFinite(coords.lng);
 }
 
 function calculateDistanceKm(origin, destination) {
@@ -77,6 +73,8 @@ export default function SpiTractorsPayAndEta() {
         tractorId: "",
         tractorName: "Greenfield 6060X",
         tractorRegId: "ABC-456ZT",
+        tractorLat: null,
+        tractorLng: null,
         distanceKm: 6.4,
         etaMinutes: 18,
         ratePerHour: 5000,
@@ -90,9 +88,18 @@ export default function SpiTractorsPayAndEta() {
 
   const [loading, setLoading] = useState(false);
   const [estimate, setEstimate] = useState(null);
-
   const [farmerLocation, setFarmerLocation] = useState(null);
-  const [tractorLocation, setTractorLocation] = useState(null);
+  const [tractorLocation, setTractorLocation] = useState(() => {
+    const lat = toNumber(job?.tractorLat);
+    const lng = toNumber(job?.tractorLng);
+
+    if (lat !== null && lng !== null) {
+      return { lat, lng };
+    }
+
+    return null;
+  });
+
   const [routeInfo, setRouteInfo] = useState({
     distanceKm: Number(job.distanceKm) || 0,
     etaMinutes: Number(job.etaMinutes) || 0,
@@ -102,6 +109,14 @@ export default function SpiTractorsPayAndEta() {
     if (isValidLatLng(farmerLocation)) return farmerLocation;
     if (isValidLatLng(tractorLocation)) return tractorLocation;
     return defaultCenter;
+  }, [farmerLocation, tractorLocation]);
+
+  const linePath = useMemo(() => {
+    if (!isValidLatLng(farmerLocation) || !isValidLatLng(tractorLocation)) {
+      return [];
+    }
+
+    return [tractorLocation, farmerLocation];
   }, [farmerLocation, tractorLocation]);
 
   const farmerIcon = useMemo(() => {
@@ -127,14 +142,6 @@ export default function SpiTractorsPayAndEta() {
     };
   }, []);
 
-  const linePath = useMemo(() => {
-    if (!isValidLatLng(farmerLocation) || !isValidLatLng(tractorLocation)) {
-      return [];
-    }
-
-    return [tractorLocation, farmerLocation];
-  }, [farmerLocation, tractorLocation]);
-
   useEffect(() => {
     const runEstimate = async () => {
       try {
@@ -145,7 +152,8 @@ export default function SpiTractorsPayAndEta() {
         });
 
         setEstimate(res?.data || null);
-      } catch {
+      } catch (error) {
+        console.log("Payment estimate error:", error);
         setEstimate(null);
       }
     };
@@ -164,6 +172,8 @@ export default function SpiTractorsPayAndEta() {
 
       if (lat !== null && lng !== null) {
         setFarmerLocation({ lat, lng });
+      } else {
+        setFarmerLocation(null);
       }
     } catch (error) {
       console.log("Unable to read farmer location from localStorage:", error);
@@ -172,14 +182,34 @@ export default function SpiTractorsPayAndEta() {
   }, []);
 
   useEffect(() => {
+    const passedLat = toNumber(job?.tractorLat);
+    const passedLng = toNumber(job?.tractorLng);
+
+    if (passedLat !== null && passedLng !== null) {
+      setTractorLocation({ lat: passedLat, lng: passedLng });
+    }
+  }, [job?.tractorLat, job?.tractorLng]);
+
+  useEffect(() => {
     if (!job.tractorId) return;
 
     const fetchTractorLocation = async () => {
       try {
         const res = await spiTractorsApi.getTractorLocation(job.tractorId);
 
-        const lat = toNumber(res?.data?.lat);
-        const lng = toNumber(res?.data?.lng);
+        const lat = toNumber(
+          res?.data?.lat ??
+            res?.data?.latitude ??
+            res?.data?.tractor?.lat ??
+            res?.data?.tractor?.latitude
+        );
+
+        const lng = toNumber(
+          res?.data?.lng ??
+            res?.data?.longitude ??
+            res?.data?.tractor?.lng ??
+            res?.data?.tractor?.longitude
+        );
 
         if (lat !== null && lng !== null) {
           setTractorLocation({ lat, lng });
@@ -201,10 +231,8 @@ export default function SpiTractorsPayAndEta() {
     }
 
     const distanceKm = calculateDistanceKm(tractorLocation, farmerLocation);
-
-    // Simple ETA estimate fallback
-    // Assumes average driving speed of ~30km/h
-    const etaMinutes = distanceKm > 0 ? Math.max(1, Math.round((distanceKm / 30) * 60)) : 0;
+    const etaMinutes =
+      distanceKm > 0 ? Math.max(1, Math.round((distanceKm / 30) * 60)) : 0;
 
     setRouteInfo({
       distanceKm,
