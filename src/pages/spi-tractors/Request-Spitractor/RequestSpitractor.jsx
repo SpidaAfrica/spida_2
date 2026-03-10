@@ -8,7 +8,7 @@ import {
 } from "@react-google-maps/api";
 import "./RequestSpitractor.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
-import tractorIcon from "../../../assets/images/Group (11).png";
+import tractorMarkerImage from "../../../assets/images/Group (11).png";
 
 const libraries = ["places"];
 
@@ -23,6 +23,11 @@ const defaultCenter = {
 };
 
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
+
+function toNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
 
 export default function RequestSpiTractor() {
   const navigate = useNavigate();
@@ -51,10 +56,11 @@ export default function RequestSpiTractor() {
 
   const onChange = (e) => {
     const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const cleanFarmSize = (v) => Number(String(v).replace(/[^\d.]/g, "")) || 1;
+  const cleanFarmSize = (value) =>
+    Number(String(value).replace(/[^\d.]/g, "")) || 1;
 
   const saveGpsToLocalStorage = useCallback((coords) => {
     try {
@@ -81,23 +87,23 @@ export default function RequestSpiTractor() {
   );
 
   const normalizeTractor = useCallback((tractor, index) => {
-    const lat = Number(tractor.lat ?? tractor.latitude);
-    const lng = Number(tractor.lng ?? tractor.longitude);
+    const lat = toNumber(tractor?.lat ?? tractor?.latitude);
+    const lng = toNumber(tractor?.lng ?? tractor?.longitude);
 
     return {
-      id: tractor.id ?? index,
-      name: tractor.name || tractor.tractor_name || "Nearby Tractor",
-      operator: tractor.operator || tractor.owner_name || "",
+      id: tractor?.id ?? index,
+      name: tractor?.name || tractor?.tractor_name || "Nearby Tractor",
+      operator: tractor?.operator || tractor?.owner_name || "",
       distance:
-        tractor.distance ||
-        tractor.distance_km ||
-        tractor.distance_in_km ||
+        tractor?.distance ||
+        tractor?.distance_km ||
+        tractor?.distance_in_km ||
         "",
-      etaMinutes: Number(tractor.eta_minutes) || 0,
-      registrationId: tractor.registration_id || "",
-      status: tractor.status || "",
-      baseRatePerHour: Number(tractor.base_rate_per_hour) || 0,
-      travelCost: Number(tractor.travel_cost) || 0,
+      etaMinutes: Number(tractor?.eta_minutes) || 0,
+      registrationId: tractor?.registration_id || "",
+      status: tractor?.status || "",
+      baseRatePerHour: Number(tractor?.base_rate_per_hour) || 0,
+      travelCost: Number(tractor?.travel_cost) || 0,
       lat,
       lng,
       raw: tractor,
@@ -114,10 +120,14 @@ export default function RequestSpiTractor() {
   }, [tractors, normalizeTractor]);
 
   const mapCenter = useMemo(() => {
-    if (gps.lat && gps.lng) return { lat: gps.lat, lng: gps.lng };
+    if (Number.isFinite(gps.lat) && Number.isFinite(gps.lng)) {
+      return { lat: gps.lat, lng: gps.lng };
+    }
+
     if (validTractors.length > 0) {
       return { lat: validTractors[0].lat, lng: validTractors[0].lng };
     }
+
     return defaultCenter;
   }, [gps, validTractors]);
 
@@ -133,10 +143,12 @@ export default function RequestSpiTractor() {
   }, []);
 
   const tractorMarkerIcon = useMemo(() => {
-    if (!window.google?.maps) return undefined;
+    if (!window.google?.maps) {
+      return { url: tractorMarkerImage };
+    }
 
     return {
-      url: tractorIcon,
+      url: tractorMarkerImage,
       scaledSize: new window.google.maps.Size(42, 42),
       anchor: new window.google.maps.Point(21, 21),
     };
@@ -148,7 +160,7 @@ export default function RequestSpiTractor() {
     const bounds = new window.google.maps.LatLngBounds();
     let hasPoint = false;
 
-    if (gps.lat && gps.lng) {
+    if (Number.isFinite(gps.lat) && Number.isFinite(gps.lng)) {
       bounds.extend({ lat: gps.lat, lng: gps.lng });
       hasPoint = true;
     }
@@ -161,7 +173,11 @@ export default function RequestSpiTractor() {
     if (hasPoint) {
       mapRef.current.fitBounds(bounds);
 
-      if (gps.lat && gps.lng && validTractors.length === 0) {
+      if (
+        Number.isFinite(gps.lat) &&
+        Number.isFinite(gps.lng) &&
+        validTractors.length === 0
+      ) {
         mapRef.current.setZoom(14);
       }
     }
@@ -200,23 +216,17 @@ export default function RequestSpiTractor() {
     }
   }, []);
 
-  // Restore saved farmer lat/lng from localStorage on page load
   useEffect(() => {
     try {
       const savedGps = JSON.parse(
         localStorage.getItem(FARM_GPS_STORAGE_KEY) || "null"
       );
 
-      if (
-        savedGps &&
-        Number.isFinite(Number(savedGps.lat)) &&
-        Number.isFinite(Number(savedGps.lng))
-      ) {
-        const coords = {
-          lat: Number(savedGps.lat),
-          lng: Number(savedGps.lng),
-        };
+      const lat = toNumber(savedGps?.lat);
+      const lng = toNumber(savedGps?.lng);
 
+      if (lat !== null && lng !== null) {
+        const coords = { lat, lng };
         setGps(coords);
         fetchNearbyTractorsForMap(coords);
       }
@@ -241,11 +251,9 @@ export default function RequestSpiTractor() {
         };
 
         setGps(coords);
-
-        // Save farmer latitude and longitude to localStorage immediately
         saveGpsToLocalStorage(coords);
-
         setGettingGps(false);
+
         await fetchNearbyTractorsForMap(coords);
       },
       () => {
@@ -256,7 +264,43 @@ export default function RequestSpiTractor() {
     );
   };
 
-  // Auto submit after OTP returns here with requestDraft
+  const buildJobFromMatch = useCallback((draft, createRes, firstTractor, requestId) => {
+    const tractorLat = toNumber(firstTractor?.lat ?? firstTractor?.latitude);
+    const tractorLng = toNumber(firstTractor?.lng ?? firstTractor?.longitude);
+
+    return {
+      full_name: draft.full_name,
+      farm_name: draft.farm_name,
+      requestId: createRes?.data?.request_code || "REQ-0000",
+      requestUuid: requestId,
+      service: draft.service,
+      farmAddress: draft.farm_address,
+      farmCity: draft.farm_city,
+      farmSize: draft.farm_size_acres,
+      preferredDate: draft.preferred_date,
+
+      tractorId: firstTractor?.id || null,
+      tractorName:
+        firstTractor?.name || firstTractor?.tractor_name || "Searching...",
+      tractorRegId: firstTractor?.registration_id || "",
+
+      tractorLat,
+      tractorLng,
+
+      distanceKm:
+        Number(
+          firstTractor?.distance_km ??
+            firstTractor?.distance ??
+            firstTractor?.distance_in_km
+        ) || 0,
+      etaMinutes: Number(firstTractor?.eta_minutes) || 0,
+
+      ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
+      estimatedHours: 6,
+      travelFee: Number(firstTractor?.travel_cost) || 0,
+    };
+  }, []);
+
   useEffect(() => {
     const draftFromState = location.state?.requestDraft || null;
 
@@ -281,7 +325,9 @@ export default function RequestSpiTractor() {
         const createRes = await spiTractorsApi.createRequest(draft);
         const requestId = createRes?.data?.id;
 
-        if (!requestId) throw new Error("Request created but request id missing.");
+        if (!requestId) {
+          throw new Error("Request created but request id missing.");
+        }
 
         const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
         const matches = matchRes?.data?.matches || [];
@@ -291,39 +337,18 @@ export default function RequestSpiTractor() {
 
         navigate("/SpiTractorsPayAndEta/", {
           state: {
-            job: {
-              full_name: draft.full_name,
-              farm_name: draft.farm_name,
-              requestId: createRes?.data?.request_code || "REQ-0000",
-              requestUuid: requestId,
-              service: draft.service,
-              farmAddress: draft.farm_address,
-              farmCity: draft.farm_city,
-              farmSize: draft.farm_size_acres,
-              preferredDate: draft.preferred_date,
-
-              tractorId: firstTractor?.id || null,
-              tractorName: firstTractor?.name || "Searching...",
-              tractorRegId: firstTractor?.registration_id || "",
-
-              distanceKm: Number(firstTractor?.distance_km) || 0,
-              etaMinutes: Number(firstTractor?.eta_minutes) || 0,
-
-              ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
-              estimatedHours: 6,
-              travelFee: Number(firstTractor?.travel_cost) || 0,
-            },
+            job: buildJobFromMatch(draft, createRes, firstTractor, requestId),
           },
         });
-      } catch (e) {
-        alert(e?.message || "Unable to create request after login");
+      } catch (error) {
+        alert(error?.message || "Unable to create request after login");
       } finally {
         setLoading(false);
       }
     };
 
     submitDraft();
-  }, [location.state, navigate]);
+  }, [location.state, navigate, buildJobFromMatch]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -338,16 +363,14 @@ export default function RequestSpiTractor() {
     if (!String(form.farmSize).trim()) return alert("Farm Size is required.");
     if (!form.service.trim()) return alert("Service is required.");
 
-    if (!gps.lat || !gps.lng) {
+    if (!Number.isFinite(gps.lat) || !Number.isFinite(gps.lng)) {
       return alert("Please click 'Use my location' before searching for nearby tractors.");
     }
 
-    // Guest flow
     if (!token) {
       if (!form.phone.trim()) return alert("Phone Number is required.");
 
       const requestDraft = buildDraftPayload(form);
-
       localStorage.setItem("spiRequestDraft", JSON.stringify(requestDraft));
 
       navigate("/Spi_Tractors-Otp/", {
@@ -361,16 +384,16 @@ export default function RequestSpiTractor() {
       return;
     }
 
-    // Logged in flow
     try {
       setLoading(true);
 
       const draft = buildDraftPayload(form);
-
       const createRes = await spiTractorsApi.createRequest(draft);
       const requestId = createRes?.data?.id;
 
-      if (!requestId) throw new Error("Request created but request id missing.");
+      if (!requestId) {
+        throw new Error("Request created but request id missing.");
+      }
 
       const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
       const matches = matchRes?.data?.matches || [];
@@ -380,28 +403,7 @@ export default function RequestSpiTractor() {
 
       navigate("/SpiTractorsPayAndEta/", {
         state: {
-          job: {
-            full_name: draft.full_name,
-            farm_name: draft.farm_name,
-            requestId: createRes?.data?.request_code || "REQ-0000",
-            requestUuid: requestId,
-            service: draft.service,
-            farmAddress: draft.farm_address,
-            farmCity: draft.farm_city,
-            farmSize: draft.farm_size_acres,
-            preferredDate: draft.preferred_date,
-
-            tractorId: firstTractor?.id || null,
-            tractorName: firstTractor?.name || "Searching...",
-            tractorRegId: firstTractor?.registration_id || "",
-
-            distanceKm: Number(firstTractor?.distance_km) || 0,
-            etaMinutes: Number(firstTractor?.eta_minutes) || 0,
-
-            ratePerHour: Number(firstTractor?.base_rate_per_hour) || 5000,
-            estimatedHours: 6,
-            travelFee: Number(firstTractor?.travel_cost) || 0,
-          },
+          job: buildJobFromMatch(draft, createRes, firstTractor, requestId),
         },
       });
     } catch (error) {
@@ -412,13 +414,17 @@ export default function RequestSpiTractor() {
   };
 
   const gpsLabel =
-    gps.lat && gps.lng
+    Number.isFinite(gps.lat) && Number.isFinite(gps.lng)
       ? `GPS: ${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`
       : "No GPS captured";
 
   return (
     <div className="rt-page">
-      <button className="rt-back" onClick={() => navigate(-1)} aria-label="Go back">
+      <button
+        className="rt-back"
+        onClick={() => navigate(-1)}
+        aria-label="Go back"
+      >
         ←
       </button>
 
@@ -477,7 +483,14 @@ export default function RequestSpiTractor() {
               placeholder="e.g. Lagos"
             />
 
-            <div style={{ display: "flex", gap: 10, alignItems: "center", margin: "10px 0" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "center",
+                margin: "10px 0",
+              }}
+            >
               <button
                 type="button"
                 onClick={getGps}
@@ -502,7 +515,12 @@ export default function RequestSpiTractor() {
 
             <label className="rt-label">Services Needed</label>
             <div className="rt-selectWrap">
-              <select className="rt-select" name="service" value={form.service} onChange={onChange}>
+              <select
+                className="rt-select"
+                name="service"
+                value={form.service}
+                onChange={onChange}
+              >
                 <option value="">e.g Ploughing</option>
                 <option value="Ploughing">Ploughing</option>
                 <option value="Harrowing">Harrowing</option>
@@ -542,7 +560,7 @@ export default function RequestSpiTractor() {
                 fullscreenControl: true,
               }}
             >
-              {gps.lat && gps.lng && (
+              {Number.isFinite(gps.lat) && Number.isFinite(gps.lng) && (
                 <Marker
                   position={{ lat: gps.lat, lng: gps.lng }}
                   icon={userMarkerIcon}
