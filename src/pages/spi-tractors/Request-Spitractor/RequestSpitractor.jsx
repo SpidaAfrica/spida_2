@@ -22,6 +22,8 @@ const defaultCenter = {
   lng: 3.3792,
 };
 
+const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
+
 export default function RequestSpiTractor() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,6 +55,14 @@ export default function RequestSpiTractor() {
   };
 
   const cleanFarmSize = (v) => Number(String(v).replace(/[^\d.]/g, "")) || 1;
+
+  const saveGpsToLocalStorage = useCallback((coords) => {
+    try {
+      localStorage.setItem(FARM_GPS_STORAGE_KEY, JSON.stringify(coords));
+    } catch (error) {
+      console.error("Unable to save farmer GPS to localStorage:", error);
+    }
+  }, []);
 
   const buildDraftPayload = useCallback(
     (srcForm) => ({
@@ -190,6 +200,31 @@ export default function RequestSpiTractor() {
     }
   }, []);
 
+  // Restore saved farmer lat/lng from localStorage on page load
+  useEffect(() => {
+    try {
+      const savedGps = JSON.parse(
+        localStorage.getItem(FARM_GPS_STORAGE_KEY) || "null"
+      );
+
+      if (
+        savedGps &&
+        Number.isFinite(Number(savedGps.lat)) &&
+        Number.isFinite(Number(savedGps.lng))
+      ) {
+        const coords = {
+          lat: Number(savedGps.lat),
+          lng: Number(savedGps.lng),
+        };
+
+        setGps(coords);
+        fetchNearbyTractorsForMap(coords);
+      }
+    } catch (error) {
+      console.error("Unable to read farmer GPS from localStorage:", error);
+    }
+  }, [fetchNearbyTractorsForMap]);
+
   const getGps = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported on this device/browser.");
@@ -206,6 +241,10 @@ export default function RequestSpiTractor() {
         };
 
         setGps(coords);
+
+        // Save farmer latitude and longitude to localStorage immediately
+        saveGpsToLocalStorage(coords);
+
         setGettingGps(false);
         await fetchNearbyTractorsForMap(coords);
       },
@@ -516,7 +555,7 @@ export default function RequestSpiTractor() {
                   key={tractor.id}
                   position={{ lat: tractor.lat, lng: tractor.lng }}
                   title={tractor.name}
-                  icon={tractorIcon}
+                  icon={tractorMarkerIcon}
                   onClick={() => setSelectedTractor(tractor)}
                 />
               ))}
