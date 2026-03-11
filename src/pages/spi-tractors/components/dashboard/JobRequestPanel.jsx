@@ -23,6 +23,7 @@ function mapSrc(lat, lng) {
 }
 
 export default function JobRequestPanel() {
+
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -30,35 +31,40 @@ export default function JobRequestPanel() {
 
   const selected = useMemo(() => {
     if (!list.length) return null;
-    return list.find((x) => x.request_id === selectedId) || list[0];
+    return list.find((x) => x.offer_id === selectedId) || list[0];
   }, [list, selectedId]);
 
   const load = async () => {
     try {
+
       setErr("");
       setLoading(true);
 
-      // 🔥 unified API (same as RequestList)
       const res = await spiTractorsApi.ownerNewRequests();
       const rows = Array.isArray(res?.data) ? res.data : [];
 
       setList(rows);
 
-      if (!selectedId && rows[0]?.request_id) {
-        setSelectedId(rows[0].request_id);
+      if (!selectedId && rows[0]?.offer_id) {
+        setSelectedId(rows[0].offer_id);
       }
+
     } catch (e) {
+
       setErr(e?.message || "Unable to load job requests");
       setList([]);
+
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+
     load();
     const t = setInterval(load, 10000);
     return () => clearInterval(t);
+
   }, []);
 
   const hasMap =
@@ -66,35 +72,50 @@ export default function JobRequestPanel() {
     Number.isFinite(Number(selected?.farm_lng));
 
   const mapUrl = useMemo(() => {
+
     if (!hasMap) return "";
-    return mapSrc(Number(selected.farm_lat), Number(selected.farm_lng));
+
+    return mapSrc(
+      Number(selected.farm_lat),
+      Number(selected.farm_lng)
+    );
+
   }, [hasMap, selected?.farm_lat, selected?.farm_lng]);
 
   const handleAction = async (action) => {
+
     if (!selected || loading) return;
 
     try {
+
       setLoading(true);
 
       await spiTractorsApi.ownerRequestAction({
-        request_id: selected.request_id,
-        action,
-        tractor_id: selected.suggested_tractor_id || undefined,
+        offer_id: selected.offer_id,
+        action
       });
 
       await load();
+
     } catch (e) {
+
       alert(e?.message || `Unable to ${action.toLowerCase()} request`);
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
-  const countLabel = `${list.length} New Job request${list.length === 1 ? "" : "s"}`;
+  const countLabel =
+    `${list.length} New Job request${list.length === 1 ? "" : "s"}`;
 
   return (
     <div className="jobpanel">
+
       <div className="jobpanel-head">
+
         <div>
           <div className="jobpanel-title">Job Request</div>
           <div className="jobpanel-sub">
@@ -105,40 +126,65 @@ export default function JobRequestPanel() {
         <div className="jobpanel-badge">
           {loading ? "Loading..." : countLabel}
         </div>
+
       </div>
 
       {list.length > 1 && (
         <div style={{ marginBottom: 10 }}>
+
           <select
-            value={selected?.request_id || ""}
+            value={selected?.offer_id || ""}
             onChange={(e) => setSelectedId(Number(e.target.value))}
-            style={{ width: "100%", padding: 10, borderRadius: 10 }}
+            style={{
+              width: "100%",
+              padding: 10,
+              borderRadius: 10
+            }}
           >
+
             {list.map((x) => (
-              <option key={x.request_id} value={x.request_id}>
-                {x.request_code} • {prettyService(x.service)} •{" "}
-                {x.farm_city || "-"}
+              <option key={x.offer_id} value={x.offer_id}>
+                {x.request_code} • {prettyService(x.service)} • {x.farm_city || "-"}
               </option>
             ))}
+
           </select>
+
         </div>
       )}
 
       <div className="mapbox">
+
         {hasMap ? (
+
           <iframe
-            title={`map-${selected?.request_id}`}
+            title={`map-${selected?.offer_id}`}
             src={mapUrl}
             loading="lazy"
-            style={{ width: "100%", height: 220, border: 0 }}
+            style={{
+              width: "100%",
+              height: 220,
+              border: 0
+            }}
           />
+
         ) : (
-          <div className="map-skeleton">No Map Available</div>
+
+          <div className="map-skeleton">
+            No Map Available
+          </div>
+
         )}
+
       </div>
 
       <div className="job-meta">
-        {err && <div style={{ padding: 10, color: "crimson" }}>{err}</div>}
+
+        {err && (
+          <div style={{ padding: 10, color: "crimson" }}>
+            {err}
+          </div>
+        )}
 
         <div className="row">
           <span className="k">Farm Name</span>
@@ -150,7 +196,9 @@ export default function JobRequestPanel() {
 
         <div className="row">
           <span className="k">Service Needed</span>
-          <span className="v">{prettyService(selected?.service)}</span>
+          <span className="v">
+            {prettyService(selected?.service)}
+          </span>
         </div>
 
         <div className="row">
@@ -163,6 +211,7 @@ export default function JobRequestPanel() {
         </div>
 
         <div className="row two">
+
           <div>
             <div className="k">Suggested Tractor</div>
             <div className="v">
@@ -178,9 +227,11 @@ export default function JobRequestPanel() {
               {selected?.preferred_date || "-"}
             </div>
           </div>
+
         </div>
 
         <div className="row two">
+
           <div>
             <div className="k">Payment Method</div>
             <div className="v">
@@ -194,10 +245,13 @@ export default function JobRequestPanel() {
               {money(selected?.meta?.amount_naira)}
             </div>
           </div>
+
         </div>
+
       </div>
 
       <div className="jobpanel-actions">
+
         <button
           className="accept"
           onClick={() => handleAction("ACCEPT")}
@@ -213,7 +267,9 @@ export default function JobRequestPanel() {
         >
           Decline
         </button>
+
       </div>
+
     </div>
   );
 }
