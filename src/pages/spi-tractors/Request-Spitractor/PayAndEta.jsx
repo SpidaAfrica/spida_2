@@ -86,24 +86,23 @@ export default function SpiTractorsPayAndEta() {
 
       const res = await spiTractorsApi.getRequestStatus(job.requestId);
 
-      console.log("STATUS RAW:", res);
+      console.log("RAW RES", res);
 
-      const data =
-        res?.data?.data ||
-        res?.data ||
-        res;
+      const data = res?.data?.data;
 
-      console.log("STATUS PARSED:", data);
+      console.log("PARSED", data);
 
-      if (data && (data.matched === true || data.status === "matched")) {
+      if (!data) return;
+
+      if (data.matched === true || data.status === "matched") {
 
         console.log("MATCHED TRUE");
 
         setWaiting(false);
 
-        if (data.matched_tractor) {
+        const t = data.matched_tractor;
 
-          const t = data.matched_tractor;
+        if (t) {
 
           setTractorData(t);
 
@@ -116,17 +115,19 @@ export default function SpiTractorsPayAndEta() {
 
       }
 
-    } catch (err) {
-      console.log("STATUS ERROR:", err);
+    } catch (e) {
+
+      console.log("STATUS ERROR", e);
+
     }
 
   };
 
   checkStatus();
 
-  const interval = setInterval(checkStatus, 4000);
+  const i = setInterval(checkStatus, 4000);
 
-  return () => clearInterval(interval);
+  return () => clearInterval(i);
 
 }, [job.requestId]);
 
