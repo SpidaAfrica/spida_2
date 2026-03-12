@@ -9,7 +9,8 @@ import {
 import "./PayAndEta.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
-
+const [waiting, setWaiting] = useState(true);
+const [requestStatus, setRequestStatus] = useState(null);
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
@@ -255,7 +256,45 @@ export default function SpiTractorsPayAndEta() {
       mapRef.current.setZoom(14);
     }
   }, [farmerLocation, tractorLocation]);
+ useEffect(() => {
+  if (!job.requestId) return;
 
+  const checkStatus = async () => {
+    try {
+      const res = await spiTractorsApi.getRequestStatus(job.requestId);
+
+      const data = res?.data;
+
+      setRequestStatus(data);
+
+      if (data?.matched_tractor) {
+        setWaiting(false);
+
+        const t = data.matched_tractor;
+
+        setTractorLocation({
+          lat: Number(t.lat),
+          lng: Number(t.lng),
+        });
+
+        job.tractorId = t.id;
+        job.tractorName = t.name;
+        job.tractorRegId = t.registration_id;
+        job.ratePerHour = t.base_rate_per_hour;
+        job.travelFee = t.travel_cost;
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  checkStatus();
+
+  const i = setInterval(checkStatus, 4000);
+
+  return () => clearInterval(i);
+
+}, [job.requestId]);
   const total = useMemo(() => {
     if (estimate?.total) return Number(estimate.total) || 0;
 
@@ -319,7 +358,23 @@ export default function SpiTractorsPayAndEta() {
       setLoading(false);
     }
   };
-
+  if (waiting) {
+    return (
+      <div className="wait-modal">
+        <div className="wait-card">
+  
+          <h2>Finding tractor...</h2>
+  
+          <p>
+            Waiting for tractor owner to accept your request.
+          </p>
+  
+          <div className="loader" />
+  
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="pay-page">
       <button className="pay-back" onClick={() => navigate(-1)}>
