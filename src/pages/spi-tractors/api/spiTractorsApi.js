@@ -192,9 +192,9 @@ paystackVerify: async (reference) => {
   getNearbyTractors: (payload) =>
     request("/get-nearby-tractors.php", { method: "POST", body: payload, auth: true }), 
   getRequestStatus(requestId) {
-    return request("/get_request_status.php", {
+    request("/get_request_status.php", {
       method: "POST",
-      body: JSON.stringify({ request_id: requestId }),
+      body: { request_id: requestId },
       auth: true,
     });
   }
