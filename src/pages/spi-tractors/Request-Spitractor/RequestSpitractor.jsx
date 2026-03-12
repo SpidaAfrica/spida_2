@@ -331,13 +331,18 @@ export default function RequestSpiTractor() {
 
         const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
         const matches = matchRes?.data?.matches || [];
-        const firstTractor = matches[0] || {};
 
         setTractors(matches);
-
+        
         navigate("/SpiTractorsPayAndEta/", {
           state: {
-            job: buildJobFromMatch(draft, createRes, firstTractor, requestId),
+            job: {
+              requestId,
+              requestCode: createRes?.data?.request_code,
+              draft,
+              matches,
+              waiting: true,
+            },
           },
         });
       } catch (error) {
@@ -397,13 +402,18 @@ export default function RequestSpiTractor() {
 
       const matchRes = await spiTractorsApi.searchRequestMatches(requestId, 30);
       const matches = matchRes?.data?.matches || [];
-      const firstTractor = matches[0] || {};
 
       setTractors(matches);
-
+      
       navigate("/SpiTractorsPayAndEta/", {
         state: {
-          job: buildJobFromMatch(draft, createRes, firstTractor, requestId),
+          job: {
+            requestId,
+            requestCode: createRes?.data?.request_code,
+            draft,
+            matches,
+            waiting: true,
+          },
         },
       });
     } catch (error) {
