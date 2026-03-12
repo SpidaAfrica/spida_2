@@ -9,8 +9,7 @@ import {
 import "./PayAndEta.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
-const [waiting, setWaiting] = useState(true);
-const [requestStatus, setRequestStatus] = useState(null);
+
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
@@ -61,7 +60,8 @@ export default function SpiTractorsPayAndEta() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const mapRef = useRef(null);
-
+  const [waiting, setWaiting] = useState(true);
+  const [requestStatus, setRequestStatus] = useState(null);
   const job = useMemo(() => {
     return (
       state?.job || {
