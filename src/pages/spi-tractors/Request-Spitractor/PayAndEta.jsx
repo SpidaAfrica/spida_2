@@ -88,7 +88,7 @@ export default function SpiTractorsPayAndEta() {
 
       console.log("RAW RES", res);
 
-      const data = res.data.data;
+      const data = res?.data;
 
       console.log("PARSED", data);
 
