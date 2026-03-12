@@ -77,39 +77,58 @@ export default function SpiTractorsPayAndEta() {
   /* ---------------- request status polling ---------------- */
 
   useEffect(() => {
-    if (!job.requestId) return;
 
-    const checkStatus = async () => {
-      try {
-        const res = await spiTractorsApi.getRequestStatus(job.requestId);
+  if (!job.requestId) return;
 
-        const data = res?.data?.data || res?.data;
+  const checkStatus = async () => {
 
-        if (data?.matched === true || data?.status === "matched") {
-          setWaiting(false);
+    try {
 
-          const t = data?.matched_tractor;
+      const res = await spiTractorsApi.getRequestStatus(job.requestId);
 
-          if (t) {
-            setTractorData(t);
+      console.log("STATUS RAW:", res);
 
-            setTractorLocation({
-              lat: Number(t.lat),
-              lng: Number(t.lng),
-            });
-          }
+      const data =
+        res?.data?.data ||
+        res?.data ||
+        res;
+
+      console.log("STATUS PARSED:", data);
+
+      if (data && (data.matched === true || data.status === "matched")) {
+
+        console.log("MATCHED TRUE");
+
+        setWaiting(false);
+
+        if (data.matched_tractor) {
+
+          const t = data.matched_tractor;
+
+          setTractorData(t);
+
+          setTractorLocation({
+            lat: Number(t.lat),
+            lng: Number(t.lng),
+          });
+
         }
-      } catch (e) {
-        console.log(e);
+
       }
-    };
 
-    checkStatus();
+    } catch (err) {
+      console.log("STATUS ERROR:", err);
+    }
 
-    const i = setInterval(checkStatus, 4000);
+  };
 
-    return () => clearInterval(i);
-  }, [job.requestId]);
+  checkStatus();
+
+  const interval = setInterval(checkStatus, 4000);
+
+  return () => clearInterval(interval);
+
+}, [job.requestId]);
 
   /* ---------------- tractor live location ---------------- */
 
