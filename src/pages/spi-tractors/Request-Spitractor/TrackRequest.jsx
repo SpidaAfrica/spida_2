@@ -100,30 +100,31 @@ export default function TrackRequest() {
   useEffect(() => {
     if (!requestId) return;
 
-    const loadStatus = async () => {
+    const fetchTracking = async () => {
       try {
-        const res = await spiTractorsApi.getRequestStatus(requestId);
+        const res = await spiTractorsApi.requestTracking(requestId);
 
-        const data = res?.data;
+        const timeline = res?.data || [];
 
-        if (!data) return;
+        if (!timeline.length) return;
 
-        const idx = STEP_MAP[data?.status] ?? 0;
+        const latest = timeline[timeline.length - 1];
+
+        const idx = STEP_MAP[latest?.to_status] ?? 0;
 
         setCurrentStep(idx);
-
-        if (data?.matched_tractor) {
-          setTractorData(data.matched_tractor);
-        }
-      } catch {}
+      } catch (e) {
+        console.log("Tracking error", e);
+      }
     };
 
-    loadStatus();
+    fetchTracking();
 
-    const i = setInterval(loadStatus, 6000);
+    const interval = setInterval(fetchTracking, 8000);
 
-    return () => clearInterval(i);
+    return () => clearInterval(interval);
   }, [requestId]);
+
 
   /* ------------------------------ */
   /* LOAD TRACTOR LOCATION          */
