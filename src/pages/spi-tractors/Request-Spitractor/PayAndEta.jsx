@@ -296,7 +296,7 @@ export default function SpiTractorsPayAndEta() {
 
   const handlePay = async () => {
     if (!job.requestUuid) return;
-
+    
     try {
       setLoading(true);
 
@@ -383,6 +383,10 @@ export default function SpiTractorsPayAndEta() {
                   {job.requestId}
                 </div>
 
+                <div className="pay-chip">
+                  {job.requestUuid}
+                </div>
+                
                 <h2 className="pay-h2">
                   {job.service}
                 </h2>
