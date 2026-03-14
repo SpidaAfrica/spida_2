@@ -290,7 +290,7 @@ useEffect(() => {
       job.ratePerHour;
 
     const travel =
-      travel_fee: toNumb(tractorData?.travel_cost) ?? job.travelFee;
+      toNumb(tractorData?.travel_cost) ?? job.travelFee;
 
     return (
       rate * job.estimatedHours + travel
