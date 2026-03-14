@@ -251,8 +251,15 @@ export default function SpiTractorsPayAndEta() {
     return (
       <div className="wait-modal">
         <div className="wait-card">
+  
           <h2>Finding tractor...</h2>
+  
+          <p>
+            Waiting for tractor owner to accept your request.
+          </p>
+  
           <div className="loader" />
+  
         </div>
       </div>
     );
