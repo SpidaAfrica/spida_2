@@ -391,9 +391,6 @@ useEffect(() => {
                   {job.requestId}
                 </div>
                 
-                <div className="pay-chip">
-                  {tractorData?.work_rate}
-                </div>
                 <h2 className="pay-h2">
                   {job.service}
                 </h2>
