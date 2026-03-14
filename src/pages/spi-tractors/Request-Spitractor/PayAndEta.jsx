@@ -400,7 +400,7 @@ export default function SpiTractorsPayAndEta() {
                 </div>
 
                 <div className="pay-tractorMeta">
-                  Reg: {tractorData?.reg_id}
+                  Reg: {tractorData?.registration_id}
                 </div>
 
               </div>
