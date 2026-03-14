@@ -295,7 +295,7 @@ export default function SpiTractorsPayAndEta() {
   /* PAY */
 
   const handlePay = async () => {
-    if (!job.requestUuid) return;
+    if (!job.requestId) return;
     
     try {
       setLoading(true);
@@ -303,7 +303,7 @@ export default function SpiTractorsPayAndEta() {
       const init =
         await spiTractorsApi.paystackInitialize({
           job_request_id:
-            job.requestUuid,
+            job.requestId,
 
           amount_kobo:
             Math.round(total * 100),
@@ -381,10 +381,6 @@ export default function SpiTractorsPayAndEta() {
 
                 <div className="pay-chip">
                   {job.requestId}
-                </div>
-
-                <div className="pay-chip">
-                  {job.requestUuid}
                 </div>
                 
                 <h2 className="pay-h2">
