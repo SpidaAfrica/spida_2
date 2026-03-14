@@ -198,30 +198,31 @@ export default function SpiTractorsPayAndEta() {
   }, [tractorData]);
 
   /* estimate */
+useEffect(() => {
+  if (!tractorData) return; // wait until tractorData is loaded
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const res =
-          await spiTractorsApi.paymentEstimate({
-            rate_per_hour:
-              tractorData?.base_rate_per_hour ||
-              job.ratePerHour,
+  const estimatedHours =
+    tractorData.farm_size_acres && tractorData.work_rate
+      ? tractorData.farm_size_acres / tractorData.work_rate
+      : job.estimatedHours;
 
-            estimated_hours: tractorData?.work_rate ||
-              job.estimatedHours,
+  const run = async () => {
+    try {
+      const res = await spiTractorsApi.paymentEstimate({
+        rate_per_hour: tractorData?.base_rate_per_hour || job.ratePerHour,
+        estimated_hours: estimatedHours,
+        travel_fee: tractorData?.travel_cost || job.travelFee,
+      });
 
-            travel_fee:
-              tractorData?.travel_cost ||
-              job.travelFee,
-          });
+      setEstimate(res?.data || null);
+    } catch (err) {
+      console.error("Payment estimate error:", err);
+      setEstimate(null);
+    }
+  };
 
-        setEstimate(res?.data || null);
-      } catch {}
-    };
-
-    run();
-  }, [tractorData, job]);
+  run();
+}, [tractorData, job]);
 
   /* distance */
 
