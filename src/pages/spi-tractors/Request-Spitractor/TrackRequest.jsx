@@ -57,7 +57,20 @@ export default function TrackRequest() {
   const mapRef = useRef(null);
 
   // ----- State -----
-  const [job, setJob] = useState(null);
+  const job = useMemo(() => {
+  return (
+      state?.job || {
+        requestId: "",
+        requestUuid: "",
+        service: "",
+        farmAddress: "",
+        farmCity: "",
+        estimatedHours: 1,
+        ratePerHour: 0,
+        travelFee: 0,
+      }
+    );
+  }, [state]);
   const [tractorData, setTractorData] = useState(null);
   const [tractorLocation, setTractorLocation] = useState(null);
   const [farmerLocation, setFarmerLocation] = useState(null);
@@ -75,46 +88,76 @@ export default function TrackRequest() {
   }, []);
 
   // ----- Fetch job details & matched tractor -----
-  useEffect(() => {
-    if (!state?.requestId) return;
+ useEffect(() => {
+  if (!job?.requestId) return;
 
-    const fetchJob = async () => {
-      try {
-        const res = await spiTractorsApi.getRequestStatus(state.requestId);
-        const data = res?.data;
-        if (!data) return;
+  const fetchJob = async () => {
+    try {
+      const res =
+        await spiTractorsApi.getRequestStatus(
+          job.requestId
+        );
 
-        setJob(data);
+      const data = res?.data;
 
-        if (data.matched && data.matched_tractor) {
-          const t = data.matched_tractor;
+      console.log("TRACK STATUS:", data);
+
+      if (!data) return;
+
+      if (
+        data.matched === true ||
+        data.status === "matched"
+      ) {
+        const t = data.matched_tractor;
+
+        if (t) {
           setTractorData(t);
-          setTractorLocation({ lat: Number(t.lat), lng: Number(t.lng) });
+
+          setTractorLocation({
+            lat: Number(t.lat),
+            lng: Number(t.lng),
+          });
         }
-
-        // Map status to step
-        const statusMap = {
-          SENT: 0,
-          RECEIVED: 1,
-          ACCEPTED: 2,
-          EN_ROUTE: 3,
-          ARRIVED: 4,
-          WORK_STARTED: 5,
-          IN_PROGRESS: 6,
-          COMPLETED: 7,
-        };
-        const status = (data.status || "EN_ROUTE").toUpperCase();
-        setCurrentStep(statusMap[status] ?? 3);
-      } catch (err) {
-        console.error("Failed to fetch request data:", err);
       }
-    };
 
-    fetchJob();
-    const interval = setInterval(fetchJob, 5000); // Poll for live updates
-    return () => clearInterval(interval);
-  }, [state?.requestId]);
+      const statusMap = {
+        SENT: 0,
+        RECEIVED: 1,
+        ACCEPTED: 2,
+        EN_ROUTE: 3,
+        ARRIVED: 4,
+        WORK_STARTED: 5,
+        IN_PROGRESS: 6,
+        COMPLETED: 7,
+      };
 
+      const status = (
+        data.status || "EN_ROUTE"
+      ).toUpperCase();
+
+      setCurrentStep(
+        statusMap[status] ?? 3
+      );
+
+    } catch (err) {
+      console.error(
+        "Failed to fetch request data:",
+        err
+      );
+    }
+  };
+
+  fetchJob();
+
+  const interval = setInterval(
+    fetchJob,
+    4000
+  );
+
+  return () =>
+    clearInterval(interval);
+
+}, [job?.requestId]);
   // ----- Poll tractor live location -----
   useEffect(() => {
     if (!tractorData?.id) return;
@@ -131,7 +174,7 @@ export default function TrackRequest() {
     fetchTractor();
     const interval = setInterval(fetchTractor, 5000);
     return () => clearInterval(interval);
-  }, [tractorData]);
+ }, [tractorData?.id]);
 
   // ----- Update distance & ETA -----
   useEffect(() => {
