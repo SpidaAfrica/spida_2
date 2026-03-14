@@ -160,7 +160,7 @@ myTractors: () => request("/tractors_me.php", { auth: true }),
   savePayoutMethod: (payload) =>
     request("/payout_method_save.php", { method: "POST", body: payload, auth: true }),
   paymentEstimate: (payload) =>
-    request("/payments_estimate.php", { method: "POST", body: payload, auth: true }),
+    request("/payment_estimate.php", { method: "POST", body: payload, auth: true }),
   getPaystackBanks: () =>
     request("/paystack_banks.php", { method: "GET" }),
   paymentIntent: (payload) =>
