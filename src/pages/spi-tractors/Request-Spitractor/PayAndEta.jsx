@@ -282,8 +282,7 @@ useEffect(() => {
       job.ratePerHour;
 
     const travel =
-      tractorData?.travel_cost ||
-      job.travelFee;
+      travel_fee: Number(tractorData?.travel_cost) ?? job.travelFee;
 
     return (
       rate * job.estimatedHours + travel
