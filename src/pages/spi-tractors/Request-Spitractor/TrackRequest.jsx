@@ -146,7 +146,6 @@ export default function TrackRequest() {
           data.matched === true ||
           data.status === "matched"
         ) {
-          setWaiting(false);
 
           const t = data.matched_tractor;
 
@@ -170,7 +169,16 @@ export default function TrackRequest() {
 
     return () => clearInterval(i);
   }, [requestId]);
-
+/* ------------------------------ */
+/* DEBUG TRACTOR DATA IN CONSOLE  */
+/* ------------------------------ */
+useEffect(() => {
+  if (tractorData) {
+    console.log("🚜 Tractor Data:", tractorData);
+  } else {
+    console.log("🚜 Tractor data not available yet");
+  }
+}, [tractorData]);
   /* ------------------------------ */
   /* MAP SETTINGS                   */
   /* ------------------------------ */
