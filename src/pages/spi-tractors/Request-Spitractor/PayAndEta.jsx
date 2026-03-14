@@ -211,7 +211,7 @@ useEffect(() => {
       const res = await spiTractorsApi.paymentEstimate({
         rate_per_hour: tractorData?.base_rate_per_hour || job.ratePerHour,
         estimated_hours: estimatedHours,
-        travel_fee: tractorData?.travel_cost || job.travelFee,
+        travel_fee: Number(tractorData?.travel_cost) ?? job.travelFee,
       });
 
       setEstimate(res?.data || null);
