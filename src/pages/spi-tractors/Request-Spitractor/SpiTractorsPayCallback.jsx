@@ -3,65 +3,83 @@ import { useNavigate } from "react-router-dom";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
+const TRACK_REQUEST_KEY = "spiTrackRequestId";
 
 export default function SpiTractorsPayCallback() {
-  const navigate = useNavigate();
-  const [msg, setMsg] = useState("Verifying payment...");
+const navigate = useNavigate();
+const [msg, setMsg] = useState("Verifying payment...");
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const url = new URL(window.location.href);
-        const reference = url.searchParams.get("reference");
+useEffect(() => {
 
-        const pending = JSON.parse(
-          localStorage.getItem(PENDING_PAY_KEY) || "null"
-        );
+```
+const run = async () => {
 
-        const ref = reference || pending?.reference;
+  try {
 
-        if (!ref) throw new Error("Missing Paystack reference.");
+    const url = new URL(window.location.href);
+    const reference = url.searchParams.get("reference");
 
-        console.log("Verifying reference:", ref);
+    const pending = JSON.parse(
+      localStorage.getItem(PENDING_PAY_KEY) || "null"
+    );
 
-        // ✅ VERIFY ON BACKEND (USE ref, NOT referenceString)
-        const verifyRes = await spiTractorsApi.paystackVerify(ref);
+    const ref = reference || pending?.reference;
 
-        if (!verifyRes?.success) {
-          throw new Error(
-            verifyRes?.message || "Payment verification failed"
-          );
-        }
+    if (!ref) throw new Error("Missing Paystack reference.");
 
-        // cleanup
-        localStorage.removeItem(PENDING_PAY_KEY);
+    console.log("Verifying reference:", ref);
 
-        // go to tracking
-        navigate("/SpiTractorsTrackRequest", {
-          replace: true,
-          state: {
-            requestId: pending?.requestId || "",
-            requestUuid: pending?.requestUuid || "",
-            tractorName: pending?.tractorName || "",
-            service: pending?.service || "",
-            farmAddress: pending?.farmAddress || "",
-            distanceKm: pending?.distanceKm || 0,
-            etaMinutes: pending?.etaMinutes || 0,
-          },
-        });
-      } catch (e) {
-        console.error("Verify error:", e);
-        setMsg(e?.message || "Unable to verify payment.");
-      }
+    // verify payment with backend
+    const verifyRes = await spiTractorsApi.paystackVerify(ref);
+
+    if (!verifyRes?.success) {
+      throw new Error(
+        verifyRes?.message || "Payment verification failed"
+      );
+    }
+
+    // prepare tracking meta
+    const trackingMeta = {
+      requestId: pending?.requestId || "",
+      requestUuid: pending?.requestUuid || "",
+      tractorName: pending?.tractorName || "",
+      service: pending?.service || "",
+      farmAddress: pending?.farmAddress || "",
+      distanceKm: pending?.distanceKm || 0,
+      etaMinutes: pending?.etaMinutes || 0,
     };
 
-    run();
-  }, [navigate]);
+    // save tracking data so TrackRequest works after refresh
+    localStorage.setItem(
+      TRACK_REQUEST_KEY,
+      JSON.stringify(trackingMeta)
+    );
 
-  return (
-    <div style={{ padding: 24 }}>
-      <h2>{msg}</h2>
-      <p>If this stays here, go back and try again.</p>
-    </div>
-  );
+    // clear pending payment
+    localStorage.removeItem(PENDING_PAY_KEY);
+
+    // redirect to tracking page
+    navigate("/SpiTractorsTrackRequest", {
+      replace: true,
+      state: trackingMeta,
+    });
+
+  } catch (e) {
+
+    console.error("Verify error:", e);
+
+    setMsg(e?.message || "Unable to verify payment.");
+
+  }
+
+};
+
+run();
+```
+
+}, [navigate]);
+
+return (
+<div style={{ padding: 40, textAlign: "center" }}> <h2>{msg}</h2> <p>Please wait while we confirm your payment.</p> </div>
+);
 }
