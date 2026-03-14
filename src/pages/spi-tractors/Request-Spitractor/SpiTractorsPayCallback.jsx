@@ -40,7 +40,13 @@ export default function SpiTractorsPayCallback() {
         navigate("/SpiTractorsTrackRequest", {
           replace: true,
           state: {
-              job: job,
+            requestId: pending?.requestId || "",
+            requestUuid: pending?.requestUuid || "",
+            tractorName: pending?.tractorName || "",
+            service: pending?.service || "",
+            farmAddress: pending?.farmAddress || "",
+            distanceKm: pending?.distanceKm || 0,
+            etaMinutes: pending?.etaMinutes || 0,
           },
         });
       } catch (e) {
