@@ -196,7 +196,15 @@ export default function SpiTractorsPayAndEta() {
 
     return () => clearInterval(i);
   }, [tractorData]);
-
+  
+function toNumb(value) {
+  if (typeof value === "string") {
+    value = value.replace(/,/g, ""); // remove commas
+  }
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+  
   /* estimate */
 useEffect(() => {
   if (!tractorData) return; // wait until tractorData is loaded
@@ -211,7 +219,7 @@ useEffect(() => {
       const res = await spiTractorsApi.paymentEstimate({
         rate_per_hour: tractorData?.base_rate_per_hour || job.ratePerHour,
         estimated_hours: estimatedHours,
-        travel_fee: Number(tractorData?.travel_cost) ?? job.travelFee,
+        travel_fee: toNumb(tractorData?.travel_cost) ?? job.travelFee,
       });
 
       setEstimate(res?.data || null);
@@ -282,7 +290,7 @@ useEffect(() => {
       job.ratePerHour;
 
     const travel =
-      travel_fee: Number(tractorData?.travel_cost) ?? job.travelFee;
+      travel_fee: toNumb(tractorData?.travel_cost) ?? job.travelFee;
 
     return (
       rate * job.estimatedHours + travel
