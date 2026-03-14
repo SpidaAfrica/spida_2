@@ -6,6 +6,7 @@ import {
   Marker,
   Polyline,
 } from "@react-google-maps/api";
+
 import "./PayAndEta.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
@@ -13,38 +14,57 @@ import tractorMarkerImage from "../../../assets/images/Group (11).png";
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
+const PENDING_PAY_KEY = "spiPendingPaystackPayment";
 
 const mapContainerStyle = {
   width: "100%",
   height: "320px",
 };
 
-const defaultCenter = { lat: 6.5244, lng: 3.3792 };
-
-const toNumber = (v) => {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
+const defaultCenter = {
+  lat: 6.5244,
+  lng: 3.3792,
 };
 
-const isValidLatLng = (c) =>
-  !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
+function toNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function isValidLatLng(c) {
+  return !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
+}
+
+function calculateDistanceKm(origin, destination) {
+  if (!isValidLatLng(origin) || !isValidLatLng(destination)) return 0;
+
+  const toRad = (d) => (d * Math.PI) / 180;
+  const R = 6371;
+
+  const dLat = toRad(destination.lat - origin.lat);
+  const dLng = toRad(destination.lng - origin.lng);
+
+  const lat1 = toRad(origin.lat);
+  const lat2 = toRad(destination.lat);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) *
+      Math.cos(lat2) *
+      Math.sin(dLng / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
 
 export default function SpiTractorsPayAndEta() {
   const navigate = useNavigate();
   const { state } = useLocation();
+
   const mapRef = useRef(null);
 
-  const [waiting, setWaiting] = useState(true);
-  const [tractorData, setTractorData] = useState(null);
-  const [tractorLocation, setTractorLocation] = useState(null);
-  const [farmerLocation, setFarmerLocation] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [estimate, setEstimate] = useState(null);
-
-  const routeInfo = {
-    distanceKm: 0,
-    etaMinutes: 0,
-  };
+  /* job */
 
   const job = useMemo(() => {
     return (
@@ -57,18 +77,35 @@ export default function SpiTractorsPayAndEta() {
         estimatedHours: 1,
         ratePerHour: 0,
         travelFee: 0,
-        tractorId: "",
-        tractorName: "",
       }
     );
   }, [state]);
+
+  /* state */
+
+  const [waiting, setWaiting] = useState(true);
+  const [tractorData, setTractorData] = useState(null);
+  const [tractorLocation, setTractorLocation] =
+    useState(null);
+  const [farmerLocation, setFarmerLocation] =
+    useState(null);
+
+  const [estimate, setEstimate] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [routeInfo, setRouteInfo] = useState({
+    distanceKm: 0,
+    etaMinutes: 0,
+  });
 
   /* farmer gps */
 
   useEffect(() => {
     try {
       const gps = JSON.parse(
-        localStorage.getItem(FARM_GPS_STORAGE_KEY) || "null"
+        localStorage.getItem(
+          FARM_GPS_STORAGE_KEY
+        ) || "null"
       );
 
       const lat = toNumber(gps?.lat);
@@ -80,22 +117,26 @@ export default function SpiTractorsPayAndEta() {
     } catch {}
   }, []);
 
-  /* request status */
+  /* WAIT FOR MATCH */
 
   useEffect(() => {
     if (!job.requestId) return;
 
     const checkStatus = async () => {
       try {
-        const res = await spiTractorsApi.getRequestStatus(
-          job.requestId
-        );
+        const res =
+          await spiTractorsApi.getRequestStatus(
+            job.requestId
+          );
 
         const data = res?.data;
 
         if (!data) return;
 
-        if (data.matched === true || data.status === "matched") {
+        if (
+          data.matched === true ||
+          data.status === "matched"
+        ) {
           setWaiting(false);
 
           const t = data.matched_tractor;
@@ -166,7 +207,10 @@ export default function SpiTractorsPayAndEta() {
             rate_per_hour:
               tractorData?.base_rate_per_hour ||
               job.ratePerHour,
-            estimated_hours: job.estimatedHours,
+
+            estimated_hours:
+              job.estimatedHours,
+
             travel_fee:
               tractorData?.travel_cost ||
               job.travelFee,
@@ -178,6 +222,31 @@ export default function SpiTractorsPayAndEta() {
 
     run();
   }, [tractorData, job]);
+
+  /* distance */
+
+  useEffect(() => {
+    if (
+      !isValidLatLng(farmerLocation) ||
+      !isValidLatLng(tractorLocation)
+    )
+      return;
+
+    const d = calculateDistanceKm(
+      tractorLocation,
+      farmerLocation
+    );
+
+    const eta =
+      d > 0
+        ? Math.max(1, Math.round((d / 30) * 60))
+        : 0;
+
+    setRouteInfo({
+      distanceKm: d,
+      etaMinutes: eta,
+    });
+  }, [farmerLocation, tractorLocation]);
 
   /* map */
 
@@ -192,8 +261,11 @@ export default function SpiTractorsPayAndEta() {
   }, [farmerLocation, tractorLocation]);
 
   const linePath = useMemo(() => {
-    if (!isValidLatLng(farmerLocation)) return [];
-    if (!isValidLatLng(tractorLocation)) return [];
+    if (
+      !isValidLatLng(farmerLocation) ||
+      !isValidLatLng(tractorLocation)
+    )
+      return [];
 
     return [tractorLocation, farmerLocation];
   }, [farmerLocation, tractorLocation]);
@@ -212,13 +284,15 @@ export default function SpiTractorsPayAndEta() {
       tractorData?.travel_cost ||
       job.travelFee;
 
-    return rate * job.estimatedHours + travel;
+    return (
+      rate * job.estimatedHours + travel
+    );
   }, [estimate, tractorData, job]);
 
   const formatMoney = (n) =>
     `₦${Number(n || 0).toLocaleString()}`;
 
-  /* pay */
+  /* PAY */
 
   const handlePay = async () => {
     if (!job.requestUuid) return;
@@ -228,8 +302,12 @@ export default function SpiTractorsPayAndEta() {
 
       const init =
         await spiTractorsApi.paystackInitialize({
-          job_request_id: job.requestUuid,
-          amount_kobo: Math.round(total * 100),
+          job_request_id:
+            job.requestUuid,
+
+          amount_kobo:
+            Math.round(total * 100),
+
           callback_url:
             window.location.origin +
             "/SpiTractorsPayCallback",
@@ -248,90 +326,169 @@ export default function SpiTractorsPayAndEta() {
     }
   };
 
-  /* waiting */
+  /* WAIT MODAL */
 
   if (waiting) {
     return (
       <div className="wait-modal">
         <div className="wait-card">
-          <h2>Finding tractor...</h2>
+          <h2>
+            Waiting for tractor owner
+          </h2>
+
           <div className="loader" />
+
+          <p>
+            Your request has been sent.
+            Waiting for acceptance...
+          </p>
         </div>
       </div>
     );
   }
 
+  /* UI */
+
   return (
     <div className="pay-page">
 
-      <button onClick={() => navigate(-1)}>
-        ← Back
-      </button>
-
-      <LoadScript googleMapsApiKey={GOOGLE_KEY}>
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={mapCenter}
-          zoom={13}
-        >
-          {farmerLocation && (
-            <Marker position={farmerLocation} />
-          )}
-
-          {tractorLocation && (
-            <Marker
-              position={tractorLocation}
-              icon={tractorMarkerImage}
-            />
-          )}
-
-          {linePath.length === 2 && (
-            <Polyline path={linePath} />
-          )}
-        </GoogleMap>
-      </LoadScript>
-
-      <h2>
-        Tractor:{" "}
-        {tractorData?.name ||
-          job.tractorName}
-      </h2>
-
-      <div className="pay-etaCard">
-
-        <div className="pay-etaItem">
-          <div className="pay-etaLabel">
-            Distance
-          </div>
-          <div className="pay-etaValue">
-            {routeInfo.distanceKm} km
-          </div>
-        </div>
-
-        <div className="pay-etaItem">
-          <div className="pay-etaLabel">
-            Arrival
-          </div>
-          <div className="pay-etaValue">
-            {routeInfo.etaMinutes} mins
-          </div>
-        </div>
-
-      </div>
-
-      <div className="pay-total">
-        Total: {formatMoney(total)}
-      </div>
-
       <button
-        className="pay-btn"
-        onClick={handlePay}
-        disabled={loading}
+        className="pay-back"
+        onClick={() => navigate(-1)}
       >
-        {loading
-          ? "Redirecting..."
-          : "Make Payment"}
+        ←
       </button>
+
+      <div className="pay-shell">
+
+        <header className="pay-head">
+          <h1 className="pay-title">
+            Payment & ETA
+          </h1>
+
+          <p className="pay-subtitle">
+            Track tractor arrival
+          </p>
+        </header>
+
+        <div className="pay-grid">
+
+          <div className="pay-card">
+
+            <div className="pay-rowTop">
+
+              <div>
+
+                <div className="pay-chip">
+                  {job.requestId}
+                </div>
+
+                <h2 className="pay-h2">
+                  {job.service}
+                </h2>
+
+                <p className="pay-muted">
+                  {job.farmAddress}
+                </p>
+
+              </div>
+
+              <div className="pay-tractor">
+
+                <div className="pay-tractorName">
+                  {tractorData?.name}
+                </div>
+
+                <div className="pay-tractorMeta">
+                  Reg: {tractorData?.reg_id}
+                </div>
+
+              </div>
+
+            </div>
+
+            <LoadScript googleMapsApiKey={GOOGLE_KEY}>
+              <GoogleMap
+                mapContainerStyle={
+                  mapContainerStyle
+                }
+                center={mapCenter}
+                zoom={13}
+              >
+
+                {farmerLocation && (
+                  <Marker
+                    position={
+                      farmerLocation
+                    }
+                  />
+                )}
+
+                {tractorLocation && (
+                  <Marker
+                    position={
+                      tractorLocation
+                    }
+                    icon={
+                      tractorMarkerImage
+                    }
+                  />
+                )}
+
+                {linePath.length === 2 && (
+                  <Polyline
+                    path={linePath}
+                  />
+                )}
+
+              </GoogleMap>
+            </LoadScript>
+
+            <div className="pay-etaCard">
+
+              <div className="pay-etaItem">
+                Distance
+                <b>
+                  {routeInfo.distanceKm.toFixed(
+                    1
+                  )} km
+                </b>
+              </div>
+
+              <div className="pay-etaItem">
+                ETA
+                <b>
+                  {routeInfo.etaMinutes} mins
+                </b>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="pay-card pay-right">
+
+            <h3>Payment</h3>
+
+            <div className="pay-total">
+              Total: {formatMoney(total)}
+            </div>
+
+            <button
+              className="pay-btn"
+              onClick={handlePay}
+              disabled={loading}
+            >
+              {loading
+                ? "Redirecting..."
+                : "Make Payment"}
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   );
