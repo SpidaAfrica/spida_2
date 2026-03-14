@@ -15,7 +15,7 @@ const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
-
+const TRACK_REQUEST_KEY = "spiTrackRequestId";
 const mapContainerStyle = {
   width: "100%",
   height: "320px",
@@ -80,7 +80,28 @@ export default function SpiTractorsPayAndEta() {
       }
     );
   }, [state]);
+useEffect(() => {
+  if (!job?.requestId) return;
 
+  try {
+    localStorage.setItem(
+      TRACK_REQUEST_KEY,
+      JSON.stringify({
+        requestId: job.requestId,
+      })
+    );
+
+    console.log(
+      "Saved requestId:",
+      job.requestId
+    );
+  } catch (e) {
+    console.log(
+      "Failed to save requestId",
+      e
+    );
+  }
+}, [job?.requestId]);
   /* state */
 
   const [waiting, setWaiting] = useState(true);
