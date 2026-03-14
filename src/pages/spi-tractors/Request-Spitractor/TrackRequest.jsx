@@ -9,6 +9,7 @@ import tractorMarkerImage from "../../../assets/images/Group (11).png";
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
 const TRACK_REQUEST_KEY = "spiTrackRequestId"; // saved from PayAndEta
+const TRACK_REQUEST_META_KEY = "spiTrackRequestMeta";
 
 const STEP_MAP = {
   SENT: 0,
@@ -43,6 +44,7 @@ const DEFAULT_META = {
   service: "",
   farmAddress: "",
   etaMinutes: 0,
+  driverPhone: "",
 };
 
 const mapContainerStyle = { width: "100%", height: "260px" };
@@ -95,25 +97,60 @@ export default function TrackRequest() {
   const mapRef = useRef(null);
 
   // ------------------- META -------------------
-  const meta = useMemo(() => {
-    // priority: state > localStorage > default
+  const initialMeta = useMemo(() => {
+    // priority: state > detailed storage > request-only storage > default
     let savedRequest = null;
+    let savedMeta = null;
+
     try {
       const stored = localStorage.getItem(TRACK_REQUEST_KEY);
       if (stored) savedRequest = JSON.parse(stored);
     } catch {}
-    return { ...DEFAULT_META, ...savedRequest, ...(state || {}) };
+
+    try {
+      const storedMeta = localStorage.getItem(TRACK_REQUEST_META_KEY);
+      if (storedMeta) savedMeta = JSON.parse(storedMeta);
+    } catch {}
+
+    return { ...DEFAULT_META, ...savedRequest, ...savedMeta, ...(state || {}) };
   }, [state]);
+
+  const [requestMeta, setRequestMeta] = useState(initialMeta);
+
+  useEffect(() => {
+    setRequestMeta(initialMeta);
+  }, [initialMeta]);
+
+  useEffect(() => {
+    if (!requestMeta.requestId) return;
+    try {
+      localStorage.setItem(
+        TRACK_REQUEST_KEY,
+        JSON.stringify({ requestId: requestMeta.requestId })
+      );
+      localStorage.setItem(TRACK_REQUEST_META_KEY, JSON.stringify(requestMeta));
+    } catch {}
+  }, [requestMeta]);
 
   // ------------------- STATE -------------------
   const [currentStep, setCurrentStep] = useState(0);
   const [farmerLocation, setFarmerLocation] = useState(null);
   const [tractorLocation, setTractorLocation] = useState(() => {
-    const lat = toNumber(meta.tractorLat);
-    const lng = toNumber(meta.tractorLng);
+    const lat = toNumber(requestMeta.tractorLat);
+    const lng = toNumber(requestMeta.tractorLng);
     return lat !== null && lng !== null ? { lat, lng } : null;
   });
-  const [liveEtaMinutes, setLiveEtaMinutes] = useState(Number(meta.etaMinutes) || 0);
+  const [liveEtaMinutes, setLiveEtaMinutes] = useState(Number(requestMeta.etaMinutes) || 0);
+  const [loadingTracking, setLoadingTracking] = useState(true);
+  const [trackingError, setTrackingError] = useState("");
+  const [cancelLoading, setCancelLoading] = useState(false);
+
+  useEffect(() => {
+    const lat = toNumber(requestMeta.tractorLat);
+    const lng = toNumber(requestMeta.tractorLng);
+    setTractorLocation(lat !== null && lng !== null ? { lat, lng } : null);
+    setLiveEtaMinutes(Number(requestMeta.etaMinutes) || 0);
+  }, [requestMeta.tractorLat, requestMeta.tractorLng, requestMeta.etaMinutes]);
 
   const safeCurrentStep = clampStep(currentStep);
   const activeStep = STEPS[safeCurrentStep];
@@ -158,21 +195,34 @@ export default function TrackRequest() {
 
   // ------------------- REQUEST STATUS -------------------
   useEffect(() => {
-    if (!meta.requestId) return;
+    if (!requestMeta.requestId) return;
 
     const fetchRequestStatus = async () => {
       try {
-        const res = await spiTractorsApi.getRequestStatus(meta.requestId);
+        const res = await spiTractorsApi.getRequestStatus(requestMeta.requestId);
         const data = res?.data;
         if (!data) return;
 
         if (data.matched === true || data.status === "matched") {
           const t = data.matched_tractor;
           if (t) {
-            setTractorLocation({ lat: Number(t.lat), lng: Number(t.lng) });
-            meta.tractorId = t.id;
-            meta.tractorName = t.name;
-            meta.tractorRegId = t.registration_id;
+            const lat = toNumber(t.lat ?? t.latitude);
+            const lng = toNumber(t.lng ?? t.longitude);
+            if (lat !== null && lng !== null) {
+              setTractorLocation({ lat, lng });
+            }
+
+            setRequestMeta((prev) => ({
+              ...prev,
+              tractorId: t.id || prev.tractorId,
+              tractorName: t.name || prev.tractorName,
+              tractorRegId: t.registration_id || prev.tractorRegId,
+              tractorLat: lat ?? prev.tractorLat,
+              tractorLng: lng ?? prev.tractorLng,
+              driverPhone: t.phone || t.driver_phone || prev.driverPhone,
+              service: data?.service || data?.service_type || prev.service,
+              farmAddress: data?.farm_address || prev.farmAddress,
+            }));
           }
         }
       } catch (err) {
@@ -183,15 +233,15 @@ export default function TrackRequest() {
     fetchRequestStatus();
     const interval = setInterval(fetchRequestStatus, 4000);
     return () => clearInterval(interval);
-  }, [meta.requestId]);
+  }, [requestMeta.requestId]);
 
   // ------------------- TRACTOR LOCATION -------------------
   useEffect(() => {
-    if (!meta.tractorId) return;
+    if (!requestMeta.tractorId) return;
 
     const fetchTractorLocation = async () => {
       try {
-        const res = await spiTractorsApi.getTractorLocation(meta.tractorId);
+        const res = await spiTractorsApi.getTractorLocation(requestMeta.tractorId);
         const lat = toNumber(
           res?.data?.lat ??
           res?.data?.latitude ??
@@ -204,7 +254,10 @@ export default function TrackRequest() {
           res?.data?.tractor?.lng ??
           res?.data?.tractor?.longitude
         );
-        if (lat !== null && lng !== null) setTractorLocation({ lat, lng });
+        if (lat !== null && lng !== null) {
+          setTractorLocation({ lat, lng });
+          setRequestMeta((prev) => ({ ...prev, tractorLat: lat, tractorLng: lng }));
+        }
       } catch (err) {
         console.log("Failed to fetch tractor location:", err);
       }
@@ -213,31 +266,38 @@ export default function TrackRequest() {
     fetchTractorLocation();
     const interval = setInterval(fetchTractorLocation, 5000);
     return () => clearInterval(interval);
-  }, [meta.tractorId]);
+  }, [requestMeta.tractorId]);
 
   // ------------------- TRACK TIMELINE -------------------
   useEffect(() => {
-    if (!meta.requestId) return;
+    if (!requestMeta.requestId) return;
 
     const fetchTracking = async () => {
       try {
-        const res = await spiTractorsApi.requestTracking(meta.requestId);
+        const res = await spiTractorsApi.requestTracking(requestMeta.requestId);
         const timeline = getTimelineArray(res);
-        if (!timeline.length) return;
+        if (!timeline.length) {
+          setLoadingTracking(false);
+          return;
+        }
 
         const latest = timeline[timeline.length - 1];
         const normalizedStatus = normalizeTrackingStatus(latest?.to_status || latest?.status);
         const nextStep = STEP_MAP[normalizedStatus] ?? 0;
         setCurrentStep(clampStep(nextStep));
+        setTrackingError("");
+        setLoadingTracking(false);
       } catch (err) {
         console.log("Tracking fetch failed:", err);
+        setTrackingError(err?.message || "Unable to load live tracking right now.");
+        setLoadingTracking(false);
       }
     };
 
     fetchTracking();
     const interval = setInterval(fetchTracking, 8000);
     return () => clearInterval(interval);
-  }, [meta.requestId]);
+  }, [requestMeta.requestId]);
 
   // ------------------- ETA -------------------
   useEffect(() => {
@@ -265,6 +325,49 @@ export default function TrackRequest() {
   const handlePrev = () => setCurrentStep((prev) => clampStep(prev - 1));
   const handleNext = () => setCurrentStep((prev) => clampStep(prev + 1));
 
+  const handleCancelRequest = async () => {
+    if (!requestMeta.requestId || cancelLoading) return;
+    const proceed = window.confirm("Cancel this tractor request?");
+    if (!proceed) return;
+
+    try {
+      setCancelLoading(true);
+      await spiTractorsApi.requestCancel({ request_id: requestMeta.requestId });
+      alert("Request cancelled successfully.");
+      localStorage.removeItem(TRACK_REQUEST_KEY);
+      localStorage.removeItem(TRACK_REQUEST_META_KEY);
+      navigate("/SpiTractorsBookServices", { replace: true });
+    } catch (err) {
+      alert(err?.message || "Unable to cancel request.");
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
+  const handleCallDriver = () => {
+    if (!requestMeta.driverPhone) {
+      alert("Driver phone number is not available yet.");
+      return;
+    }
+    window.location.href = `tel:${requestMeta.driverPhone}`;
+  };
+
+  if (!requestMeta.requestId) {
+    return (
+      <div className="trk-page">
+        <div className="trk-shell">
+          <div className="trk-card">
+            <h2 className="trk-title">No request to track</h2>
+            <p className="trk-muted">Start a new request and complete payment to access live tracking.</p>
+            <div className="trk-row">
+              <button className="trk-btn" type="button" onClick={() => navigate("/SpiTractorsBookServices")}>Book Service</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ------------------- RENDER -------------------
   return (
     <div className="trk-page">
@@ -273,10 +376,10 @@ export default function TrackRequest() {
       <div className="trk-shell">
         <header className="trk-head">
           <div>
-            <div className="trk-chip">{meta.requestId}</div>
+            <div className="trk-chip">{requestMeta.requestId}</div>
             <h1 className="trk-title">Track your request</h1>
-            <p className="trk-subtitle">{meta.service} • {meta.tractorName}</p>
-            <p className="trk-muted">{meta.farmAddress}</p>
+            <p className="trk-subtitle">{requestMeta.service} • {requestMeta.tractorName || "Awaiting tractor"}</p>
+            <p className="trk-muted">{requestMeta.farmAddress}</p>
           </div>
 
           <div className="trk-actions">
@@ -315,6 +418,8 @@ export default function TrackRequest() {
             <h3 className="trk-rightTitle">Live Status</h3>
             <div className="trk-statusBox">
               <div className="trk-statusKey">Current status</div>
+              {loadingTracking && <div className="trk-statusDesc">Loading live updates…</div>}
+              {!!trackingError && <div className="trk-statusDesc">{trackingError}</div>}
               <div className="trk-statusVal">{activeStep.title}</div>
               <div className="trk-statusDesc">{activeStep.desc}</div>
               {activeStep.key === "enroute" && (
@@ -334,18 +439,18 @@ export default function TrackRequest() {
                   options={{ streetViewControl: false, mapTypeControl: false, fullscreenControl: true }}
                 >
                   {isValidLatLng(farmerLocation) && <Marker position={farmerLocation} icon={farmerIcon} title="Farm" />}
-                  {isValidLatLng(tractorLocation) && <Marker position={tractorLocation} icon={tractorMarkerIcon} title={meta.tractorName || "Matched Tractor"} />}
+                  {isValidLatLng(tractorLocation) && <Marker position={tractorLocation} icon={tractorMarkerIcon} title={requestMeta.tractorName || "Matched Tractor"} />}
                   {linePath.length === 2 && <Polyline path={linePath} options={{ strokeColor: "#1A73E8", strokeOpacity: 0.9, strokeWeight: 5 }} />}
                 </GoogleMap>
               </LoadScript>
             </div>
 
             <div className="trk-row">
-              <button className="trk-btn" type="button" onClick={() => alert("Calling driver (demo)")}>Call Driver</button>
+              <button className="trk-btn" type="button" onClick={handleCallDriver}>Call Driver</button>
               <button className="trk-btnOutline" type="button" onClick={() => alert("Support chat (demo)")}>Support</button>
             </div>
 
-            <button className="trk-cancel" type="button" onClick={() => alert("Cancel request (demo)")}>Cancel Request</button>
+            <button className="trk-cancel" type="button" onClick={handleCancelRequest} disabled={cancelLoading}>{cancelLoading ? "Cancelling..." : "Cancel Request"}</button>
           </div>
         </div>
       </div>

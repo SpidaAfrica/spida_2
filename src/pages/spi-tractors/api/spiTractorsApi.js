@@ -190,7 +190,9 @@ paystackVerify: async (reference) => {
   myNotifications: () => request("/notifications_me.php", { auth: true }),
   adminUsers: () => request("/admin_users.php", { auth: true }),
   getNearbyTractors: (payload) =>
-    request("/get-nearby-tractors.php", { method: "POST", body: payload, auth: true }), 
+    request("/get-nearby-tractors.php", { method: "POST", body: payload, auth: true }),
+  getTractorLocation: (tractorId) =>
+    request(`/tractor_location.php?tractor_id=${tractorId}`, { auth: true }),
 getRequestStatus(requestId) {
   return request("/get_request_status.php", {
     method: "POST",
