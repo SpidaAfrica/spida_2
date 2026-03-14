@@ -40,7 +40,7 @@ export default function TrackRequest() {
 
   const job = useMemo(() => state?.job || {}, [state]);
 
-  const [waiting, setWaiting] = useState(true);
+  
   const [tractorData, setTractorData] = useState(null);
   const [tractorLocation, setTractorLocation] = useState(null);
   const [farmerLocation, setFarmerLocation] = useState(null);
@@ -67,7 +67,6 @@ export default function TrackRequest() {
         if (!data) return;
 
         if (data.matched === true || data.status === "matched") {
-          setWaiting(false);
           if (data.matched_tractor) {
             setTractorData(data.matched_tractor);
             setTractorLocation({ lat: Number(data.matched_tractor.lat), lng: Number(data.matched_tractor.lng) });
@@ -119,18 +118,6 @@ export default function TrackRequest() {
     if (!isValidLatLng(farmerLocation) || !isValidLatLng(tractorLocation)) return [];
     return [tractorLocation, farmerLocation];
   }, [farmerLocation, tractorLocation]);
-
-  if (waiting) {
-    return (
-      <div className="wait-modal">
-        <div className="wait-card">
-          <h2>Waiting for tractor owner</h2>
-          <div className="loader" />
-          <p>Your request has been sent. Waiting for acceptance...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="trk-page">
