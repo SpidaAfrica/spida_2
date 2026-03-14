@@ -6,7 +6,7 @@ import {
   Marker,
   Polyline,
 } from "@react-google-maps/api";
-
+import { useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
 import "./TrackRequest.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
@@ -183,16 +183,32 @@ useEffect(() => {
   /* MAP SETTINGS                   */
   /* ------------------------------ */
 
-  const mapCenter = useMemo(() => {
-    if (farmerLocation) return farmerLocation;
-    if (tractorLocation) return tractorLocation;
-    return defaultCenter;
-  }, [farmerLocation, tractorLocation]);
+const { isLoaded } = useJsApiLoader({
+  googleMapsApiKey: GOOGLE_KEY,
+});
 
-  const linePath = useMemo(() => {
-    if (!farmerLocation || !tractorLocation) return [];
-    return [tractorLocation, farmerLocation];
-  }, [farmerLocation, tractorLocation]);
+const [directions, setDirections] = useState(null);
+
+useEffect(() => {
+  if (!tractorLocation || !farmerLocation) return;
+
+  const service = new window.google.maps.DirectionsService();
+
+  service.route(
+    {
+      origin: tractorLocation,
+      destination: farmerLocation,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+    },
+    (result, status) => {
+      if (status === "OK" && result) {
+        setDirections(result);
+      } else {
+        console.error("Directions request failed:", status);
+      }
+    }
+  );
+}, [tractorLocation, farmerLocation]);
 
   /* ------------------------------ */
   /* DRIVER CALL                    */
@@ -312,30 +328,31 @@ useEffect(() => {
 
             <h3>Live Location</h3>
 
-            <LoadScript googleMapsApiKey={GOOGLE_KEY}>
-              <GoogleMap
-                mapContainerStyle={mapContainerStyle}
-                center={mapCenter}
-                zoom={13}
-              >
-                {farmerLocation && (
-                  <Marker position={farmerLocation} />
-                )}
+            <div style={{ width: "100%", height: "260px" }}>
+              {isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={mapCenter}
+                  zoom={13}
+                >
+                  {farmerLocation && <Marker position={farmerLocation} />}
+                  {tractorLocation && (
+                    <Marker
+                      position={tractorLocation}
+                      icon={{
+                        url: tractorMarkerImage,
+                        scaledSize: new window.google.maps.Size(40, 40),
+                      }}
+                    />
+                  )}
+                  {directions && <DirectionsRenderer directions={directions} />}
+                </GoogleMap>
+              ) : (
+                <p>Loading map...</p>
+              )}
+            </div>
 
-                {tractorLocation && (
-                  <Marker
-                    position={tractorLocation}
-                    icon={tractorMarkerImage}
-                  />
-                )}
-
-                {linePath.length === 2 && (
-                  <Polyline path={linePath} />
-                )}
-              </GoogleMap>
-            </LoadScript>
-
-            <div className="trk-row">
+            <div className="trk-row" style={{marginTop:"15px"}}>
               <button
                 className="trk-btn"
                 onClick={handleCallDriver}
