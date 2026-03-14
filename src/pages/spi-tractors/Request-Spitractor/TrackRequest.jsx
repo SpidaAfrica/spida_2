@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { LoadScript, GoogleMap, Marker, Polyline } from "@react-google-maps/api";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  LoadScript,
+  GoogleMap,
+  Marker,
+  Polyline,
+} from "@react-google-maps/api";
 import "./TrackRequest.css";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
@@ -8,7 +13,18 @@ import tractorMarkerImage from "../../../assets/images/Group (11).png";
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
 
-const mapContainerStyle = { width: "100%", height: "260px" };
+const STEPS = [
+  "Sent",
+  "Received",
+  "Accepted",
+  "En Route",
+  "Arrived",
+  "Work Started",
+  "In Progress",
+  "Completed",
+];
+
+const mapContainerStyle = { width: "100%", height: "320px" };
 const defaultCenter = { lat: 6.5244, lng: 3.3792 };
 
 function toNumber(v) {
@@ -28,7 +44,9 @@ function calculateDistanceKm(origin, destination) {
   const dLng = toRad(destination.lng - origin.lng);
   const lat1 = toRad(origin.lat);
   const lat2 = toRad(destination.lat);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -38,13 +56,16 @@ export default function TrackRequest() {
   const { state } = useLocation();
   const mapRef = useRef(null);
 
+  // Job data passed from PayAndEta
   const job = useMemo(() => state?.job || {}, [state]);
 
-  
-  const [tractorData, setTractorData] = useState(null);
-  const [tractorLocation, setTractorLocation] = useState(null);
+  const [tractorData, setTractorData] = useState(job?.matched_tractor || null);
+  const [tractorLocation, setTractorLocation] = useState(
+    tractorData ? { lat: Number(tractorData.lat), lng: Number(tractorData.lng) } : null
+  );
   const [farmerLocation, setFarmerLocation] = useState(null);
   const [routeInfo, setRouteInfo] = useState({ distanceKm: 0, etaMinutes: 0 });
+  const [currentStep, setCurrentStep] = useState(3); // Default: En Route
 
   // Load farmer GPS from localStorage
   useEffect(() => {
@@ -56,37 +77,51 @@ export default function TrackRequest() {
     } catch {}
   }, []);
 
-  // Poll request status like PayAndEta
+  // Poll request status for live progress
   useEffect(() => {
     if (!job.requestId) return;
 
-    const checkStatus = async () => {
+    const statusMap = {
+      SENT: 0,
+      RECEIVED: 1,
+      ACCEPTED: 2,
+      EN_ROUTE: 3,
+      ARRIVED: 4,
+      WORK_STARTED: 5,
+      IN_PROGRESS: 6,
+      COMPLETED: 7,
+    };
+
+    const fetchStatus = async () => {
       try {
         const res = await spiTractorsApi.getRequestStatus(job.requestId);
         const data = res?.data;
         if (!data) return;
 
-        if (data.matched === true || data.status === "matched") {
-          if (data.matched_tractor) {
-            setTractorData(data.matched_tractor);
-            setTractorLocation({ lat: Number(data.matched_tractor.lat), lng: Number(data.matched_tractor.lng) });
-          }
+        // Update tractor info if matched
+        if ((data.matched || data.status === "matched") && data.matched_tractor) {
+          const t = data.matched_tractor;
+          setTractorData(t);
+          setTractorLocation({ lat: Number(t.lat), lng: Number(t.lng) });
         }
+
+        const status = (data.status || "EN_ROUTE").toUpperCase();
+        setCurrentStep(statusMap[status] ?? 3);
       } catch (e) {
-        console.log("Error fetching request status:", e);
+        console.log(e);
       }
     };
 
-    checkStatus();
-    const interval = setInterval(checkStatus, 4000);
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 5000);
     return () => clearInterval(interval);
   }, [job.requestId]);
 
-  // Poll live tractor location
+  // Poll tractor live location
   useEffect(() => {
     if (!tractorData?.id) return;
 
-    const load = async () => {
+    const fetchTractor = async () => {
       try {
         const res = await spiTractorsApi.getTractorLocation(tractorData.id);
         const lat = toNumber(res?.data?.lat ?? res?.data?.tractor?.lat);
@@ -95,8 +130,8 @@ export default function TrackRequest() {
       } catch {}
     };
 
-    load();
-    const interval = setInterval(load, 5000);
+    fetchTractor();
+    const interval = setInterval(fetchTractor, 5000);
     return () => clearInterval(interval);
   }, [tractorData]);
 
@@ -119,61 +154,76 @@ export default function TrackRequest() {
     return [tractorLocation, farmerLocation];
   }, [farmerLocation, tractorLocation]);
 
+  const safeStep = Math.min(currentStep, STEPS.length - 1);
+
   return (
     <div className="trk-page">
       <button className="trk-back" onClick={() => navigate(-1)}>←</button>
-
       <div className="trk-shell">
         <header className="trk-head">
           <div>
             <div className="trk-chip">{job.requestId}</div>
-            <h1 className="trk-title">Track Tractor Arrival</h1>
-            <p className="trk-subtitle">{job.service} • {tractorData?.name}</p>
+            <h1 className="trk-title">{job.service} - {tractorData?.name}</h1>
             <p className="trk-muted">{job.farmAddress}</p>
           </div>
         </header>
 
         <div className="trk-grid">
+          <div className="trk-card">
+            <h3>Progress</h3>
+            <div className="trk-timeline">
+              {STEPS.map((step, index) => {
+                const done = index < safeStep;
+                const active = index === safeStep;
+                return (
+                  <div key={index} className={`trk-step ${done ? "done" : ""} ${active ? "active" : ""}`}>
+                    <div className="trk-dot">{done ? "✓" : active ? "•" : ""}</div>
+                    <div className="trk-stepBody">
+                      <div className="trk-stepTitle">{step}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="trk-eta">
+              <div>Distance: <b>{routeInfo.distanceKm.toFixed(1)} km</b></div>
+              <div>ETA: <b>{routeInfo.etaMinutes} mins</b></div>
+            </div>
+          </div>
+
           <div className="trk-card trk-right">
-            <h3 className="trk-rightTitle">Live Status</h3>
-            <div className="trk-statusBox">
-              <div className="trk-statusKey">Distance</div>
-              <div className="trk-statusVal">{routeInfo.distanceKm.toFixed(1)} km</div>
-              <div className="trk-statusKey">ETA</div>
-              <div className="trk-statusVal">{routeInfo.etaMinutes} mins</div>
-            </div>
+            <h3>Live Map</h3>
+            <LoadScript googleMapsApiKey={GOOGLE_KEY}>
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={mapCenter}
+                zoom={15}
+                onLoad={(map) => (mapRef.current = map)}
+              >
+                {isValidLatLng(farmerLocation) && <Marker position={farmerLocation} title="Farm" />}
+                {isValidLatLng(tractorLocation) && <Marker position={tractorLocation} icon={tractorMarkerImage} title={tractorData?.name} />}
+                {linePath.length === 2 && <Polyline path={linePath} />}
+              </GoogleMap>
+            </LoadScript>
 
-            <div className="trk-realMap">
-              <LoadScript googleMapsApiKey={GOOGLE_KEY}>
-                <GoogleMap
-                  mapContainerStyle={{ width: "100%", height: "260px" }}
-                  center={mapCenter}
-                  zoom={13}
-                >
-                  {farmerLocation && <Marker position={farmerLocation} />}
-                  {tractorLocation && <Marker position={tractorLocation} icon={tractorMarkerImage} />}
-                  {linePath.length === 2 && <Polyline path={linePath} />}
-                </GoogleMap>
-              </LoadScript>
-            </div>
-
-            <div className="trk-row">
-              {tractorData?.phone && (
-                <a href={`tel:${tractorData.phone}`} className="trk-btn">
-                  Call Driver
-                </a>
-              )}
-
-              <a href={`mailto:support@spida.africa`} className="trk-btnOutline">
-                Support
+            {tractorData?.phone && (
+              <a className="trk-btn" href={`tel:${tractorData.phone}`}>
+                Call Driver
               </a>
-            </div>
+            )}
+
+            <button className="trk-btnOutline" onClick={() => alert("Support Chat")}>
+              Support
+            </button>
 
             <button className="trk-cancel" onClick={async () => {
+              if (!job.requestId) return;
               try {
                 await spiTractorsApi.cancelRequest(job.requestId);
+                alert("Request cancelled");
                 navigate(-1);
-              } catch { alert("Cancel failed"); }
+              } catch { alert("Unable to cancel request"); }
             }}>
               Cancel Request
             </button>
