@@ -208,7 +208,7 @@ export default function SpiTractorsPayAndEta() {
               tractorData?.base_rate_per_hour ||
               job.ratePerHour,
 
-            estimated_hours:
+            estimated_hours: tractorData?.work_rate ||
               job.estimatedHours,
 
             travel_fee:
