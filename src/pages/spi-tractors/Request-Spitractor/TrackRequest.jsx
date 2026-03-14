@@ -131,34 +131,45 @@ export default function TrackRequest() {
   /* ------------------------------ */
 
   useEffect(() => {
-    if (!tractorData?.id) return;
+    if (!requestId) return;
 
-    const load = async () => {
+    const checkStatus = async () => {
       try {
         const res =
-          await spiTractorsApi.getTractorLocation(tractorData.id);
+          await spiTractorsApi.getRequestStatus(requestId);
 
-        const lat =
-          res?.data?.lat ?? res?.data?.tractor?.lat;
+        const data = res?.data;
 
-        const lng =
-          res?.data?.lng ?? res?.data?.tractor?.lng;
+        if (!data) return;
 
-        if (lat && lng) {
-          setTractorLocation({
-            lat: Number(lat),
-            lng: Number(lng),
-          });
+        if (
+          data.matched === true ||
+          data.status === "matched"
+        ) {
+          setWaiting(false);
+
+          const t = data.matched_tractor;
+
+          if (t) {
+            setTractorData(t);
+
+            setTractorLocation({
+              lat: Number(t.lat),
+              lng: Number(t.lng),
+            });
+          }
         }
-      } catch {}
+      } catch (e) {
+        console.log(e);
+      }
     };
 
-    load();
+    checkStatus();
 
-    const i = setInterval(load, 5000);
+    const i = setInterval(checkStatus, 4000);
 
     return () => clearInterval(i);
-  }, [tractorData]);
+  }, [requestId]);
 
   /* ------------------------------ */
   /* MAP SETTINGS                   */
