@@ -11,7 +11,7 @@ import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
 
 const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
-const PENDING_PAY_KEY = "spiPendingPaystackPayment";
+
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
 
 const mapContainerStyle = {
@@ -41,6 +41,11 @@ export default function SpiTractorsPayAndEta() {
   const [loading, setLoading] = useState(false);
   const [estimate, setEstimate] = useState(null);
 
+  const routeInfo = {
+    distanceKm: 0,
+    etaMinutes: 0,
+  };
+
   const job = useMemo(() => {
     return (
       state?.job || {
@@ -54,12 +59,11 @@ export default function SpiTractorsPayAndEta() {
         travelFee: 0,
         tractorId: "",
         tractorName: "",
-        tractorRegId: "",
       }
     );
   }, [state]);
 
-  /* ---------------- farmer gps ---------------- */
+  /* farmer gps */
 
   useEffect(() => {
     try {
@@ -70,84 +74,73 @@ export default function SpiTractorsPayAndEta() {
       const lat = toNumber(gps?.lat);
       const lng = toNumber(gps?.lng);
 
-      if (lat && lng) setFarmerLocation({ lat, lng });
+      if (lat && lng) {
+        setFarmerLocation({ lat, lng });
+      }
     } catch {}
   }, []);
 
-  /* ---------------- request status polling ---------------- */
+  /* request status */
 
   useEffect(() => {
+    if (!job.requestId) return;
 
-  if (!job.requestId) return;
+    const checkStatus = async () => {
+      try {
+        const res = await spiTractorsApi.getRequestStatus(
+          job.requestId
+        );
 
-  const checkStatus = async () => {
+        const data = res?.data;
 
-    try {
+        if (!data) return;
 
-      const res = await spiTractorsApi.getRequestStatus(job.requestId);
+        if (data.matched === true || data.status === "matched") {
+          setWaiting(false);
 
-      console.log("RAW RES", res);
+          const t = data.matched_tractor;
 
-      const data = res?.data;
+          if (t) {
+            setTractorData(t);
 
-      console.log("PARSED", data);
-
-      if (!data) return;
-
-      if (data.matched === true || data.status === "matched") {
-
-        console.log("MATCHED TRUE");
-
-        setWaiting(false);
-
-        const t = data.matched_tractor;
-
-        if (t) {
-
-          setTractorData(t);
-
-          setTractorLocation({
-            lat: Number(t.lat),
-            lng: Number(t.lng),
-          });
-
+            setTractorLocation({
+              lat: Number(t.lat),
+              lng: Number(t.lng),
+            });
+          }
         }
-
+      } catch (e) {
+        console.log(e);
       }
+    };
 
-    } catch (e) {
+    checkStatus();
 
-      console.log("STATUS ERROR", e);
+    const i = setInterval(checkStatus, 4000);
 
-    }
+    return () => clearInterval(i);
+  }, [job.requestId]);
 
-  };
-
-  checkStatus();
-
-  const i = setInterval(checkStatus, 4000);
-
-  return () => clearInterval(i);
-
-}, [job.requestId]);
-
-  /* ---------------- tractor live location ---------------- */
+  /* tractor live location */
 
   useEffect(() => {
     if (!tractorData?.id) return;
 
     const load = async () => {
       try {
-        const res = await spiTractorsApi.getTractorLocation(
-          tractorData.id
-        );
+        const res =
+          await spiTractorsApi.getTractorLocation(
+            tractorData.id
+          );
 
         const lat = toNumber(
-          res?.data?.lat ?? res?.data?.tractor?.lat
+          res?.data?.lat ??
+            res?.data?.tractor?.lat
         );
 
         const lng = toNumber(
-          res?.data?.lng ?? res?.data?.tractor?.lng
+          res?.data?.lng ??
+            res?.data?.tractor?.lng
         );
 
         if (lat && lng) {
@@ -163,18 +156,21 @@ export default function SpiTractorsPayAndEta() {
     return () => clearInterval(i);
   }, [tractorData]);
 
-  /* ---------------- payment estimate ---------------- */
+  /* estimate */
 
   useEffect(() => {
     const run = async () => {
       try {
-        const res = await spiTractorsApi.paymentEstimate({
-          rate_per_hour:
-            tractorData?.base_rate_per_hour || job.ratePerHour,
-          estimated_hours: job.estimatedHours,
-          travel_fee:
-            tractorData?.travel_cost || job.travelFee,
-        });
+        const res =
+          await spiTractorsApi.paymentEstimate({
+            rate_per_hour:
+              tractorData?.base_rate_per_hour ||
+              job.ratePerHour,
+            estimated_hours: job.estimatedHours,
+            travel_fee:
+              tractorData?.travel_cost ||
+              job.travelFee,
+          });
 
         setEstimate(res?.data || null);
       } catch {}
@@ -183,30 +179,38 @@ export default function SpiTractorsPayAndEta() {
     run();
   }, [tractorData, job]);
 
-  /* ---------------- map helpers ---------------- */
+  /* map */
 
   const mapCenter = useMemo(() => {
-    if (isValidLatLng(farmerLocation)) return farmerLocation;
-    if (isValidLatLng(tractorLocation)) return tractorLocation;
+    if (isValidLatLng(farmerLocation))
+      return farmerLocation;
+
+    if (isValidLatLng(tractorLocation))
+      return tractorLocation;
+
     return defaultCenter;
   }, [farmerLocation, tractorLocation]);
 
   const linePath = useMemo(() => {
     if (!isValidLatLng(farmerLocation)) return [];
     if (!isValidLatLng(tractorLocation)) return [];
+
     return [tractorLocation, farmerLocation];
   }, [farmerLocation, tractorLocation]);
 
-  /* ---------------- total ---------------- */
+  /* total */
 
   const total = useMemo(() => {
-    if (estimate?.total) return Number(estimate.total);
+    if (estimate?.total)
+      return Number(estimate.total);
 
     const rate =
-      tractorData?.base_rate_per_hour || job.ratePerHour;
+      tractorData?.base_rate_per_hour ||
+      job.ratePerHour;
 
     const travel =
-      tractorData?.travel_cost || job.travelFee;
+      tractorData?.travel_cost ||
+      job.travelFee;
 
     return rate * job.estimatedHours + travel;
   }, [estimate, tractorData, job]);
@@ -214,7 +218,7 @@ export default function SpiTractorsPayAndEta() {
   const formatMoney = (n) =>
     `₦${Number(n || 0).toLocaleString()}`;
 
-  /* ---------------- pay ---------------- */
+  /* pay */
 
   const handlePay = async () => {
     if (!job.requestUuid) return;
@@ -222,50 +226,40 @@ export default function SpiTractorsPayAndEta() {
     try {
       setLoading(true);
 
-      const init = await spiTractorsApi.paystackInitialize({
-        job_request_id: job.requestUuid,
-        amount_kobo: Math.round(total * 100),
-        callback_url:
-          window.location.origin +
-          "/SpiTractorsPayCallback",
-        meta: {
-          request_code: job.requestId,
-          tractor_id:
-            tractorData?.id || job.tractorId,
-        },
-      });
+      const init =
+        await spiTractorsApi.paystackInitialize({
+          job_request_id: job.requestUuid,
+          amount_kobo: Math.round(total * 100),
+          callback_url:
+            window.location.origin +
+            "/SpiTractorsPayCallback",
+        });
 
-      const url = init?.data?.authorization_url;
+      const url =
+        init?.data?.authorization_url;
 
-      if (url) window.location.href = url;
-    } catch (e) {
+      if (url) {
+        window.location.href = url;
+      }
+    } catch {
       alert("Payment failed");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- waiting ---------------- */
+  /* waiting */
 
   if (waiting) {
     return (
       <div className="wait-modal">
         <div className="wait-card">
-  
           <h2>Finding tractor...</h2>
-  
-          <p>
-            Waiting for tractor owner to accept your request.
-          </p>
-  
           <div className="loader" />
-  
         </div>
       </div>
     );
   }
-
-  /* ---------------- UI ---------------- */
 
   return (
     <div className="pay-page">
@@ -279,7 +273,6 @@ export default function SpiTractorsPayAndEta() {
           mapContainerStyle={mapContainerStyle}
           center={mapCenter}
           zoom={13}
-          onLoad={(m) => (mapRef.current = m)}
         >
           {farmerLocation && (
             <Marker position={farmerLocation} />
@@ -300,16 +293,44 @@ export default function SpiTractorsPayAndEta() {
 
       <h2>
         Tractor:{" "}
-        {tractorData?.name || job.tractorName}
+        {tractorData?.name ||
+          job.tractorName}
       </h2>
 
-      <h3>Total: {formatMoney(total)}</h3>
+      <div className="pay-etaCard">
+
+        <div className="pay-etaItem">
+          <div className="pay-etaLabel">
+            Distance
+          </div>
+          <div className="pay-etaValue">
+            {routeInfo.distanceKm} km
+          </div>
+        </div>
+
+        <div className="pay-etaItem">
+          <div className="pay-etaLabel">
+            Arrival
+          </div>
+          <div className="pay-etaValue">
+            {routeInfo.etaMinutes} mins
+          </div>
+        </div>
+
+      </div>
+
+      <div className="pay-total">
+        Total: {formatMoney(total)}
+      </div>
 
       <button
+        className="pay-btn"
         onClick={handlePay}
         disabled={loading}
       >
-        {loading ? "Loading..." : "Pay"}
+        {loading
+          ? "Redirecting..."
+          : "Make Payment"}
       </button>
 
     </div>
