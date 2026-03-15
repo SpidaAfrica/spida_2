@@ -134,7 +134,7 @@ export default function RequestCard({ data, onChanged }) {
 
             <div className="req-k mt">Suggested Tractor</div>
             <div className="req-v">
-              {data.tractor_registration || "-"}
+              {data.tractor_registration || data.tractor_registration || "-"}
             </div>
           </div>
         </div>
