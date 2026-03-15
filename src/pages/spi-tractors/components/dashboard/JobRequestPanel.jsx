@@ -1,3 +1,27 @@
+import { useEffect, useMemo, useState } from "react";
+import "./jobpanel.css";
+import { spiTractorsApi } from "../../api/spiTractorsApi";
+
+function prettyService(serviceRaw) {
+  const s = String(serviceRaw || "").toLowerCase();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "-";
+}
+
+function money(n) {
+  if (n === null || n === undefined) return "-";
+  return `₦${Number(n).toLocaleString()}`;
+}
+
+function mapSrc(lat, lng) {
+  const d = 0.01;
+  const left = lng - d;
+  const right = lng + d;
+  const top = lat + d;
+  const bottom = lat - d;
+
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lng}`;
+}
+
 export default function JobRequestPanel() {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState([]);
