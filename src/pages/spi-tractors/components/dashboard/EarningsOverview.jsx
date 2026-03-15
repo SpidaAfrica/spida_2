@@ -27,20 +27,25 @@ export default function EarningsOverview() {
     series: [],
   });
 
+  // ✅ Load function for fetching data
+  const load = async () => {
+    try {
+      setErr("");
+      setLoading(true);
+      const res = await spiTractorsApi.ownerEarnings();
+      setData(res?.data || data);
+    } catch (e) {
+      setErr(e?.message || "Unable to load earnings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ useEffect to fetch on mount + refresh every 5s
   useEffect(() => {
-    const load = async () => {
-      try {
-        setErr("");
-        setLoading(true);
-        const res = await spiTractorsApi.ownerEarnings(); // /dashboard_owner_earnings.php
-        setData(res?.data || data);
-      } catch (e) {
-        setErr(e?.message || "Unable to load earnings");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    load(); // initial load
+    const interval = setInterval(load, 5000); // every 5 seconds
+    return () => clearInterval(interval); // cleanup on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
