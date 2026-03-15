@@ -549,6 +549,7 @@ export default function RequestSpiTractor() {
               name="preferredDate"
               value={form.preferredDate}
               onChange={onChange}
+              min={new Date().toISOString().split("T")[0]} // today in YYYY-MM-DD format
             />
 
             <button className="rt-btn" type="submit" disabled={loading}>
