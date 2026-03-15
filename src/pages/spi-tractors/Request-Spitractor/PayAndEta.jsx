@@ -361,17 +361,11 @@ useEffect(() => {
     return (
       <div className="wait-modal">
         <div className="wait-card">
-          <h2>
-            Waiting for tractor owner
-          </h2>
-
-          <div className="loader" />
-
-          <p>
-            Your request has been sent.
-            Waiting for acceptance...
-          </p>
+          <h2>Waiting for tractor owner</h2>
+          <p>Your request has been sent. Waiting for acceptance...</p>
         </div>
+      
+        <div className="loader" /> {/* now absolute and centered */}
       </div>
     );
   }
