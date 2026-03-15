@@ -9,18 +9,28 @@ export default function StatCards() {
     { title: "Upcoming Job", value: "0" },
   ]);
 
+  // ✅ Function to load stats
+  const loadStats = async () => {
+    try {
+      const res = await spiTractorsApi.ownerSummary();
+      const summary = res?.data || {};
+      setStats([
+        { title: "Total Jobs to date", value: String(summary.completed_jobs || 0) },
+        { title: "Active Jobs", value: String(summary.active_requests || 0) },
+        { title: "Upcoming Job", value: String(summary.tractors_count || 0) },
+      ]);
+    } catch (e) {
+      // Optionally handle error
+      console.error("Unable to fetch stats", e);
+    }
+  };
+
   useEffect(() => {
-    spiTractorsApi
-      .ownerSummary()
-      .then((res) => {
-        const summary = res?.data || {};
-        setStats([
-          { title: "Total Jobs to date", value: String(summary.completed_jobs || 0) },
-          { title: "Active Jobs", value: String(summary.active_requests || 0) },
-          { title: "Upcoming Job", value: String(summary.tractors_count || 0) },
-        ]);
-      })
-      .catch(() => {});
+    loadStats(); // initial load
+
+    const interval = setInterval(loadStats, 5000); // refresh every 5 seconds
+
+    return () => clearInterval(interval); // cleanup on unmount
   }, []);
 
   return (
