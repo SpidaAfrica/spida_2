@@ -9,28 +9,29 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
 .wait-card {
-  background:white;
-  padding:30px;
-  border-radius:12px;
-  text-align:center; justify-content:center;
-  width:280px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  width: 80%;
+  max-width: 280px;
 }
 
 .loader {
-  margin-top:15px;
-  width:40px;
-  height:40px;
-  border:4px solid #eee;
-  border-top:4px solid green;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
+  margin-top: 15px;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid green;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
