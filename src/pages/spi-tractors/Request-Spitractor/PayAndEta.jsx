@@ -158,7 +158,6 @@ useEffect(() => {
           data.matched === true ||
           data.status === "matched"
         ) {
-          setWaiting(false);
 
           const t = data.matched_tractor;
 
@@ -169,6 +168,7 @@ useEffect(() => {
               lat: Number(t.lat),
               lng: Number(t.lng),
             });
+          setWaiting(false);
           }
         }
       } catch (e) {
