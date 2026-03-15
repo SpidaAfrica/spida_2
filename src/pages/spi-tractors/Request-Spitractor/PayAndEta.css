@@ -21,10 +21,11 @@
   border-radius:12px;
   text-align:center;
   width:280px;
+  position: relative; /* needed if loader is inside */
 }
 
 .loader {
-  position: absolute; /* center relative to viewport */
+  position: absolute; /* screen-centered if direct child of .wait-modal */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -34,10 +35,6 @@
   border-top:4px solid green;
   border-radius:50%;
   animation:spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
 }
   .pay-back {
     position: absolute;
