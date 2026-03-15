@@ -164,7 +164,7 @@ export default function JobRequestPanel() {
             <div className="v">{selected?.preferred_date || "-"}</div>
           </div>
         </div>
-
+        {/*
         <div className="row two">
           <div>
             <div className="k">Payment Method</div>
@@ -176,6 +176,7 @@ export default function JobRequestPanel() {
             <div className="v">{money(selected?.meta?.amount_naira)}</div>
           </div>
         </div>
+        */}
       </div>
 
       <div className="jobpanel-actions">
