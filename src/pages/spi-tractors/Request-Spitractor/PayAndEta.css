@@ -24,10 +24,10 @@
 }
 
 .loader {
-  margin-top:15px;
-  margin-left: -15px;
+  margin-top:45px;
+  margin-left: -45px;
   width:40px;
-  height:40px;
+  height:70px;
   border:4px solid #eee;
   border-top:4px solid green;
   border-radius:50%;
