@@ -156,7 +156,7 @@ export default function JobRequestPanel() {
         <div className="row two">
           <div>
             <div className="k">Suggested Tractor</div>
-            <div className="v">{selected?.suggested_tractor_reg_id || selected?.suggested_tractor_id || "-"}</div>
+            <div className="v">{selected?.tractor_registration || selected?.tractor_registration || "-"}</div>
           </div>
 
           <div>
