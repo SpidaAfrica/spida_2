@@ -364,8 +364,6 @@ useEffect(() => {
           <h2>Waiting for tractor owner</h2>
           <p>Your request has been sent. Waiting for acceptance...</p>
         </div>
-      
-        <div className="loader" /> {/* now absolute and centered */}
       </div>
     );
   }
