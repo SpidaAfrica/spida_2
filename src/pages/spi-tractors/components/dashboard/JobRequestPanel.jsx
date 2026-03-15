@@ -18,7 +18,6 @@ function mapSrc(lat, lng) {
   const right = lng + d;
   const top = lat + d;
   const bottom = lat - d;
-
   return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lng}`;
 }
 
@@ -28,25 +27,30 @@ export default function JobRequestPanel() {
   const [selectedId, setSelectedId] = useState(null);
   const [err, setErr] = useState("");
 
+  // Determine selected job (always compute hook)
   const selected = useMemo(() => {
     if (!list.length) return null;
     return list.find((x) => x.offer_id === selectedId) || list[0];
   }, [list, selectedId]);
 
+  const hasMap =
+    Number.isFinite(Number(selected?.farm_lat)) &&
+    Number.isFinite(Number(selected?.farm_lng));
+
+  const mapUrl = useMemo(() => {
+    if (!hasMap) return "";
+    return mapSrc(Number(selected.farm_lat), Number(selected.farm_lng));
+  }, [hasMap, selected?.farm_lat, selected?.farm_lng]);
+
+  // Load job requests
   const load = async () => {
     try {
       setErr("");
       setLoading(true);
-
       const res = await spiTractorsApi.ownerNewRequests();
       const rows = Array.isArray(res?.data) ? res.data : [];
-
       setList(rows);
-
-      if (!selectedId && rows[0]?.offer_id) {
-        setSelectedId(rows[0].offer_id);
-      }
-
+      if (!selectedId && rows[0]?.offer_id) setSelectedId(rows[0].offer_id);
     } catch (e) {
       setErr(e?.message || "Unable to load job requests");
       setList([]);
@@ -61,32 +65,8 @@ export default function JobRequestPanel() {
     return () => clearInterval(t);
   }, []);
 
-  // If no jobs exist, show a placeholder
-  if (!loading && list.length === 0) {
-    return (
-      <div className="jobpanel no-jobs">
-        <p>No job request at the moment...</p>
-      </div>
-    );
-  }
-
-  const hasMap =
-    Number.isFinite(Number(selected?.farm_lat)) &&
-    Number.isFinite(Number(selected?.farm_lng));
-
-  const mapUrl = useMemo(() => {
-    if (!hasMap) return "";
-    const d = 0.01;
-    const left = selected.farm_lng - d;
-    const right = selected.farm_lng + d;
-    const top = selected.farm_lat + d;
-    const bottom = selected.farm_lat - d;
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${selected.farm_lat}%2C${selected.farm_lng}`;
-  }, [hasMap, selected?.farm_lat, selected?.farm_lng]);
-
   const handleAction = async (action) => {
     if (!selected || loading) return;
-
     try {
       setLoading(true);
       await spiTractorsApi.ownerRequestAction({
@@ -101,18 +81,16 @@ export default function JobRequestPanel() {
     }
   };
 
-  const countLabel =
-    `${list.length} New Job request${list.length === 1 ? "" : "s"}`;
+  const countLabel = `${list.length} New Job request${list.length === 1 ? "" : "s"}`;
 
-  const prettyService = (s) => {
-    const str = String(s || "").toLowerCase();
-    return str ? str.charAt(0).toUpperCase() + str.slice(1) : "-";
-  };
-
-  const money = (n) => {
-    if (n === null || n === undefined) return "-";
-    return `₦${Number(n).toLocaleString()}`;
-  };
+  // ✅ Early return if no requests (but after hooks)
+  if (!loading && list.length === 0) {
+    return (
+      <div className="jobpanel no-jobs">
+        <p>No job request at the moment...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="jobpanel">
@@ -172,20 +150,15 @@ export default function JobRequestPanel() {
 
         <div className="row">
           <span className="k">Farm Size</span>
-          <span className="v">
-            {selected?.farm_size_acres ? `${selected.farm_size_acres} acres` : "-"}
-          </span>
+          <span className="v">{selected?.farm_size_acres ? `${selected.farm_size_acres} acres` : "-"}</span>
         </div>
 
         <div className="row two">
           <div>
             <div className="k">Suggested Tractor</div>
-            <div className="v">
-              {selected?.suggested_tractor_reg_id ||
-                selected?.suggested_tractor_id ||
-                "-"}
-            </div>
+            <div className="v">{selected?.suggested_tractor_reg_id || selected?.suggested_tractor_id || "-"}</div>
           </div>
+
           <div>
             <div className="k">Preferred Date</div>
             <div className="v">{selected?.preferred_date || "-"}</div>
@@ -197,6 +170,7 @@ export default function JobRequestPanel() {
             <div className="k">Payment Method</div>
             <div className="v">{selected?.meta?.payment_method || "Card"}</div>
           </div>
+
           <div>
             <div className="k">Total Amount</div>
             <div className="v">{money(selected?.meta?.amount_naira)}</div>
@@ -221,7 +195,6 @@ export default function JobRequestPanel() {
           Decline
         </button>
       </div>
-
     </div>
   );
 }
