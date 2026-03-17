@@ -31,6 +31,7 @@ export default function ChooseRole() {
   }, []);
   
   const handleType = (type) => {
+  localStorage.setItem("requestType", type)
   navigate("/Spi_Tractors_Request", {
     state: { requestType: type }
   });
