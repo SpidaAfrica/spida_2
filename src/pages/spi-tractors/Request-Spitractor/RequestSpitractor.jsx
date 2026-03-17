@@ -50,7 +50,9 @@ export default function RequestSpiTractor() {
   const [selectedTractor, setSelectedTractor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gettingGps, setGettingGps] = useState(false);
-
+  const [reqType, setReqType] = useState(requestType);
+  const requestType =
+  location.state?.requestType || "single";
   const token = localStorage.getItem("spiTractorsToken") || "";
   const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 
