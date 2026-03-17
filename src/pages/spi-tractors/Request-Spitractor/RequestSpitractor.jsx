@@ -74,7 +74,7 @@ const [reqType, setReqType] = useState(requestType);
     }
   }, []);
 
-  const buildDraftPayload = useCallback(
+   const buildDraftPayload = useCallback(
     (srcForm) => ({
       full_name: (srcForm.fullName || "").trim(),
       farm_name: (srcForm.farmName || "").trim(),
@@ -85,12 +85,13 @@ const [reqType, setReqType] = useState(requestType);
       preferred_date: srcForm.preferredDate || null,
       farm_lat: gps.lat,
       farm_lng: gps.lng,
-      request_type: reqType,
-      notes: "Created from SpiTractors frontend",  
+  
+      request_type: reqType, // ✅ correct
+  
+      notes: "Created from SpiTractors frontend",
     }),
-    [gps.lat, gps.lng]
+    [gps.lat, gps.lng, reqType] // ✅ FIX HERE
   );
-
   const normalizeTractor = useCallback((tractor, index) => {
     const lat = toNumber(tractor?.lat ?? tractor?.latitude);
     const lng = toNumber(tractor?.lng ?? tractor?.longitude);
@@ -450,7 +451,9 @@ const [reqType, setReqType] = useState(requestType);
               Request a tractor <span className="rt-info">ⓘ</span>
             </h1>
           </div>
-
+          <div className="rt-type">
+            Request type: <b>{reqType === "pair" ? "Pair with farmers" : "Single order"}</b>
+          </div>
           <form className="rt-form" onSubmit={onSubmit}>
             <label className="rt-label">Full Name</label>
             <input
