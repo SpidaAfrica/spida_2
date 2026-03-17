@@ -409,7 +409,7 @@ export default function SpiTractorsPayAndEta() {
             </p>
 
             <p>
-              Acres: {job?.draft?.acres || 1}
+              Acres: {job?.draft?.farm_size_acres|| 1}
             </p>
 
             <h3>
