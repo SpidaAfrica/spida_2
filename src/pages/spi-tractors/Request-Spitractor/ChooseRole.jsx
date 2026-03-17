@@ -12,6 +12,7 @@ import { spiTractorsApi } from "../api/spiTractorsApi";
 export default function ChooseRole() {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showTypeModal, setShowTypeModal] = useState(false);
 
   const slides = [
     { image: img1, title: "Boosted yields and improved food security", text: "Mechanized farming boosts yields, contributing to improved food security and livelihoods." },
@@ -28,7 +29,12 @@ export default function ChooseRole() {
   useEffect(() => {
     spiTractorsApi.health().catch(() => {});
   }, []);
-
+  
+  const handleType = (type) => {
+  navigate("/Spi_Tractors_Request", {
+    state: { requestType: type }
+  });
+};
   return (
     <div className="choose-page">
       <div className="choose-left">
@@ -39,7 +45,7 @@ export default function ChooseRole() {
             <h1 className="choose-title">What would you like to do?</h1>
             <p className="choose-subtitle">Choose your path to continue on Spida.</p>
 
-            <button className="choose-option" onClick={() => navigate("/Spi_Tractors_Request/")} type="button">
+            <button className="choose-option" onClick={() => setShowTypeModal(true)} type="button">
               <div className="choose-optionLeft">
                 <div className="choose-ic">🚜</div>
                 <div>
@@ -49,7 +55,27 @@ export default function ChooseRole() {
               </div>
               <div className="choose-arrow">→</div>
             </button>
-
+            {showTypeModal && (
+                <div className="modal">
+                  <div className="modalBox">
+              
+                    <h3>Choose request type</h3>
+              
+                    <button
+                      onClick={() => handleType("single")}
+                    >
+                      Order tractor for myself
+                    </button>
+              
+                    <button
+                      onClick={() => handleType("pair")}
+                    >
+                      Pair with other farmers
+                    </button>
+              
+                  </div>
+                </div>
+              )}
             <button className="choose-option" onClick={() => navigate("/Spi_Tractors_Login/")} type="button">
               <div className="choose-optionLeft">
                 <div className="choose-ic">🧑‍🌾</div>
