@@ -191,6 +191,14 @@ paystackVerify: async (reference) => {
   adminUsers: () => request("/admin_users.php", { auth: true }),
   getNearbyTractors: (payload) =>
     request("/get-nearby-tractors.php", { method: "POST", body: payload, auth: true }), 
+
+  // Add this inside the spiTractorsApi object
+pairMatchEngine: () =>
+  request("/pair_match_engine.php", {
+    method: "POST",
+    auth: true,
+  }),
+  
 getRequestStatus(requestId) {
   return request("/get_request_status.php", {
     method: "POST",
