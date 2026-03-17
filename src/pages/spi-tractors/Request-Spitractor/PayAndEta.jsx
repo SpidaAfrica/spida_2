@@ -296,7 +296,7 @@ export default function SpiTractorsPayAndEta() {
     if (requestType === "pair") {
 
       const acres =
-        job?.draft?.acres || 1;
+        job?.draft?.farm_size_acres || 1;
 
       return acres * 100000;
     }
