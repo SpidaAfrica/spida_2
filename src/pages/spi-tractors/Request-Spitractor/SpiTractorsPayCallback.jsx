@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { spiTractorsApi } from "../api/spiTractorsApi";
 
 const PENDING_PAY_KEY = "spiPendingPaystackPayment";
+const TRACK_REQUEST_KEY = "spiTrackRequestId";
 
 export default function SpiTractorsPayCallback() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function SpiTractorsPayCallback() {
   useEffect(() => {
     const run = async () => {
       try {
+        // 1️⃣ Get Paystack reference
         const url = new URL(window.location.href);
         const reference = url.searchParams.get("reference");
 
@@ -19,24 +21,34 @@ export default function SpiTractorsPayCallback() {
         );
 
         const ref = reference || pending?.reference;
-
         if (!ref) throw new Error("Missing Paystack reference.");
 
+        setMsg("Verifying payment with Paystack...");
         console.log("Verifying reference:", ref);
 
-        // ✅ VERIFY ON BACKEND (USE ref, NOT referenceString)
+        // 2️⃣ Verify payment on backend
         const verifyRes = await spiTractorsApi.paystackVerify(ref);
-
         if (!verifyRes?.success) {
-          throw new Error(
-            verifyRes?.message || "Payment verification failed"
+          throw new Error(verifyRes?.message || "Payment verification failed");
+        }
+
+        // 3️⃣ Trigger pair engine
+        setMsg("Processing your request...");
+        const engineRes = await spiTractorsApi.pairMatchEngine();
+        console.log("Pair engine response:", engineRes);
+
+        // 4️⃣ Save request ID to storage for tracking
+        if (pending?.requestId) {
+          localStorage.setItem(
+            TRACK_REQUEST_KEY,
+            JSON.stringify({ requestId: pending.requestId })
           );
         }
 
-        // cleanup
+        // 5️⃣ Cleanup pending payment
         localStorage.removeItem(PENDING_PAY_KEY);
 
-        // go to tracking
+        // 6️⃣ Navigate to tracking page
         navigate("/SpiTractorsTrackRequest", {
           replace: true,
           state: {
@@ -50,7 +62,7 @@ export default function SpiTractorsPayCallback() {
           },
         });
       } catch (e) {
-        console.error("Verify error:", e);
+        console.error("Payment verification error:", e);
         setMsg(e?.message || "Unable to verify payment.");
       }
     };
@@ -61,7 +73,7 @@ export default function SpiTractorsPayCallback() {
   return (
     <div style={{ padding: 24 }}>
       <h2>{msg}</h2>
-      <p>If this stays here, go back and try again.</p>
+      <p>If this stays here, try refreshing or going back and trying again.</p>
     </div>
   );
 }
