@@ -50,9 +50,11 @@ export default function RequestSpiTractor() {
   const [selectedTractor, setSelectedTractor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gettingGps, setGettingGps] = useState(false);
+  const storedType =
+    localStorage.getItem("spiRequestType") || "single";
   const requestType =
-  location.state?.requestType || "single";
-  const [reqType, setReqType] = useState(requestType);
+    location.state?.requestType || storedType || "single";
+const [reqType, setReqType] = useState(requestType);
   const token = localStorage.getItem("spiTractorsToken") || "";
   const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 
@@ -83,7 +85,8 @@ export default function RequestSpiTractor() {
       preferred_date: srcForm.preferredDate || null,
       farm_lat: gps.lat,
       farm_lng: gps.lng,
-      notes: "Created from SpiTractors frontend",
+      request_type: reqType,
+      notes: "Created from SpiTractors frontend",  
     }),
     [gps.lat, gps.lng]
   );
