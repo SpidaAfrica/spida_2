@@ -12,7 +12,6 @@ export default function SpiTractorsPayCallback() {
   useEffect(() => {
     const run = async () => {
       try {
-        // 1️⃣ Get Paystack reference
         const url = new URL(window.location.href);
         const reference = url.searchParams.get("reference");
 
@@ -24,20 +23,16 @@ export default function SpiTractorsPayCallback() {
         if (!ref) throw new Error("Missing Paystack reference.");
 
         setMsg("Verifying payment with Paystack...");
-        console.log("Verifying reference:", ref);
 
-        // 2️⃣ Verify payment on backend
         const verifyRes = await spiTractorsApi.paystackVerify(ref);
         if (!verifyRes?.success) {
           throw new Error(verifyRes?.message || "Payment verification failed");
         }
 
-        // 3️⃣ Trigger pair engine
-        setMsg("Processing your request...");
-        const engineRes = await spiTractorsApi.pairMatchEngine();
-        console.log("Pair engine response:", engineRes);
+        setMsg("Triggering pairing engine...");
+        await spiTractorsApi.pairMatchEngine();
 
-        // 4️⃣ Save request ID to storage for tracking
+        // Save requestId for tracking
         if (pending?.requestId) {
           localStorage.setItem(
             TRACK_REQUEST_KEY,
@@ -45,10 +40,9 @@ export default function SpiTractorsPayCallback() {
           );
         }
 
-        // 5️⃣ Cleanup pending payment
         localStorage.removeItem(PENDING_PAY_KEY);
 
-        // 6️⃣ Navigate to tracking page
+        // Navigate to tracking page
         navigate("/SpiTractorsTrackRequest", {
           replace: true,
           state: {
@@ -62,7 +56,7 @@ export default function SpiTractorsPayCallback() {
           },
         });
       } catch (e) {
-        console.error("Payment verification error:", e);
+        console.error("Payment/Pairing error:", e);
         setMsg(e?.message || "Unable to verify payment.");
       }
     };
@@ -71,7 +65,7 @@ export default function SpiTractorsPayCallback() {
   }, [navigate]);
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: 24, textAlign: "center" }}>
       <h2>{msg}</h2>
       <p>If this stays here, try refreshing or going back and trying again.</p>
     </div>
