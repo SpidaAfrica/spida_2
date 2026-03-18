@@ -24,25 +24,31 @@ export default function SpiTractorsPayCallback() {
 
         setMsg("Verifying payment with Paystack...");
 
+        // ✅ verify payment only
         const verifyRes = await spiTractorsApi.paystackVerify(ref);
+
         if (!verifyRes?.success) {
-          throw new Error(verifyRes?.message || "Payment verification failed");
+          throw new Error(
+            verifyRes?.message || "Payment verification failed"
+          );
         }
 
-        setMsg("Triggering pairing engine...");
-        await spiTractorsApi.pairMatchEngine();
+        // ✅ pairing now happens in backend (paystack_verify.php)
+        setMsg("Payment successful. Preparing tracking...");
 
         // Save requestId for tracking
         if (pending?.requestId) {
           localStorage.setItem(
             TRACK_REQUEST_KEY,
-            JSON.stringify({ requestId: pending.requestId })
+            JSON.stringify({
+              requestId: pending.requestId,
+            })
           );
         }
 
         localStorage.removeItem(PENDING_PAY_KEY);
 
-        // Navigate to tracking page
+        // ✅ go to tracking page
         navigate("/SpiTractorsTrackRequest", {
           replace: true,
           state: {
@@ -56,7 +62,7 @@ export default function SpiTractorsPayCallback() {
           },
         });
       } catch (e) {
-        console.error("Payment/Pairing error:", e);
+        console.error("Payment verify error:", e);
         setMsg(e?.message || "Unable to verify payment.");
       }
     };
@@ -67,7 +73,7 @@ export default function SpiTractorsPayCallback() {
   return (
     <div style={{ padding: 24, textAlign: "center" }}>
       <h2>{msg}</h2>
-      <p>If this stays here, try refreshing or going back and trying again.</p>
+      <p>If this stays here, try refreshing or go back and try again.</p>
     </div>
   );
 }
