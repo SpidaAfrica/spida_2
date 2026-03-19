@@ -18,6 +18,7 @@ function mapSrc(lat, lng) {
   const right = lng + d;
   const top = lat + d;
   const bottom = lat - d;
+
   return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${lat}%2C${lng}`;
 }
 
@@ -27,32 +28,80 @@ export default function JobRequestPanel() {
   const [selectedId, setSelectedId] = useState(null);
   const [err, setErr] = useState("");
 
-  // Determine selected job (always compute hook)
+  /* =========================
+     SELECTED
+  ========================= */
+
   const selected = useMemo(() => {
     if (!list.length) return null;
-    return list.find((x) => x.offer_id === selectedId) || list[0];
+    return list.find((x) => x.id === selectedId) || list[0];
   }, [list, selectedId]);
 
   const hasMap =
-    Number.isFinite(Number(selected?.farm_lat)) &&
-    Number.isFinite(Number(selected?.farm_lng));
+    Number.isFinite(Number(selected?.lat)) &&
+    Number.isFinite(Number(selected?.lng));
 
   const mapUrl = useMemo(() => {
     if (!hasMap) return "";
-    return mapSrc(Number(selected.farm_lat), Number(selected.farm_lng));
-  }, [hasMap, selected?.farm_lat, selected?.farm_lng]);
+    return mapSrc(Number(selected.lat), Number(selected.lng));
+  }, [hasMap, selected]);
 
-  // Load job requests
+  /* =========================
+     LOAD BOTH ENDPOINTS
+  ========================= */
+
   const load = async () => {
     try {
-      setErr("");
       setLoading(true);
-      const res = await spiTractorsApi.ownerNewRequests();
-      const rows = Array.isArray(res?.data) ? res.data : [];
-      setList(rows);
-      if (!selectedId && rows[0]?.offer_id) setSelectedId(rows[0].offer_id);
+      setErr("");
+
+      const [singleRes, pairRes] = await Promise.all([
+        spiTractorsApi.ownerNewRequestsSingle(),
+        spiTractorsApi.ownerNewRequestsPair(),
+      ]);
+
+      const singleRows = Array.isArray(singleRes?.data)
+        ? singleRes.data.map((r) => ({
+            id: "single_" + r.offer_id,
+            type: "single",
+            offer_id: r.offer_id,
+            lat: r.farm_lat,
+            lng: r.farm_lng,
+            service: r.service,
+            farm_size_acres: r.farm_size_acres,
+            request_code: r.request_code,
+            farm_name: r.farm_name,
+            farm_address: r.farm_address,
+            preferred_date: r.preferred_date,
+            tractor_registration: r.tractor_registration,
+          }))
+        : [];
+
+      const pairRows = pairRes?.data
+        ? [
+            {
+              id: "pair_" + pairRes.data.group.id,
+              type: "pair",
+              group_id: pairRes.data.group.id,
+              lat: pairRes.data.farmers[0]?.farm_lat,
+              lng: pairRes.data.farmers[0]?.farm_lng,
+              service: pairRes.data.farmers[0]?.service,
+              farm_size_acres: pairRes.data.group.total_acres,
+              request_code: "PAIR-" + pairRes.data.group.id,
+              farmers: pairRes.data.farmers,
+            },
+          ]
+        : [];
+
+      const merged = [...singleRows, ...pairRows];
+
+      setList(merged);
+
+      if (!selectedId && merged[0]) {
+        setSelectedId(merged[0].id);
+      }
     } catch (e) {
-      setErr(e?.message || "Unable to load job requests");
+      setErr(e.message);
       setList([]);
     } finally {
       setLoading(false);
@@ -65,25 +114,47 @@ export default function JobRequestPanel() {
     return () => clearInterval(t);
   }, []);
 
+  /* =========================
+     ACTION
+  ========================= */
+
   const handleAction = async (action) => {
     if (!selected || loading) return;
+
     try {
       setLoading(true);
-      await spiTractorsApi.ownerRequestAction({
-        offer_id: selected.offer_id,
-        action,
-      });
+
+      if (selected.type === "single") {
+        await spiTractorsApi.ownerRequestActionSingle({
+          offer_id: selected.offer_id,
+          action,
+        });
+      }
+
+      if (selected.type === "pair") {
+        if (action === "ACCEPT") {
+          await spiTractorsApi.ownerAcceptPairGroup({
+            group_id: selected.group_id,
+          });
+        } else {
+          await spiTractorsApi.ownerDeclinePairGroup({
+            group_id: selected.group_id,
+          });
+        }
+      }
+
       await load();
     } catch (e) {
-      alert(e?.message || `Unable to ${action.toLowerCase()} request`);
+      alert(e.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const countLabel = `${list.length} New Job request${list.length === 1 ? "" : "s"}`;
+  const countLabel = `${list.length} New Job request${
+    list.length === 1 ? "" : "s"
+  }`;
 
-  // ✅ Early return if no requests (but after hooks)
   if (!loading && list.length === 0) {
     return (
       <div className="jobpanel no-jobs">
@@ -97,105 +168,99 @@ export default function JobRequestPanel() {
 
       <div className="jobpanel-head">
         <div>
-          <div className="jobpanel-title">Job Request</div>
-          <div className="jobpanel-sub">{selected?.request_code || "—"}</div>
+          <div className="jobpanel-title">
+            {selected?.type === "pair"
+              ? "Pair Request"
+              : "Single Request"}
+          </div>
+
+          <div className="jobpanel-sub">
+            {selected?.request_code}
+          </div>
         </div>
-        <div className="jobpanel-badge">{loading ? "Loading..." : countLabel}</div>
+
+        <div className="jobpanel-badge">
+          {loading ? "Loading..." : countLabel}
+        </div>
       </div>
 
       {list.length > 1 && (
-        <div style={{ marginBottom: 10 }}>
-          <select
-            value={selected?.offer_id || ""}
-            onChange={(e) => setSelectedId(Number(e.target.value))}
-            style={{ width: "100%", padding: 10, borderRadius: 10 }}
-          >
-            {list.map((x) => (
-              <option key={x.offer_id} value={x.offer_id}>
-                {x.request_code} • {prettyService(x.service)} • {x.farm_city || "-"}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={selected?.id || ""}
+          onChange={(e) => setSelectedId(e.target.value)}
+        >
+          {list.map((x) => (
+            <option key={x.id} value={x.id}>
+              {x.request_code} • {prettyService(x.service)}
+            </option>
+          ))}
+        </select>
       )}
 
       <div className="mapbox">
         {hasMap ? (
           <iframe
-            title={`map-${selected?.offer_id}`}
+            title="map"
             src={mapUrl}
-            loading="lazy"
             style={{ width: "100%", height: 220, border: 0 }}
           />
         ) : (
-          <div className="map-skeleton">No Map Available</div>
+          <div>No map</div>
         )}
       </div>
 
       <div className="job-meta">
-        {err && <div style={{ padding: 10, color: "crimson" }}>{err}</div>}
 
         <div className="row">
-          <span className="k">Farm Name</span>
+          <span className="k">Service</span>
           <span className="v">
-            {(selected?.farm_name ? `${selected.farm_name}, ` : "")}
-            {selected?.farm_address || "-"}
+            {prettyService(selected?.service)}
           </span>
         </div>
 
         <div className="row">
-          <span className="k">Service Needed</span>
-          <span className="v">{prettyService(selected?.service)}</span>
+          <span className="k">
+            {selected?.type === "pair"
+              ? "Total Acres"
+              : "Farm Size"}
+          </span>
+
+          <span className="v">
+            {selected?.farm_size_acres} acres
+          </span>
         </div>
 
-        <div className="row">
-          <span className="k">Farm Size</span>
-          <span className="v">{selected?.farm_size_acres ? `${selected.farm_size_acres} acres` : "-"}</span>
-        </div>
+        {selected?.type === "pair" && (
+          <div className="row">
+            <span className="k">Farmers</span>
+            <span className="v">
+              {selected.farmers?.length}
+            </span>
+          </div>
+        )}
 
-        <div className="row two">
-          <div>
-            <div className="k">Suggested Tractor</div>
-            <div className="v">{selected?.tractor_registration || selected?.tractor_registration || "-"}</div>
-          </div>
-
-          <div>
-            <div className="k">Preferred Date</div>
-            <div className="v">{selected?.preferred_date || "-"}</div>
-          </div>
-        </div>
-        {/*
-        <div className="row two">
-          <div>
-            <div className="k">Payment Method</div>
-            <div className="v">{selected?.meta?.payment_method || "Card"}</div>
-          </div>
-
-          <div>
-            <div className="k">Total Amount</div>
-            <div className="v">{money(selected?.meta?.amount_naira)}</div>
-          </div>
-        </div>
-        */}
       </div>
 
       <div className="jobpanel-actions">
+
         <button
           className="accept"
           onClick={() => handleAction("ACCEPT")}
-          disabled={!selected || loading}
+          disabled={loading}
         >
-          {loading ? "Working..." : "Accept"}
+          Accept
         </button>
 
         <button
           className="decline"
           onClick={() => handleAction("DECLINE")}
-          disabled={!selected || loading}
+          disabled={loading}
         >
           Decline
         </button>
+
       </div>
+
     </div>
   );
 }
