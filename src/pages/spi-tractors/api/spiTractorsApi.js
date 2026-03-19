@@ -109,8 +109,39 @@ notificationsMarkRead: () => request("/notifications_mark_read.php", { method: "
   login: (payload) => request("/login.php", { method: "POST", body: payload }),
   me: () => request("/me.php", { auth: true }),
   ownerNewRequests: () => request("/requests_owner_new.php", { auth: true }),
-  ownerRequestAction: (payload) =>
-    request("/requests_owner_action.php", { method: "POST", body: payload, auth: true }),
+
+/* =========================
+   NEW SPLIT APIS
+========================= */
+
+ownerNewRequestsSingle: () =>
+  request("/requests_owner_new.php", { auth: true }),
+
+ownerRequestActionSingle: (payload) =>
+  request("/requests_owner_action.php", {
+    method: "POST",
+    body: payload,
+    auth: true,
+  }),
+
+ownerNewRequestsPair: () =>
+  request("/get_waiting_pair_group_for_tractor.php", {
+    auth: true,
+  }),
+
+ownerAcceptPairGroup: (payload) =>
+  request("/tractor_accept_pair_group.php", {
+    method: "POST",
+    body: payload,
+    auth: true,
+  }),
+
+ownerDeclinePairGroup: (payload) =>
+  request("/tractor_decline_pair_group.php", {
+    method: "POST",
+    body: payload,
+    auth: true,
+  }),
   // resend verify code (if you build it)
   sendVerifyEmailCode: () =>
     request("/verify_email_send.php", { method: "POST", auth: true }),
