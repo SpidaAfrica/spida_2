@@ -18,7 +18,7 @@ function mapSrc(lat, lng) {
 
 export default function RequestCard({ data, onChanged }) {
   const [loading, setLoading] = useState(false);
-
+  const isPair = data.type === "pair";
   const hasMap = Number.isFinite(Number(data.farm_lat)) && Number.isFinite(Number(data.farm_lng));
   const phone = String(data.farmer_phone || "").trim();
 
@@ -28,11 +28,15 @@ export default function RequestCard({ data, onChanged }) {
   }, [hasMap, data.farm_lat, data.farm_lng]);
 
   const onAccept = async () => {
-    if (loading) return;
-    try {
-      setLoading(true);
+  if (loading) return;
+  try {
+    setLoading(true);
 
-      // Must have suggested tractor id (backend picks closest)
+    if (isPair) {
+      await spiTractorsApi.ownerAcceptPairGroup({
+        group_id: data.group_id,
+      });
+    } else {
       if (!data.suggested_tractor_id) {
         throw new Error("No tractor was suggested for this request yet.");
       }
@@ -42,32 +46,39 @@ export default function RequestCard({ data, onChanged }) {
         action: "ACCEPT",
         tractor_id: data.suggested_tractor_id,
       });
-
-      onChanged?.();
-    } catch (e) {
-      alert(e?.message || "Unable to accept request");
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const onDecline = async () => {
-    if (loading) return;
-    try {
-      setLoading(true);
+    onChanged?.();
+  } catch (e) {
+    alert(e?.message || "Unable to accept request");
+  } finally {
+    setLoading(false);
+  }
+};
 
+const onDecline = async () => {
+  if (loading) return;
+  try {
+    setLoading(true);
+
+    if (isPair) {
+      await spiTractorsApi.ownerDeclinePairGroup({
+        group_id: data.group_id,
+      });
+    } else {
       await spiTractorsApi.ownerRequestAction({
         request_id: data.request_id,
         action: "DECLINE",
       });
-
-      onChanged?.();
-    } catch (e) {
-      alert(e?.message || "Unable to decline request");
-    } finally {
-      setLoading(false);
     }
-  };
+
+    onChanged?.();
+  } catch (e) {
+    alert(e?.message || "Unable to decline request");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="req-card">
@@ -90,7 +101,16 @@ export default function RequestCard({ data, onChanged }) {
         <div className="req-details-head">
           <div>
             <div className="req-id">{data.request_code || data.request_id}</div>
-            <div className="req-small">{data.full_name ? "1 Farmer" : "-"}</div>
+            <div className="req-type">
+              {isPair ? "Pair Request" : "Single Request"}
+            </div>
+            <div className="req-small">
+              {isPair
+                ? `${data.farmers?.length || 0} Farmers`
+                : data.full_name
+                ? "1 Farmer"
+                : "-"}
+            </div>
           </div>
 
           <div className="req-contact">
@@ -112,7 +132,9 @@ export default function RequestCard({ data, onChanged }) {
             <div className="req-v strong">{data.farm_name || "-"}</div>
 
             <div className="req-k mt">Farmer</div>
-            <div className="req-v">{data.full_name || "-"}</div>
+            <div className="req-v">
+              {isPair ? `${data.farmers?.length || 0} Farmers` : data.full_name || "-"}
+            </div>
           </div>
 
           <div className="req-field">
@@ -134,7 +156,7 @@ export default function RequestCard({ data, onChanged }) {
 
             <div className="req-k mt">Suggested Tractor</div>
             <div className="req-v">
-              {data.tractor_registration || data.tractor_registration || "-"}
+              {isPair ? "-" : data.tractor_registration || "-"}
             </div>
           </div>
         </div>
