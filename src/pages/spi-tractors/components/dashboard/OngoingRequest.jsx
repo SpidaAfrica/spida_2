@@ -1,27 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import "./ongoing.css";
 import { spiTractorsApi } from "../../api/spiTractorsApi";
+
 import call from "../../../../assets/images/elements (9).png";
 import cancel from "../../../../assets/images/elements (10).png";
 import complete from "../../../../assets/images/mark.jpg";
+
 const STEP_LABELS = ["Tractor Travel", "Task Execution", "Payment"];
 
-function workflowToStep(workflowStatus, requestStatus) {
-  const wf = String(workflowStatus || "").toUpperCase();
-  const rs = String(requestStatus || "").toLowerCase();
 
-  if (rs === "cancelled") return 2;
-  if (rs === "completed") return 2;
+/* =========================
+   STEP FROM request_status
+========================= */
 
-  if (["MATCHED", "ACCEPTED", "EN_ROUTE", "ARRIVED"].includes(wf)) return 0;
-  if (["WORK_STARTED", "IN_PROGRESS"].includes(wf)) return 1;
-  if (["PAYMENT_PENDING", "PAID", "COMPLETED"].includes(wf)) return 2;
+function statusToStep(status) {
+  const s = String(status || "").toLowerCase();
 
-  if (rs === "pending") return 0;
-  if (rs === "matched") return 0;
+  if (s === "pending") return 0;
+  if (s === "matched") return 0;
+  if (s === "accepted") return 0;
+  if (s === "started") return 1;
+  if (s === "completed") return 2;
+  if (s === "cancelled") return 2;
 
   return 0;
 }
+
 
 function prettyService(serviceRaw) {
   const s = String(serviceRaw || "").toLowerCase();
@@ -34,199 +38,456 @@ function initials(name) {
 }
 
 function normalizePhone(phoneRaw) {
-  // Keep digits + leading +
   const p = String(phoneRaw || "").trim();
   if (!p) return "";
-  const cleaned = p.replace(/[^\d+]/g, "");
-  return cleaned;
+  return p.replace(/[^\d+]/g, "");
 }
 
+
 export default function OngoingRequests() {
+
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [err, setErr] = useState("");
 
+
+  /* =========================
+     FETCH
+  ========================= */
+
   const fetchOngoing = async () => {
     try {
+
       setErr("");
       setLoading(true);
-      const res = await spiTractorsApi.ongoingRequests();
-      setRows(Array.isArray(res?.data) ? res.data : []);
+
+      const res =
+        await spiTractorsApi.ongoingRequests();
+
+      setRows(
+        Array.isArray(res?.data)
+          ? res.data
+          : []
+      );
+
     } catch (e) {
-      setErr(e?.message || "Unable to load ongoing requests");
+
+      setErr(
+        e?.message ||
+        "Unable to load ongoing requests"
+      );
+
       setRows([]);
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
+
   useEffect(() => {
+
     fetchOngoing();
-    const t = setInterval(fetchOngoing, 10000);
+
+    const t =
+      setInterval(fetchOngoing, 10000);
+
     return () => clearInterval(t);
+
   }, []);
 
+
+
+  /* =========================
+     UI
+  ========================= */
+
   const content = useMemo(() => {
-    if (loading && rows.length === 0) return <div className="ongoing-empty">Loading...</div>;
-    if (err) return <div className="ongoing-empty">{err}</div>;
-    if (!rows.length) return <div className="ongoing-empty">No ongoing requests yet.</div>;
 
-    return rows.map((x) => {
-      const step = workflowToStep(x.workflow_status, x.request_status);
-
-      const depart = x?.meta?.departure_time ? `Departure Time: ${x.meta.departure_time}` : "";
-      const eta = x?.meta?.eta_time ? `Estimated Arrival Time: ${x.meta.eta_time}` : "";
-
-      const wf = String(x.workflow_status || "").toUpperCase();
-      const rs = String(x.request_status || "").toLowerCase();
-
-      const canStart = wf === "ACCEPTED";
-      const canComplete =
-        rs !== "completed" &&
-        rs !== "cancelled" &&
-        ["WORK_STARTED", "IN_PROGRESS", "ARRIVED", "EN_ROUTE", "ACCEPTED"].includes(wf);
-
-      const farmerPhone = normalizePhone(x?.farmer_phone);
-      const canCall = !!farmerPhone;
-
-      const onStart = async () => {
-        try {
-          await spiTractorsApi.requestSetStatus({
-            request_id: x.request_id,
-            to_status: "WORK_STARTED",
-            note: "Work started",
-            tractor_id: x.tractor_id || 0,
-            owner_user_id: x?.meta?.owner_user_id || 0,
-          });
-          fetchOngoing();
-        } catch (e) {
-          alert(e?.message || "Unable to start request");
-        }
-      };
-
-      const onComplete = async () => {
-        if (!window.confirm("Mark this request as COMPLETED?")) return;
-        try {
-        await spiTractorsApi.requestSetStatus({
-          request_id: x.request_id,
-          to_status: "COMPLETED",
-          note: "Job completed by tractor owner",
-          tractor_id: x.tractor_id || 0,
-          owner_user_id: x?.meta?.owner_user_id || 0,
-        });
-          fetchOngoing();
-        } catch (e) {
-          alert(e?.message || "Unable to complete request");
-        }
-      };
-
-      const onCancel = async () => {
-        if (!window.confirm("Cancel this request?")) return;
-        try {
-          await spiTractorsApi.requestCancel({ request_id: x.request_id, note: "Cancelled" });
-          fetchOngoing();
-        } catch (e) {
-          alert(e?.message || "Unable to cancel request");
-        }
-      };
-
+    if (loading && rows.length === 0)
       return (
-        <div className="ongoing-item" key={x.request_id}>
-          <div className="ongoing-top">
-            <div className="ongoing-user">
-              <div className="avatar-sm">{initials(x.farmer_name)}</div>
-              <div>
-                <div className="name">{x.farmer_name || "Farmer"}</div>
-                <div className="meta">
-                  Farm Name: <span>{x.farm_name || "-"}</span> &nbsp; Service Needed:{" "}
-                  <span>{prettyService(x.service)}</span>
-                </div>
-                {farmerPhone ? (
-                  <div className="meta" style={{ marginTop: 4 }}>
-                    Phone: <span>{farmerPhone}</span>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="ongoing-actions">
-              {canStart ? (
-                <button className="start-btn" onClick={onStart}>
-                  Start Request
-                </button>
-              ) : (
-                <>
-                  {/* 📞 REAL CALL */}
-                  <a
-                    className={`mini-ic ${canCall ? "" : "disabled"}`}
-                    title={canCall ? "Call farmer" : "No phone number"}
-                    href={canCall ? `tel:${farmerPhone}` : undefined}
-                    onClick={(e) => {
-                      if (!canCall) e.preventDefault();
-                    }}
-                    style={{ textDecoration: "none" }}
-                  >
-                   <img src={call} style={{width:"25px"}}/>
-                  </a>
-
-                  {/* ✅ COMPLETED */}
-                  <button
-                    className="mini-ic"
-                    title="Mark completed"
-                    onClick={onComplete}
-                    disabled={!canComplete}
-                    style={{
-                      opacity: canComplete ? 1 : 0.45,
-                      cursor: canComplete ? "pointer" : "not-allowed",
-                    }}
-                  >
-                    <img src={complete} style={{width:"25px"}}/>
-                  </button>
-
-                  {/* ✖ CANCEL */}
-                  <button className="mini-ic danger" title="Cancel" onClick={onCancel}>
-                    <img src={cancel} style={{width: "25px"}}/>
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="ongoing-bar">
-            <div className="bar-labels">
-              <span className={step === 0 ? "active" : ""}>{STEP_LABELS[0]}</span>
-              <span className={step === 1 ? "active" : ""}>{STEP_LABELS[1]}</span>
-              <span className={step === 2 ? "active" : ""}>{STEP_LABELS[2]}</span>
-            </div>
-
-            <div className="progress">
-              <div className={`dot ${step >= 0 ? "on" : ""}`} />
-              <div className="line" />
-              <div className={`dot ${step >= 1 ? "on" : ""}`} />
-              <div className="line" />
-              <div className={`dot ${step >= 2 ? "on" : ""}`} />
-            </div>
-
-            <div className="bar-foot">
-              <span>{depart}</span>
-              <span>{eta}</span>
-            </div>
-          </div>
+        <div className="ongoing-empty">
+          Loading...
         </div>
       );
+
+    if (err)
+      return (
+        <div className="ongoing-empty">
+          {err}
+        </div>
+      );
+
+    if (!rows.length)
+      return (
+        <div className="ongoing-empty">
+          No ongoing requests yet.
+        </div>
+      );
+
+
+    return rows.map((x) => {
+
+      const step =
+        statusToStep(
+          x.request_status
+        );
+
+      const rs =
+        String(
+          x.request_status || ""
+        ).toLowerCase();
+
+      const farmerPhone =
+        normalizePhone(
+          x.farmer_phone
+        );
+
+      const canCall =
+        !!farmerPhone;
+
+      const canStart =
+        rs === "matched" ||
+        rs === "accepted";
+
+      const canComplete =
+        rs === "started" ||
+        rs === "accepted";
+
+
+      /* =========================
+         ACTIONS
+      ========================= */
+
+      const onStart = async () => {
+
+        try {
+
+          await spiTractorsApi.requestSetStatus({
+            request_id: x.request_id,
+            to_status: "started",
+            tractor_id: x.tractor_id,
+          });
+
+          fetchOngoing();
+
+        } catch (e) {
+
+          alert(
+            e?.message ||
+            "Unable to start request"
+          );
+
+        }
+
+      };
+
+
+      const onComplete = async () => {
+
+        if (
+          !window.confirm(
+            "Mark as completed?"
+          )
+        ) return;
+
+        try {
+
+          await spiTractorsApi.requestSetStatus({
+            request_id: x.request_id,
+            to_status: "completed",
+            tractor_id: x.tractor_id,
+          });
+
+          fetchOngoing();
+
+        } catch (e) {
+
+          alert(
+            e?.message ||
+            "Unable to complete"
+          );
+
+        }
+
+      };
+
+
+      const onCancel = async () => {
+
+        if (
+          !window.confirm(
+            "Cancel request?"
+          )
+        ) return;
+
+        try {
+
+          await spiTractorsApi.requestCancel({
+            request_id: x.request_id,
+          });
+
+          fetchOngoing();
+
+        } catch (e) {
+
+          alert(
+            e?.message ||
+            "Unable to cancel"
+          );
+
+        }
+
+      };
+
+
+      return (
+
+        <div
+          className="ongoing-item"
+          key={x.request_id}
+        >
+
+          <div className="ongoing-top">
+
+            <div className="ongoing-user">
+
+              <div className="avatar-sm">
+                {initials(
+                  x.farmer_name
+                )}
+              </div>
+
+              <div>
+
+                <div className="name">
+                  {x.farmer_name ||
+                    "Farmer"}
+                </div>
+
+                <div className="meta">
+
+                  Farm Name:
+                  <span>
+                    {x.farm_name}
+                  </span>
+
+                  &nbsp; Service:
+                  <span>
+                    {prettyService(
+                      x.service
+                    )}
+                  </span>
+
+                </div>
+
+                {farmerPhone && (
+
+                  <div
+                    className="meta"
+                  >
+                    Phone:
+                    <span>
+                      {farmerPhone}
+                    </span>
+                  </div>
+
+                )}
+
+              </div>
+
+            </div>
+
+
+
+            {/* ACTIONS */}
+
+            <div className="ongoing-actions">
+
+              {canStart ? (
+
+                <button
+                  className="start-btn"
+                  onClick={onStart}
+                >
+                  Start
+                </button>
+
+              ) : (
+
+                <>
+
+                  {/* CALL */}
+
+                  <a
+                    className="mini-ic"
+                    href={
+                      canCall
+                        ? `tel:${farmerPhone}`
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={call}
+                      style={{
+                        width: 25,
+                      }}
+                    />
+                  </a>
+
+
+                  {/* COMPLETE */}
+
+                  <button
+                    className="mini-ic"
+                    disabled={
+                      !canComplete
+                    }
+                    onClick={onComplete}
+                  >
+                    <img
+                      src={complete}
+                      style={{
+                        width: 25,
+                      }}
+                    />
+                  </button>
+
+
+                  {/* CANCEL */}
+
+                  <button
+                    className="mini-ic danger"
+                    onClick={onCancel}
+                  >
+                    <img
+                      src={cancel}
+                      style={{
+                        width: 25,
+                      }}
+                    />
+                  </button>
+
+                </>
+
+              )}
+
+            </div>
+
+          </div>
+
+
+
+          {/* PROGRESS */}
+
+          <div className="ongoing-bar">
+
+            <div className="bar-labels">
+
+              <span
+                className={
+                  step === 0
+                    ? "active"
+                    : ""
+                }
+              >
+                {STEP_LABELS[0]}
+              </span>
+
+              <span
+                className={
+                  step === 1
+                    ? "active"
+                    : ""
+                }
+              >
+                {STEP_LABELS[1]}
+              </span>
+
+              <span
+                className={
+                  step === 2
+                    ? "active"
+                    : ""
+                }
+              >
+                {STEP_LABELS[2]}
+              </span>
+
+            </div>
+
+
+            <div className="progress">
+
+              <div
+                className={`dot ${
+                  step >= 0
+                    ? "on"
+                    : ""
+                }`}
+              />
+
+              <div className="line" />
+
+              <div
+                className={`dot ${
+                  step >= 1
+                    ? "on"
+                    : ""
+                }`}
+              />
+
+              <div className="line" />
+
+              <div
+                className={`dot ${
+                  step >= 2
+                    ? "on"
+                    : ""
+                }`}
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+
+      );
+
     });
+
   }, [rows, loading, err]);
 
+
   return (
+
     <div className="card-block">
+
       <div className="block-head">
-        <div className="block-title">Ongoing requests</div>
-        <div className="info" onClick={fetchOngoing} title="Refresh">
+
+        <div className="block-title">
+          Ongoing requests
+        </div>
+
+        <div
+          className="info"
+          onClick={fetchOngoing}
+        >
           ⓘ
         </div>
+
       </div>
 
-      <div className="ongoing-list">{content}</div>
+
+      <div className="ongoing-list">
+        {content}
+      </div>
+
     </div>
+
   );
+
 }
