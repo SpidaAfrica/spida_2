@@ -167,7 +167,7 @@ export default function OngoingRequests() {
 
           await spiTractorsApi.requestSetStatus({
             request_id: x.request_id,
-            to_status: "started",
+            to_status: "WORK_STARTED",
             tractor_id: x.tractor_id,
           });
 
@@ -197,7 +197,7 @@ export default function OngoingRequests() {
 
           await spiTractorsApi.requestSetStatus({
             request_id: x.request_id,
-            to_status: "completed",
+            to_status: "COMPLETED",
             tractor_id: x.tractor_id,
           });
 
