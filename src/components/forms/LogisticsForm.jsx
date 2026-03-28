@@ -33,27 +33,23 @@ const LogisticsForm = () => {
     businessLicense: null,
   });
 
+  /* ------------------ GEOLOCATION ------------------ */
   useEffect(() => {
-    if (useLocation) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLatitude(position.coords.latitude);
-            setLongitude(position.coords.longitude);
-          },
-          (error) => {
-            alert("Failed to get location: " + error.message);
-          }
-        );
-      } else {
-        alert("Geolocation is not supported by your browser.");
-      }
+    if (useLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLatitude(pos.coords.latitude);
+          setLongitude(pos.coords.longitude);
+        },
+        (err) => alert("Location error: " + err.message)
+      );
     } else {
       setLatitude("");
       setLongitude("");
     }
   }, [useLocation]);
 
+  /* ------------------ INPUT HANDLERS ------------------ */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -70,41 +66,61 @@ const LogisticsForm = () => {
     }));
   };
 
+  /* ------------------ SUBMIT ------------------ */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (loading) return;
 
+    // ✅ Validations
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
-    if (!latitude || !longitude) {
-      alert("Please enable location services.");
+    if (!formData.termsAgreed) {
+      alert("You must agree to the terms");
       return;
     }
 
-    if (!formData.termsAgreed) {
-      alert("You must agree to the terms and privacy policy.");
+    if (!latitude || !longitude) {
+      alert("Please enable location");
+      return;
+    }
+
+    if (!formData.businessLicense) {
+      alert("Please upload business license");
       return;
     }
 
     setLoading(true);
 
-    const formDataObj = new FormData();
-
-    Object.keys(formData).forEach((key) => {
-      if (formData[key] !== null && formData[key] !== undefined) {
-        formDataObj.append(key, formData[key]);
-      }
-    });
-
-    formDataObj.append("latitude", latitude);
-    formDataObj.append("longitude", longitude);
-
     try {
-      const response = await fetch(
+      const formDataObj = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (
+          value !== null &&
+          value !== undefined &&
+          key !== "confirmPassword" &&
+          key !== "termsAgreed"
+        ) {
+          formDataObj.append(key, value);
+        }
+      });
+
+      // Append location
+      formDataObj.append("latitude", latitude);
+      formDataObj.append("longitude", longitude);
+
+      // Format phone (+234)
+      let phone = formData.phoneNumber;
+      if (phone.startsWith("0")) {
+        phone = "+234" + phone.slice(1);
+      }
+      formDataObj.set("phoneNumber", phone);
+
+      const res = await fetch(
         "https://api.spida.africa/logistics/logistics_signup.php",
         {
           method: "POST",
@@ -112,234 +128,77 @@ const LogisticsForm = () => {
         }
       );
 
-      const result = await response.json();
+      const result = await res.json();
 
-      if (!response.ok) {
-        throw new Error(result.message || "Server error");
+      if (!res.ok || !result.success) {
+        throw new Error(result.message || "Signup failed");
       }
 
-      if (result.email === formData.email) {
-        alert(result.message);
+      alert(result.message);
 
-        sessionStorage.setItem("logisticsEmail", formData.email);
-        sessionStorage.setItem("companyName", formData.companyName);
+      // Save for OTP verification
+      sessionStorage.setItem("logisticsPhone", formData.phoneNumber);
+      sessionStorage.setItem("companyName", formData.companyName);
 
-        navigate("/verify/logistics");
-      } else {
-        alert("Signup failed. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert(error.message || "Network error. Please try again.");
+      navigate("/verify/logistics");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Network error");
     } finally {
       setLoading(false);
     }
   };
 
+  /* ------------------ UI ------------------ */
   return (
-    <div>
-      <form
-        className="form logistics_form"
-        onSubmit={handleSubmit}
-        encType="multipart/form-data"
-      >
-        <h1>Company Information</h1>
+    <form className="form logistics_form" onSubmit={handleSubmit} encType="multipart/form-data">
+      <h1>Company Information</h1>
 
-        <div className="form_field">
-          <input
-            name="companyName"
-            type="text"
-            placeholder="Company Name"
-            value={formData.companyName}
-            onChange={handleChange}
-            required
-          />
+      <input name="companyName" placeholder="Company Name" onChange={handleChange} />
+      <input name="businessRegNumber" placeholder="Registration Number" onChange={handleChange} />
+      <input name="taxId" placeholder="TIN" onChange={handleChange} />
+      <input name="email" type="email" placeholder="Email" onChange={handleChange} />
+      <input name="phoneNumber" placeholder="Phone Number" onChange={handleChange} />
 
-          <input
-            name="businessRegNumber"
-            type="text"
-            placeholder="Registration Number"
-            value={formData.businessRegNumber}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <textarea name="fullAddress" placeholder="Full Address" onChange={handleChange} />
 
-        <div className="form_field">
-          <input
-            name="taxId"
-            type="text"
-            placeholder="Tax ID"
-            value={formData.taxId}
-            onChange={handleChange}
-          />
+      <div>
+        <input type="checkbox" checked={useLocation} onChange={() => setUseLocation(!useLocation)} />
+        Use My Location
+      </div>
 
-          <input
-            name="logisticsServices"
-            type="text"
-            placeholder="Logistics Services"
-            value={formData.logisticsServices}
-            onChange={handleChange}
-          />
-        </div>
+      <input value={latitude} readOnly />
+      <input value={longitude} readOnly />
 
-        <div className="form_field">
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+      <input type="file" onChange={handleFileChange} />
 
-          <input
-            name="location"
-            type="text"
-            placeholder="Location"
-            value={formData.location}
-            onChange={handleChange}
-          />
-        </div>
+      <h2>Vehicle Info</h2>
+      <input name="vehicleType" placeholder="Vehicle Type" onChange={handleChange} />
+      <input name="vehicleRegNumber" placeholder="Vehicle Reg" onChange={handleChange} />
+      <input name="vehicleCapacity" placeholder="Capacity" onChange={handleChange} />
+      <input name="vehicleMakeModel" placeholder="Make & Model" onChange={handleChange} />
 
-        <textarea
-          name="fullAddress"
-          placeholder="Full Address"
-          value={formData.fullAddress}
-          onChange={handleChange}
-        />
+      <h2>Authorized Person</h2>
+      <input name="signatoryName" placeholder="Full Name" onChange={handleChange} />
+      <input name="positionHeld" placeholder="Position" onChange={handleChange} />
+      <input name="idCardNumber" placeholder="ID Number" onChange={handleChange} />
 
-        <div>
-          <input
-            type="checkbox"
-            checked={useLocation}
-            onChange={() => setUseLocation(!useLocation)}
-          />
-          <span>Use My Location</span>
-        </div>
+      <input name="password" type="password" placeholder="Password" onChange={handleChange} />
+      <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} />
 
-        <input type="text" value={latitude} readOnly placeholder="Latitude" />
-        <input type="text" value={longitude} readOnly placeholder="Longitude" />
+      <div>
+        <input type="checkbox" name="termsAgreed" onChange={handleChange} />
+        I agree to Terms
+      </div>
 
-        <input
-          name="deliveryRadius"
-          type="number"
-          placeholder="Delivery Radius"
-          value={formData.deliveryRadius}
-          onChange={handleChange}
-        />
-
-        <div className="custom_file_input">
-          <input type="file" onChange={handleFileChange} />
-
-          <span>
-            {formData.businessLicense
-              ? formData.businessLicense.name
-              : "Upload Business License"}
-          </span>
-        </div>
-
-        <h2>Vehicle Information</h2>
-
-        <input
-          name="vehicleType"
-          placeholder="Vehicle Type"
-          value={formData.vehicleType}
-          onChange={handleChange}
-        />
-
-        <input
-          name="vehicleRegNumber"
-          placeholder="Vehicle Reg Number"
-          value={formData.vehicleRegNumber}
-          onChange={handleChange}
-        />
-
-        <input
-          name="vehicleCapacity"
-          placeholder="Capacity"
-          value={formData.vehicleCapacity}
-          onChange={handleChange}
-        />
-
-        <input
-          name="vehicleMakeModel"
-          placeholder="Make & Model"
-          value={formData.vehicleMakeModel}
-          onChange={handleChange}
-        />
-
-        <h2>Signatory</h2>
-
-        <input
-          name="signatoryName"
-          placeholder="Full Name"
-          value={formData.signatoryName}
-          onChange={handleChange}
-        />
-
-        <input
-          name="positionHeld"
-          placeholder="Position"
-          value={formData.positionHeld}
-          onChange={handleChange}
-        />
-
-        <input
-          name="phoneNumber"
-          placeholder="Phone Number"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-        />
-
-        <input
-          name="idCardNumber"
-          placeholder="ID Number"
-          value={formData.idCardNumber}
-          onChange={handleChange}
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          required
-        />
-
-        <div>
-          <input
-            type="checkbox"
-            name="termsAgreed"
-            checked={formData.termsAgreed}
-            onChange={handleChange}
-          />
-          <span>
-            I agree to the{" "}
-            <Link to="/terms-of-service">Terms</Link> and{" "}
-            <Link to="/privacy-policy">Privacy Policy</Link>
-          </span>
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Account"}
-        </button>
-      </form>
+      <button disabled={loading}>
+        {loading ? "Creating..." : "Create Account"}
+      </button>
 
       <p>
         Already have an account? <Link to="/login">Login</Link>
       </p>
-    </div>
+    </form>
   );
 };
 
