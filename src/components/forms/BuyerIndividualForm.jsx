@@ -1,76 +1,100 @@
 import React, { useState } from "react";
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import uploadicon from "../../assets/images/product/uploadicon.png";
 
-  const BuyerIndividualForm = () => {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false); 
-    const [formData, setFormData] = useState({
-        fullName: "",
-        phoneNumber: "",
-        email: "",
-        location: "",
-        identityType: "",
-        identityNumber: "",
-        password: "",
-        confirmPassword: "",
-        address: "",
+const BuyerIndividualForm = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phoneNumber: "",
+    email: "",
+    location: "",
+    identityType: "",
+    identityNumber: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+    agreement: false,
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
     });
-
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-
-
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true); // Show loading state
-
-
-    const formDataObj = new FormData();
-
-      for (const key in formData) {
-          formDataObj.append(key, formData[key]);
-      }
-      try {
-        const response = await fetch("https://api.spida.africa/buyer/individual_signup.php", {
-            method: "POST",
-            body: formDataObj,
-        });
-    
-        // Check if the response is OK (status 200)
-        if (response.ok) {
-            const result = await response.json(); // Assuming API returns JSON
-    
-            if (result.email == formData.email) {
-                alert(result.message);
-                sessionStorage.setItem("individualEmail", formData.email);
-                sessionStorage.setItem("individualId", formData.id);
-                sessionStorage.setItem("individualName", formData.fullName);
-                navigate('/verify/individual');
-            } else {
-                alert("There is an issue, please try signing up again. Ensure you fill all form input");
-            }
-        } else {
-            alert("Server error! Please try again later.");
-        }
-    } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("Network error! Please check your internet connection and try again. Also Ensure you fill all form input");
-    } finally {
-      setLoading(false); // Hide loading state
-    }
-
   };
 
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  if (!formData.agreement) {
+    alert("You must agree to the terms.");
+    setLoading(false);
+    return;
+  }
+
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match.");
+    setLoading(false);
+    return;
+  }
+
+  const formattedPhone = formatNigeriaPhone(formData.phoneNumber);
+
+  const formDataObj = new FormData();
+
+  const { confirmPassword, agreement, ...dataToSend } = formData;
+
+  for (const key in dataToSend) {
+    // ✅ Override phoneNumber with formatted version
+    if (key === "phoneNumber") {
+      formDataObj.append(key, formattedPhone);
+    } else {
+      formDataObj.append(key, dataToSend[key]);
+    }
+  }
+
+  try {
+    const response = await fetch(
+      "https://api.spida.africa/buyer/individual_signup.php",
+      {
+        method: "POST",
+        body: formDataObj,
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(result.message);
+
+      sessionStorage.setItem("individualPhone", formattedPhone); // ✅ store formatted number
+      sessionStorage.setItem("individualEmail", formData.email);
+      sessionStorage.setItem("individualName", formData.fullName);
+
+      navigate("/verify/individual");
+    } else {
+      alert(result.message || "Signup failed. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    alert("Network error! Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div>
-      <form className="form farmer_form" onSubmit={handleSubmit} enctype="multipart/form-data">
+      <form
+        className="form farmer_form"
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+      >
         <div className="form_field">
           <div>
             <label htmlFor="fullName">Full Name</label>
@@ -129,7 +153,9 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
             </select>
           </div>
           <div>
-            <label htmlFor="idNumber">Identity Verification Number</label>
+            <label htmlFor="identityNumber">
+              Identity Verification Number
+            </label>
             <input
               name="identityNumber"
               type="text"
@@ -165,7 +191,9 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
 
         <div className="form_field">
           <div>
-            <label htmlFor="address">Full Address (with landmarks)</label>
+            <label htmlFor="address">
+              Full Address (with landmarks)
+            </label>
             <textarea
               name="address"
               rows="4"
@@ -190,10 +218,11 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
           </span>
         </div>
 
-        <button type="submit" target="_blank" disabled={loading}>
+        <button type="submit" disabled={loading}>
           {loading ? "Creating..." : "Create Account"}
         </button>
       </form>
+
       <p className="no_account">
         Don't have an account? <Link to="/login">Login</Link>
       </p>
