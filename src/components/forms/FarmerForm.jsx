@@ -391,44 +391,53 @@ const FarmerSignupForm = () => {
   };
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true); // Show loading state
-
-      const formDataObj = new FormData();
-
-      for (const key in formData) {
-          formDataObj.append(key, formData[key]);
-      }
-
-      try {
-        const response = await fetch("https://api.spida.africa/farmer/farmer_signup.php", {
-            method: "POST",
-            body: formDataObj,
-        });
-    
-        // Check if the response is OK (status 200)
-        if (response.ok) {
-            const result = await response.json(); // Assuming API returns JSON
-    
-            if (result.email == formData.email) {
-                alert(result.message);
-                sessionStorage.setItem("farmerEmail", formData.email);
-                sessionStorage.setItem("farmerName", formData.fullName);
-                sessionStorage.setItem("farmerId", formData.id);
-                navigate('/verify/farmer');
-            } else {
-                alert("There is an issue, please try signing up again. Ensure you fill all form input");
-            }
-        } else {
-            alert("Server error! Please try again later.");
-        }
-    } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("Network error! Please check your internet connection and try again. Also Ensure you fill all form input");
-    } finally {
-      setLoading(false); // Hide loading state
+    e.preventDefault();
+  
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
     }
-    
+  
+    setLoading(true);
+  
+    const formDataObj = new FormData();
+  
+    for (const key in formData) {
+      formDataObj.append(key, formData[key]);
+    }
+  
+    // ✅ format phone
+    let phone = formData.phone;
+    if (phone.startsWith("0")) {
+      phone = "+234" + phone.substring(1);
+    }
+    formDataObj.set("phone", phone);
+  
+    try {
+      const response = await fetch("https://api.spida.africa/farmer/farmer_signup.php", {
+        method: "POST",
+        body: formDataObj,
+      });
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        alert(result.message);
+  
+        sessionStorage.setItem("farmerPhone", result.phone);
+        sessionStorage.setItem("farmerName", formData.fullName);
+  
+        navigate('/verify/farmer');
+      } else {
+        alert(result.message || "Signup failed");
+      }
+  
+    } catch (error) {
+      console.error(error);
+      alert("Network error");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div>
