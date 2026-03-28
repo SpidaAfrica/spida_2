@@ -142,7 +142,7 @@ const LogisticsForm = () => {
       alert(result.message);
 
       // Save for OTP step
-      sessionStorage.setItem("logisticsEmail", formData.email);
+      sessionStorage.setItem("logisticsPhoneNumber", formData.phoneNumber);
       sessionStorage.setItem("companyName", formData.companyName);
 
       navigate("/verify/logistics");
