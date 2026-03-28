@@ -3,74 +3,157 @@ import { Link, useNavigate } from "react-router-dom";
 
 import uploadicon from "../../assets/images/product/uploadicon.png";
 
-  const BuyerBusinessForm = () => {
-      const [formData, setFormData] = useState({
-          business_name: "",
-          business_phone: "",
-          business_email: "",
-          business_location: "",
-          business_registration_number: "",
-          identity_verification_number: "",
-          password: "",
-          confirm_password: "",
-          business_address: "",
-          contact_person_name: "",
-          contact_person_title: "",
-          corporate_email: "",
-          official_phone: "",
-      });
-  
+const BuyerBusinessForm = () => {
+  const [formData, setFormData] = useState({
+    business_name: "",
+    business_phone: "",
+    business_email: "",
+    business_location: "",
+    business_registration_number: "",
+    identity_verification_number: "",
+    password: "",
+    confirm_password: "",
+    business_address: "",
+    contact_person_name: "",
+    contact_person_title: "",
+    corporate_email: "",
+    official_phone: "",
+    agreement: false,
+  });
 
-      const [loading, setLoading] = useState(false);
-      const navigate = useNavigate();
-  
-      const handleChange = (e) => {
-          setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      // Prevent double submissions
-      if (loading) return;
-      setLoading(true);
-    
-      const formDataToSend = new FormData();
-      Object.keys(formData).forEach((key) => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // ✅ FORMAT NIGERIAN PHONE
+  const formatNigeriaPhone = (phone) => {
+    if (!phone) return "";
+
+    let cleaned = phone.replace(/\D/g, "");
+
+    if (cleaned.startsWith("0")) {
+      return "+234" + cleaned.slice(1);
+    }
+
+    if (cleaned.startsWith("234")) {
+      return "+" + cleaned;
+    }
+
+    if (phone.startsWith("+234")) {
+      return phone;
+    }
+
+    return cleaned;
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (loading) return;
+    setLoading(true);
+
+    // ✅ AGREEMENT CHECK
+    if (!formData.agreement) {
+      alert("You must agree to the terms.");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ PASSWORD CHECK
+    if (formData.password !== formData.confirm_password) {
+      alert("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ FORMAT PHONES
+    const formattedBusinessPhone = formatNigeriaPhone(formData.business_phone);
+    const formattedOfficialPhone = formatNigeriaPhone(formData.official_phone);
+
+    // ✅ VALIDATE PHONES
+    const phoneRegex = /^\+234\d{10}$/;
+
+    if (!phoneRegex.test(formattedBusinessPhone)) {
+      alert("Enter a valid Business Phone Number");
+      setLoading(false);
+      return;
+    }
+
+    if (!phoneRegex.test(formattedOfficialPhone)) {
+      alert("Enter a valid Official Phone Number");
+      setLoading(false);
+      return;
+    }
+
+    const formDataToSend = new FormData();
+
+    Object.keys(formData).forEach((key) => {
+      if (key === "business_phone") {
+        formDataToSend.append(key, formattedBusinessPhone);
+      } else if (key === "official_phone") {
+        formDataToSend.append(key, formattedOfficialPhone);
+      } else {
         formDataToSend.append(key, formData[key]);
-      });
-    
-      try {
-        const response = await fetch("https://api.spida.africa/buyer/business_signup.php", {
+      }
+    });
+
+    try {
+      const response = await fetch(
+        "https://api.spida.africa/buyer/business_signup.php",
+        {
           method: "POST",
           body: formDataToSend,
-        });
-    
-        const result = await response.json();
-        console.log("API result:", result);
-    
-        if (response.ok && result.success) {
-          alert(result.message || "Signup successful!");
-          
-          // Store the actual values returned from backend, not local inputs
-          sessionStorage.setItem("businessEmail", result.email || formData.business_email);
-          sessionStorage.setItem("businessId", result.id || "");
-          sessionStorage.setItem("businessName", result.business_name || "");
-    
-          navigate("/verify/business");
-        } else {
-          alert(result.error || "Signup failed. Please review your inputs and try again.");
         }
-    
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("Network error. Please check your internet connection and try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
-  
+      const result = await response.json();
+      console.log("API result:", result);
+
+      if (response.ok && result.success) {
+        alert(result.message || "Signup successful!");
+
+        // ✅ STORE FORMATTED VALUES
+        sessionStorage.setItem(
+          "businessPhone",
+          formattedBusinessPhone
+        );
+        sessionStorage.setItem(
+          "officialPhone",
+          formattedOfficialPhone
+        );
+        sessionStorage.setItem(
+          "businessEmail",
+          result.email || formData.business_email
+        );
+        sessionStorage.setItem("businessId", result.id || "");
+        sessionStorage.setItem(
+          "businessName",
+          result.business_name || formData.business_name
+        );
+
+        navigate("/verify/business");
+      } else {
+        alert(
+          result.error ||
+            result.message ||
+            "Signup failed. Please review your inputs and try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Network error. Please check your internet connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -239,12 +322,7 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
           <input
             type="checkbox"
             name="agreement"
-            onChange={(e) =>
-              setFormData((prevData) => ({
-                ...prevData,
-                agreement: e.target.checked,
-              }))
-            }
+            onChange={handleChange}
             checked={formData.agreement}
           />
           <span>
@@ -257,8 +335,8 @@ import uploadicon from "../../assets/images/product/uploadicon.png";
         <button type="submit" disabled={loading}>
           {loading ? "Creating..." : "Create Account"}
         </button>
-
       </form>
+
       <p className="no_account">
         Dont have an account? <Link to="/login">Login</Link>
       </p>
