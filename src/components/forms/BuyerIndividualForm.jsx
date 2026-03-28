@@ -19,6 +19,27 @@ const BuyerIndividualForm = () => {
     agreement: false,
   });
 
+  // ✅ FORMAT NIGERIAN PHONE NUMBER (+234)
+  const formatNigeriaPhone = (phone) => {
+    if (!phone) return "";
+
+    let cleaned = phone.replace(/\D/g, "");
+
+    if (cleaned.startsWith("0")) {
+      return "+234" + cleaned.slice(1);
+    }
+
+    if (cleaned.startsWith("234")) {
+      return "+" + cleaned;
+    }
+
+    if (phone.startsWith("+234")) {
+      return phone;
+    }
+
+    return cleaned;
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -29,65 +50,76 @@ const BuyerIndividualForm = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  if (!formData.agreement) {
-    alert("You must agree to the terms.");
-    setLoading(false);
-    return;
-  }
-
-  if (formData.password !== formData.confirmPassword) {
-    alert("Passwords do not match.");
-    setLoading(false);
-    return;
-  }
-
-  const formattedPhone = formatNigeriaPhone(formData.phoneNumber);
-
-  const formDataObj = new FormData();
-
-  const { confirmPassword, agreement, ...dataToSend } = formData;
-
-  for (const key in dataToSend) {
-    // ✅ Override phoneNumber with formatted version
-    if (key === "phoneNumber") {
-      formDataObj.append(key, formattedPhone);
-    } else {
-      formDataObj.append(key, dataToSend[key]);
+    // ✅ AGREEMENT CHECK
+    if (!formData.agreement) {
+      alert("You must agree to the terms.");
+      setLoading(false);
+      return;
     }
-  }
 
-  try {
-    const response = await fetch(
-      "https://api.spida.africa/buyer/individual_signup.php",
-      {
-        method: "POST",
-        body: formDataObj,
+    // ✅ PASSWORD MATCH
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ FORMAT PHONE
+    const formattedPhone = formatNigeriaPhone(formData.phoneNumber);
+
+    // ✅ VALIDATE PHONE
+    if (!formattedPhone.match(/^\+234\d{10}$/)) {
+      alert("Enter a valid Nigerian phone number");
+      setLoading(false);
+      return;
+    }
+
+    const formDataObj = new FormData();
+
+    const { confirmPassword, agreement, ...dataToSend } = formData;
+
+    for (const key in dataToSend) {
+      if (key === "phoneNumber") {
+        formDataObj.append(key, formattedPhone); // ✅ use formatted phone
+      } else {
+        formDataObj.append(key, dataToSend[key]);
       }
-    );
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert(result.message);
-
-      sessionStorage.setItem("individualPhone", formattedPhone); // ✅ store formatted number
-      sessionStorage.setItem("individualEmail", formData.email);
-      sessionStorage.setItem("individualName", formData.fullName);
-
-      navigate("/verify/individual");
-    } else {
-      alert(result.message || "Signup failed. Please try again.");
     }
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    alert("Network error! Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+
+    try {
+      const response = await fetch(
+        "https://api.spida.africa/buyer/individual_signup.php",
+        {
+          method: "POST",
+          body: formDataObj,
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+
+        // ✅ STORE FORMATTED VALUES
+        sessionStorage.setItem("individualPhone", formattedPhone);
+        sessionStorage.setItem("individualEmail", formData.email);
+        sessionStorage.setItem("individualName", formData.fullName);
+
+        navigate("/verify/individual");
+      } else {
+        alert(result.message || "Signup failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Network error! Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <form
