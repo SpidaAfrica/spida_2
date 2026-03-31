@@ -1,7 +1,7 @@
 import React from 'react';
 import dan from "../../assets/dan.png";
 import mar from "../../assets/mar.png";
-import tri from "../../assets/tri.png";
+import ben from "../../assets/ben.png";
 
 const FoundersComponent = () => {
   const founders = [
@@ -18,10 +18,10 @@ const FoundersComponent = () => {
       image: mar
     },
     {
-      name: "Triumphant Akinola",
+      name: "Uwa Benjamin",
       title: "CTO/ Co-Founder",
-      description: "5 years + experience Software Engineer, AI Solutions Engineer, Innovating AI Solutions, GENAI Leader",
-      image: tri
+      description: "7 years + experience Software Engineer, AI Engineer",
+      image: ben
     }
   ];console.log(founders.image)
 
