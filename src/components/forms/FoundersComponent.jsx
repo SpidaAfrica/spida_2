@@ -1,7 +1,7 @@
 import React from 'react';
 import dan from "../../assets/dan.png";
 import mar from "../../assets/mar.png";
-import ben from "../../assets/ben.png";
+import ben from "../../assets/ben.png.png";
 
 const FoundersComponent = () => {
   const founders = [
