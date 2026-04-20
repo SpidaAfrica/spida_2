@@ -312,9 +312,22 @@ export default function SpiTractorsPayAndEta() {
 
   }, [estimate, job, requestType]);
 
-  const formatMoney = (n) =>
-    `₦${Number(n || 0).toLocaleString()}`;
+const formatMoney = (n) =>
+  `₦${Number(n || 0).toLocaleString()}`;
 
+// ADD THESE TWO — fixes the blank white page
+const mapCenter = useMemo(() => {
+  if (isValidLatLng(tractorLocation)) return tractorLocation;
+  if (isValidLatLng(farmerLocation))  return farmerLocation;
+  return defaultCenter;
+}, [tractorLocation, farmerLocation]);
+
+const linePath = useMemo(() => {
+  if (isValidLatLng(tractorLocation) && isValidLatLng(farmerLocation)) {
+    return [tractorLocation, farmerLocation];
+  }
+  return [];
+}, [tractorLocation, farmerLocation]);
   /* ==============================
      PAY
   ============================== */
