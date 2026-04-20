@@ -1,68 +1,146 @@
 .earn-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .earn-tabs {
-    display: flex;
-    gap: 6px;
-    background: #f5f7f9;
-    padding: 4px;
-    border-radius: 10px;
-  }
-  
-  .tab {
-    border: none;
-    background: transparent;
-    padding: 8px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 8px;
-    color: #6b7280;
-  }
-  
-  .tab.active {
-    background: #fff;
-    border: 1px solid #eef0f2;
-    color: #111;
-    font-weight: 700;
-  }
-  
-  .earn-main {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  .earn-amount .k {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 700;
-  }
-  
-  .amt {
-    font-size: 22px;
-    font-weight: 900;
-    color: #166534;
-    margin-top: 6px;
-  }
-  
-  .earn-filters {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  
-  .chart {
-    margin-top: 12px;
-    border: 1px solid #eef0f2;
-    border-radius: 12px;
-    background: #fff;
-    padding: 10px;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.earn-tabs {
+  display: flex;
+  gap: 6px;
+  background: #f5f7f9;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #6b7280;
+  transition: all 0.15s;
+}
+
+.tab.active {
+  background: #fff;
+  border: 1px solid #eef0f2;
+  color: #111;
+  font-weight: 700;
+}
+
+/* View tabs: Daily / Monthly / Yearly */
+.earn-view-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 8px 0;
+  background: #f0fdf4;
+  padding: 4px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.view-tab {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 7px;
+  color: #166534;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.view-tab.active {
+  background: #16a34a;
+  color: #fff;
+}
+
+/* Period selectors */
+.earn-period-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.earn-select {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #111;
+  background: #fff;
+  cursor: pointer;
+}
+
+.earn-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.earn-amount .k {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.amt {
+  font-size: 22px;
+  font-weight: 900;
+  color: #166534;
+  margin-top: 6px;
+}
+
+/* Summary cards */
+.earn-summary-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0 0 14px;
+}
+
+.earn-summary-card {
+  border: 1px solid #eef0f2;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.sum-label {
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+.sum-value {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sum-value2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.earn-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chart {
+  margin-top: 12px;
+  border: 1px solid #eef0f2;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+  overflow-x: auto;
+}
