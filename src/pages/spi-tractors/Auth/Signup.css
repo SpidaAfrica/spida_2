@@ -119,3 +119,42 @@
     }
   }
   
+/* ── Mobile fixes ── */
+@media (max-width: 600px) {
+  .signup-page {
+    padding: 24px 14px;
+  }
+
+  .signup-container h1 {
+    font-size: 22px;
+  }
+
+  /* Two-column form grids collapse to single */
+  .signup-grid,
+  .form-grid,
+  .field-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Utility bill upload button — full width */
+  .upload-btn,
+  .pick-btn {
+    width: 100%;
+  }
+
+  /* Stepper — smaller on mobile */
+  .step-label {
+    font-size: 10px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .signup-page {
+    padding: 20px 10px;
+  }
+}
