@@ -4,33 +4,36 @@ import { spiTractorsApi } from "../../api/spiTractorsApi";
 
 export default function StatCards() {
   const [stats, setStats] = useState([
-    { title: "Total Jobs to date", value: "0" },
-    { title: "Active Jobs", value: "0" },
-    { title: "Upcoming Job", value: "0" },
+    { title: "Total Jobs Completed", value: "—" },
+    { title: "Active Jobs",          value: "—" },
+    { title: "Upcoming Jobs",        value: "—" },
   ]);
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Function to load stats
   const loadStats = async () => {
     try {
-      const res = await spiTractorsApi.ownerSummary();
+      setLoading(true);
+      const res     = await spiTractorsApi.ownerSummary();
       const summary = res?.data || {};
+
       setStats([
-        { title: "Total Jobs to date", value: String(summary.completed_jobs || 0) },
-        { title: "Active Jobs", value: String(summary.active_requests || 0) },
-        { title: "Upcoming Job", value: String(summary.tractors_count || 0) },
+        { title: "Total Jobs Completed", value: String(summary.completed_jobs  ?? 0) },
+        { title: "Active Jobs",          value: String(summary.active_requests  ?? 0) },
+        // FIX: was using tractors_count here — now correctly uses upcoming_jobs
+        { title: "Upcoming Jobs",        value: String(summary.upcoming_jobs    ?? 0) },
       ]);
     } catch (e) {
-      // Optionally handle error
-      console.error("Unable to fetch stats", e);
+      console.error("Unable to fetch stats:", e?.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadStats(); // initial load
-
-    const interval = setInterval(loadStats, 5000); // refresh every 5 seconds
-
-    return () => clearInterval(interval); // cleanup on unmount
+    loadStats();
+    // FIX: was 5 seconds — reduced to 30s to avoid hammering server
+    const interval = setInterval(loadStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -41,8 +44,13 @@ export default function StatCards() {
             <div className="stat-title">{s.title}</div>
             <div className="info">ⓘ</div>
           </div>
-          <div className="stat-value">{s.value}</div>
-          <button className="stat-link">See full details</button>
+          <div className="stat-value">
+            {loading && s.value === "—" ? (
+              <span style={{ opacity: 0.4, fontSize: 14 }}>…</span>
+            ) : (
+              s.value
+            )}
+          </div>
         </div>
       ))}
     </div>
