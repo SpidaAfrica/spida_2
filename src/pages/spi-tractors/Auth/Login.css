@@ -259,3 +259,51 @@
     }
   }
   
+/* ── Mobile fixes ── */
+@media (max-width: 767px) {
+  .login-page {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-right {
+    display: none; /* hide decorative right panel on mobile */
+  }
+
+  .login-left {
+    padding: 24px 16px;
+    align-items: flex-start;
+    padding-top: 48px;
+  }
+
+  .login-wrapper {
+    max-width: 100%;
+  }
+
+  .login-card {
+    padding: 20px 16px;
+    box-shadow: none;
+    border: 1px solid #eef0f2;
+  }
+
+  .logo {
+    height: 34px;
+    margin-bottom: 24px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .login-left {
+    padding: 32px 12px;
+  }
+
+  .login-card {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+}
