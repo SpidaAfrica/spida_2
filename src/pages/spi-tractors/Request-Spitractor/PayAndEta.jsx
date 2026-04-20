@@ -386,7 +386,7 @@ export default function SpiTractorsPayAndEta() {
                 href={`tel:${tractorData.owner_phone}`}
                 style={{ display: "block", textAlign: "center", marginTop: 12, fontSize: 13, color: "#16a34a", textDecoration: "none" }}
               >
-                📞 Call Driver
+                📞 Call Tractor Owner
               </a>
             )}
           </div>
