@@ -11,7 +11,7 @@ import { spiTractorsApi } from "../api/spiTractorsApi";
 import tractorMarkerImage from "../../../assets/images/Group (11).png";
 
 // FIX: moved from hardcoded string to environment variable
-const GOOGLE_KEY = process.env.REACT_APP_GOOGLE_MAPS_KEY || "";
+const GOOGLE_KEY = "AIzaSyA4vJ953vqwIwSm5vhEHQyFDEXVC-S9_qg";
 
 const TRACK_REQUEST_KEY    = "spiTrackRequestId";
 const FARM_GPS_STORAGE_KEY = "spiFarmerGps";
