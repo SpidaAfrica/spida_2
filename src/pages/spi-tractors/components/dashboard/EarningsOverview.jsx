@@ -280,36 +280,6 @@ export default function EarningsOverview() {
           </svg>
         )}
       </div>
-
-      {/* Breakdown list */}
-      <div style={{ paddingTop: 12 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 13 }}>
-          {view === "yearly"  && "Yearly Breakdown"}
-          {view === "monthly" && `Monthly Breakdown · ${filterYear}`}
-          {view === "daily"   && `Daily Breakdown · ${MONTHS[filterMonth - 1]} ${filterYear}`}
-        </div>
-        <div style={{ display: "grid", gap: 6 }}>
-          {series.map((x, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                border: "1px solid #eef0f2",
-                borderRadius: 10,
-                padding: "8px 12px",
-                fontSize: 12,
-              }}
-            >
-              <div style={{ fontWeight: 700 }}>{x.label}</div>
-              <div style={{ opacity: 0.85 }}>
-                Gross: <b>{formatMoney(x.gross)}</b>
-                &nbsp;•&nbsp;Owner: <b>{formatMoney(x.owner_90)}</b>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
