@@ -11,9 +11,8 @@ import { spiTractorsApi } from "../../api/spiTractorsApi";
 const fallbackImages = [img1, img2, img3, img4, img5, img6];
 
 const EquipmentGrid = forwardRef((props, ref) => {
-
   const [equipment, setEquipment] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading]     = useState(false);
 
   const load = async () => {
     try {
@@ -27,33 +26,50 @@ const EquipmentGrid = forwardRef((props, ref) => {
     }
   };
 
-  // 👇 NOW load exists before we use it
-  useImperativeHandle(ref, () => ({
-    reload: load,
-  }));
+  useImperativeHandle(ref, () => ({ reload: load }));
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const mapped = useMemo(() => {
     return equipment.map((e, idx) => ({
-      id: e.id,
+      // Identity
+      id:   e.id,
       name: e.name,
-      reg: e.registration_id,
+      reg:  e.registration_id,
+
+      // Detail fields
+      model:         e.model,
+      brand:         e.brand,
+      spec:          e.spec,
+      release_year:  e.release_year,
+      travel_speed:  e.travel_speed,
+      base_rate:     e.base_rate_per_hour,
+      daily_capacity:e.daily_capacity,
+      city:          e.city,
+      lat:           e.lat,
+      lng:           e.lng,
+
+      // Card meta
       completed: Number(e.completed_jobs || 0),
-      status: e.availability_status || "Available",
-      image: fallbackImages[idx % fallbackImages.length],
+      status:    e.availability_status || "Available",
+      image:     fallbackImages[idx % fallbackImages.length],
     }));
   }, [equipment]);
 
   if (loading && mapped.length === 0)
     return <div style={{ padding: 12 }}>Loading...</div>;
 
+  if (!loading && mapped.length === 0)
+    return (
+      <div style={{ padding: 24, textAlign: "center", color: "#6b7280" }}>
+        No equipment found. Add your first tractor above.
+      </div>
+    );
+
   return (
     <div className="eq-grid">
       {mapped.map((e) => (
-        <EquipmentCard key={e.reg} item={e} onSaved={load} />
+        <EquipmentCard key={e.reg || e.id} item={e} onSaved={load} />
       ))}
     </div>
   );
