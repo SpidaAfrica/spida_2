@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import "./pages/spi-tractors/mobile.css"; 
 import ScrollToTop from "./customHook/useScrollToTop";
 import Home from "./pages/website/Home/Home";
 import About from "./pages/website/About/About";
