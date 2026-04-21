@@ -3,6 +3,7 @@ import "./Topbar.css";
 import { clearSession, getCurrentUser, spiTractorsApi } from "../../api/spiTractorsApi";
 import { useNavigate } from "react-router-dom";
 import bell from "../../../../assets/images/bell.png";
+import logo from "../../../../assets/images/logo2.png";
 
 export default function Topbar() {
   const navigate     = useNavigate();
@@ -76,6 +77,8 @@ export default function Topbar() {
 
   return (
     <div className="topbar" ref={panelRef}>
+      {/* Logo — only visible on mobile when sidebar is hidden */}
+      <img src={logo} alt="Spida Tractors" className="topbar-logo-mobile" />
       <div className="topbar-spacer" />
 
       <div className="topbar-actions">
