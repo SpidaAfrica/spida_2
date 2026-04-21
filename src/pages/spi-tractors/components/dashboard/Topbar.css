@@ -227,3 +227,17 @@
 @media (max-width: 900px) {
   .desktop-only { display: none; }
 }
+
+/* Logo — shows on mobile when sidebar is hidden */
+.topbar-logo-mobile {
+  display: none;
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .topbar-logo-mobile {
+    display: block;
+  }
+}
