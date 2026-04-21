@@ -274,3 +274,47 @@
     .trk-btnGhost { flex: 1; }
   }
   
+
+/* ── Mobile fixes ── */
+@media (max-width: 900px) {
+  .trk-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trk-right {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .trk-shell {
+    padding: 60px 12px 30px;
+  }
+
+  .trk-title {
+    font-size: 20px;
+  }
+
+  .trk-head {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .trk-row {
+    flex-direction: column;
+  }
+
+  .trk-btn,
+  .trk-btnOutline {
+    width: 100%;
+  }
+
+  .trk-cancel {
+    width: 100%;
+  }
+
+  .trk-back {
+    top: 12px;
+    left: 12px;
+  }
+}
