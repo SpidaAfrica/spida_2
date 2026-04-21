@@ -20,8 +20,8 @@
   
   /* Header */
   .req-header {
-    max-width: 1080px;
-    margin: 0 auto 20px;   /* bottom gap between header and stats */
+    width: 100%;
+    margin: 0;
   }
   
   .req-title {
@@ -35,7 +35,6 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    margin-top: 10px;
   }
   
   .req-chip {
@@ -55,8 +54,8 @@
   
   /* Stats */
   .req-stats {
-    max-width: 1080px;
-    margin: 16px auto 0;
+    width: 100%;          /* fill the full container width */
+    margin: 16px 0 0;     /* no auto centering */
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
@@ -105,8 +104,8 @@
   
   /* List wrapper */
   .req-list-wrap {
-    max-width: 1080px;
-    margin: 18px auto 0;
+    width: 100%;
+    margin: 18px 0 0;
     background: #fff;
     border: 1px solid #eef0f2;
     border-radius: 12px;
