@@ -1,69 +1,81 @@
 .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-  
-  .stat-card {
-    background: #fff;
-    border: 1px solid #eef0f2;
-    border-radius: 12px;
-    padding: 12px 14px;
-  }
-  
-  .stat-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .stat-title {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 600;
-  }
-  
-  .info {
-    font-size: 12px;
-    color: #9ca3af;
-  }
-  
-  .stat-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111;
-    margin: 10px 0 8px;
-  }
-  
-  .stat-link {
-    border: none;
-    background: transparent;
-    color: #16a34a;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 0;
-  }
-  
-/* ── Mobile fixes ── */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;        /* fill whatever container it sits in */
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #eef0f2;
+  border-radius: 12px;
+  padding: 16px 18px;
+  min-width: 0;       /* prevents overflow inside grid */
+}
+
+.stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-title {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.info {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin: 10px 0 8px;
+}
+
+.stat-link {
+  border: none;
+  background: transparent;
+  color: #16a34a;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ── Tablet: 3 columns still but tighter ── */
 @media (max-width: 900px) {
   .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+  }
+
+  .stat-value {
+    font-size: 20px;
   }
 }
 
-@media (max-width: 480px) {
+/* ── Mobile: 2 columns, last card full width if odd ── */
+@media (max-width: 540px) {
   .stats-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
+  /* If there's an odd card (3rd), stretch it full width */
+  .stat-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
   .stat-card {
-    padding: 10px 12px;
+    padding: 12px 14px;
   }
 
   .stat-value {
-    font-size: 17px;
+    font-size: 18px;
   }
 
   .stat-title {
