@@ -8,10 +8,8 @@
 ============================================================ */
 
 /* ---- Base: smooth scrolling + touch feel ---- */
-* {
-  -webkit-tap-highlight-color: transparent;
-  box-sizing: border-box;
-}
+/* Only suppress tap highlight — do NOT set box-sizing globally
+   as it breaks existing layouts that don't expect it */
 
 html {
   scroll-behavior: smooth;
@@ -393,18 +391,22 @@ body {
 
 /* ============================================================
    GENERAL FORM INPUTS — bigger touch targets on mobile
+   font-size: 16px prevents iOS from zooming in on focus.
+   We use it ONLY on actual form inputs, NOT buttons,
+   and we use inherit for font-family so your app fonts
+   are never overridden.
 ============================================================ */
 @media (max-width: 600px) {
   input,
   select,
-  textarea,
-  button {
-    font-size: 16px !important; /* prevents iOS zoom on focus */
+  textarea {
+    font-size: 16px; /* no !important — avoids overriding custom styles */
+    font-family: inherit; /* keep your app font, don't let browser reset it */
   }
 
   input,
   select {
-    min-height: 44px; /* Apple HIG minimum touch target */
+    min-height: 44px;
   }
 }
 
