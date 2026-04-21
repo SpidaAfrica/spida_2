@@ -275,3 +275,49 @@
     .pay-mapWrap { grid-template-columns: 1fr; }
   }
   
+
+/* ── Mobile fixes ── */
+@media (max-width: 600px) {
+  .pay-shell {
+    padding: 60px 12px 30px;
+  }
+
+  .pay-title {
+    font-size: 20px;
+  }
+
+  .pay-rowTop {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pay-tractor {
+    text-align: left;
+  }
+
+  .pay-etaCard {
+    grid-template-columns: 1fr 1fr;
+    display: grid;
+  }
+
+  .wait-card {
+    width: calc(100vw - 32px);
+    padding: 24px 16px;
+  }
+
+  .pay-back {
+    top: 12px;
+    left: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .pay-shell {
+    padding: 56px 10px 24px;
+  }
+
+  .pay-btn {
+    height: 48px;
+    font-size: 15px;
+  }
+}
