@@ -111,3 +111,27 @@
     }
   }
   
+
+/* ── Mobile fixes ── */
+@media (max-width: 600px) {
+  .dash-content {
+    padding: 10px;
+  }
+
+  .dash-title {
+    font-size: 15px;
+  }
+
+  .dash-filters {
+    gap: 6px;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+
+  .wave {
+    font-size: 16px;
+  }
+}
