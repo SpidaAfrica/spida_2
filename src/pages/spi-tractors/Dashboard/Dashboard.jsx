@@ -109,9 +109,6 @@ export default function SpiTractorDashboard() {
             </div>
           </div>
 
-          {/* Stat cards — always full width above the two-column grid */}
-          <StatCards />
-
           <div className="dash-grid">
             <section className="dash-left">
               <RequestsStats />
