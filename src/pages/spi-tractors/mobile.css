@@ -1,0 +1,466 @@
+/* ============================================================
+   SPIDA TRACTORS — GLOBAL MOBILE STYLES
+   Import this in your index.css or App.js.
+   Breakpoints:
+     ≤900px  = tablet / large phone (sidebar hides)
+     ≤600px  = phone (single column everywhere)
+     ≤400px  = small phone
+============================================================ */
+
+/* ---- Base: smooth scrolling + touch feel ---- */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overscroll-behavior-y: contain; /* prevent pull-to-refresh interfering */
+}
+
+/* ---- Safe area padding for notch phones ---- */
+.dash-main,
+.eq-main,
+.er-main,
+.req-main,
+.bk-main {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============================================================
+   SIDEBAR — hide on mobile, show bottom nav instead
+============================================================ */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none !important;
+  }
+
+  /* Push content down to account for bottom nav (64px) */
+  .dash-main,
+  .eq-main,
+  .er-main,
+  .req-main,
+  .bk-main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================================
+   TOPBAR
+============================================================ */
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .topbar-spacer {
+    flex: 1;
+  }
+
+  /* Show menu label on mobile */
+  .topbar-name {
+    display: none; /* hide role text, save space */
+  }
+}
+
+/* ============================================================
+   DASHBOARD — main grid
+============================================================ */
+@media (max-width: 1100px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .dash-content {
+    padding: 14px;
+  }
+
+  .dash-title {
+    font-size: 16px;
+  }
+
+  /* Job request panel becomes full width below grid */
+  .dash-right {
+    width: 100%;
+  }
+
+  .jobpanel {
+    position: static; /* remove sticky on mobile */
+  }
+}
+
+@media (max-width: 600px) {
+  .dash-content {
+    padding: 12px;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+}
+
+/* ============================================================
+   STAT CARDS
+============================================================ */
+@media (max-width: 900px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+}
+
+/* ============================================================
+   REQUEST STATS (5-column → 2-column → 2-column)
+============================================================ */
+@media (max-width: 1100px) {
+  .req-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .req-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .req-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .req-stat-value {
+    font-size: 18px;
+  }
+}
+
+/* ============================================================
+   REQUEST CARD (map + details side by side → stacked)
+============================================================ */
+@media (max-width: 900px) {
+  .req-card {
+    grid-template-columns: 1fr;
+  }
+
+  .req-map {
+    height: 180px;
+    border-right: none;
+    border-bottom: 1px solid #eef0f2;
+  }
+
+  .req-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .req-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .req-actions {
+    flex-direction: column;
+  }
+
+  .req-accept,
+  .req-decline {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   EQUIPMENT GRID
+============================================================ */
+@media (max-width: 1100px) {
+  .eq-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .eq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .eq-content {
+    padding: 14px;
+  }
+}
+
+/* ============================================================
+   EARNINGS
+============================================================ */
+@media (max-width: 900px) {
+  .earn-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .er-content {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .er-summary {
+    flex-direction: column;
+  }
+
+  .er-card {
+    width: 100%;
+  }
+
+  .amt {
+    font-size: 18px;
+  }
+}
+
+/* ============================================================
+   BOOKINGS BOARD
+============================================================ */
+@media (max-width: 900px) {
+  .bk-board {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .bk-content {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bk-board {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   ONGOING REQUESTS
+============================================================ */
+@media (max-width: 600px) {
+  .ongoing-top {
+    flex-wrap: wrap;
+  }
+
+  .ongoing-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}
+
+/* ============================================================
+   JOB REQUEST PANEL (pair/single)
+============================================================ */
+@media (max-width: 900px) {
+  .jobpanel {
+    border-radius: 12px;
+    margin-top: 0;
+  }
+
+  .mapbox {
+    height: 180px;
+  }
+}
+
+/* ============================================================
+   SETTINGS
+============================================================ */
+@media (max-width: 900px) {
+  .stg-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stg-span {
+    grid-column: 1;
+  }
+
+  .stg-row {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   LOGIN / SIGNUP (auth pages)
+============================================================ */
+@media (max-width: 768px) {
+  /* Most auth pages have a two-column layout — collapse to single */
+  .login-grid,
+  .signup-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hide the decorative left panel on small screens */
+  .login-left,
+  .signup-left {
+    display: none;
+  }
+
+  .login-right,
+  .signup-right {
+    padding: 24px 20px;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CHOOSE ROLE
+============================================================ */
+@media (max-width: 600px) {
+  .role-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .role-card {
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
+/* ============================================================
+   REQUEST SPITRACTOR (farmer form)
+============================================================ */
+@media (max-width: 700px) {
+  .rt-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rt-map {
+    height: 220px;
+  }
+}
+
+/* ============================================================
+   PAY AND ETA
+============================================================ */
+@media (max-width: 900px) {
+  .pay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pay-shell {
+    padding: 14px;
+  }
+}
+
+/* ============================================================
+   TRACK REQUEST
+============================================================ */
+@media (max-width: 900px) {
+  .trk-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trk-shell {
+    padding: 14px;
+  }
+}
+
+/* ============================================================
+   TRACTOR ADD / CAPABILITY FORMS
+============================================================ */
+@media (max-width: 600px) {
+  .tractor-form,
+  .cap-form {
+    grid-template-columns: 1fr;
+  }
+
+  .tractor-container,
+  .cap-container {
+    padding: 16px;
+  }
+}
+
+/* ============================================================
+   GENERAL FORM INPUTS — bigger touch targets on mobile
+============================================================ */
+@media (max-width: 600px) {
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+
+  input,
+  select {
+    min-height: 44px; /* Apple HIG minimum touch target */
+  }
+}
+
+/* ============================================================
+   MODALS — full screen on mobile
+============================================================ */
+@media (max-width: 600px) {
+  .eq-modal-card {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .eq-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+}
+
+/* ============================================================
+   NOTIFICATION POPUP
+============================================================ */
+@media (max-width: 600px) {
+  .notif-pop {
+    position: fixed;
+    top: 56px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   TRACTOR DETAILS MODAL
+============================================================ */
+@media (max-width: 600px) {
+  .eq-details-modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+  }
+}
+
+/* ============================================================
+   UTILS — hide/show helpers
+============================================================ */
+.mobile-only { display: none; }
+.desktop-only { display: block; }
+
+@media (max-width: 900px) {
+  .mobile-only  { display: block; }
+  .desktop-only { display: none;  }
+}
