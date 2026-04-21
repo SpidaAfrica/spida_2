@@ -6,7 +6,7 @@ import OngoingRequests from "../components/dashboard/OngoingRequest";
 import JobRequestPanel from "../components/dashboard/JobRequestPanel";
 import Upcoming from "../components/dashboard/Upcoming";
 import EarningsOverview from "../components/dashboard/EarningsOverview";
-import StatCards from "../components/dashboard/StatCard";
+//import StatCards from "../components/dashboard/StatCard";
 import SplashScreen from "../SplashScreen";
 import "./dashboard.css";
 import "../SplashScreen.css";
@@ -90,7 +90,7 @@ export default function SpiTractorDashboard() {
               </div>
             </div>
 
-            <StatCards />
+            {/*<StatCards />*/}
 
             <div className="dash-grid">
               <section className="dash-left">
