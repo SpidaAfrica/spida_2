@@ -126,7 +126,7 @@ const LogisticsForm = () => {
       formDataObj.set("phoneNumber", phone);
 
       const response = await fetch(
-        "https://api.spida.africa/logistics/logistics_signup.php",
+        "https://api.holyspirithubinternational.org/spida_api/logistics/logistics_signup.php",
         {
           method: "POST",
           body: formDataObj,

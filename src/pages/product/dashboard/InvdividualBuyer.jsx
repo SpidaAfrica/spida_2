@@ -35,7 +35,7 @@ const InvdividualBuyer = () => {
        }
      
        try {
-         const response = await fetch(`https://api.spida.africa/individual/get_order_individual_dashboard.php?individual_id=${individualId}`);
+         const response = await fetch(`https://api.holyspirithubinternational.org/spida_api/individual/get_order_individual_dashboard.php?individual_id=${individualId}`);
          const data = await response.json();
      
          if (data.success) {

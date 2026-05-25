@@ -91,7 +91,7 @@ const BuyerIndividualForm = () => {
 
     try {
       const response = await fetch(
-        "https://api.spida.africa/buyer/individual_signup.php",
+        "https://api.holyspirithubinternational.org/spida_api/buyer/individual_signup.php",
         {
           method: "POST",
           body: formDataObj,

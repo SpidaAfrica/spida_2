@@ -80,13 +80,13 @@ const Notifications = () => {
 
   useEffect(() => {
     if(userType === "individual"){
-      fetch(`https://api.spida.africa/individual/get_order_individual_dashboard.php?individual_id=${userId}`)
+      fetch(`https://api.holyspirithubinternational.org/spida_api/individual/get_order_individual_dashboard.php?individual_id=${userId}`)
       .then((response) => response.json())
       .then((data) => setNotifications(data.orders))
       .catch((error) => console.error("Error fetching notifications:", error));
     }
     if(userType === "farmer"){
-      fetch("https://api.spida.africa/individual/get_orders.php", {
+      fetch("https://api.holyspirithubinternational.org/spida_api/individual/get_orders.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ farmer_id: userId }),
@@ -97,14 +97,14 @@ const Notifications = () => {
     }
 
     if(userType === "logistics"){
-      fetch(`https://api.spida.africa/logistics/get_orders_for_logistics.php?logistics_id=${userId}`)
+      fetch(`https://api.holyspirithubinternational.org/spida_api/logistics/get_orders_for_logistics.php?logistics_id=${userId}`)
       .then((response) => response.json())
       .then((data) => setNotifications(data.orders))
       .catch((error) => console.error("Error fetching notifications:", error));
     }
 
     if(userType === "business"){
-      fetch(`https://api.spida.africa/individual/get_order_individual_dashboard.php?individual_id=${userId}`)
+      fetch(`https://api.holyspirithubinternational.org/spida_api/individual/get_order_individual_dashboard.php?individual_id=${userId}`)
       .then((response) => response.json())
       .then((data) => setNotifications(data.orders))
       .catch((error) => console.error("Error fetching notifications:", error));
@@ -112,7 +112,7 @@ const Notifications = () => {
   }, [userId]);
 /*
   const markAllAsRead = () => {
-    fetch(`https://api.spida.africa/${userType}/mark_notifications_read.php`, {
+    fetch(`https://api.holyspirithubinternational.org/spida_api/${userType}/mark_notifications_read.php`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: userId }),

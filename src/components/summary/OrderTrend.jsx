@@ -11,7 +11,7 @@ const OrderTrends = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://api.spida.africa/farmer/farmer_orders_graph.php?farmer_id=${farmerId}&timeframe=${timeframe}`
+          `https://api.holyspirithubinternational.org/spida_api/farmer/farmer_orders_graph.php?farmer_id=${farmerId}&timeframe=${timeframe}`
         );
 
         if (!response.ok) {

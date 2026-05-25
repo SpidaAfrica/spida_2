@@ -15,7 +15,7 @@ const News = () => {
   const { id } = useParams();
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    fetch(`https://api.spida.africa/news.php/${id}`)
+    fetch(`https://api.holyspirithubinternational.org/spida_api/news.php/${id}`)
       .then((response) => response.json())
       .then((data) => setPosts(data))
       .catch((error) => console.error("Error fetching blogs:", error));
@@ -30,7 +30,7 @@ const News = () => {
       <Nav />
       <section className="news_section_post_content">
         <div className="post_img">
-          <img src={`https://api.spida.africa/${selectedPost?.imgSrc}`} alt="" />
+          <img src={`https://api.holyspirithubinternational.org/spida_api/${selectedPost?.imgSrc}`} alt="" />
           <h3 className="img_label">{selectedPost?.label}</h3>
         </div>
         <div className="post_title">

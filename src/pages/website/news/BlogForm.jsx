@@ -31,7 +31,7 @@ const BlogForm = () => {
     }
 
     try {
-      const response = await fetch("https://api.spida.africa/add_blog.php", {
+      const response = await fetch("https://api.holyspirithubinternational.org/spida_api/add_blog.php", {
         method: "POST",
         body: formDataToSend,
       });

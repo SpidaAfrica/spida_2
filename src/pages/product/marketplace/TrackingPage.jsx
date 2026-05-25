@@ -31,7 +31,7 @@ const TrackingPage = () => {
       return;
     }
 
-    fetch(`https://api.spida.africa/individual/get_order_details.php?order_id=${orderId}`)
+    fetch(`https://api.holyspirithubinternational.org/spida_api/individual/get_order_details.php?order_id=${orderId}`)
       .then((res) => res.json())
       .then((data) => setOrderDetails(data))
       .catch((error) => console.error("Error fetching order:", error));

@@ -29,7 +29,7 @@ const OngoingDelivery = () => {
     }
   
     try {
-      const response = await fetch(`https://api.spida.africa/farmer/get_order_delivery.php?farmer_id=${farmerId}`);
+      const response = await fetch(`https://api.holyspirithubinternational.org/spida_api/farmer/get_order_delivery.php?farmer_id=${farmerId}`);
       const data = await response.json();
   
       if (data.success) {

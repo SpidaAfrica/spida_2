@@ -9,7 +9,7 @@ const IndividualAnalytics = () => {
   const businessId = sessionStorage.getItem("businessId");
 
   useEffect(() => {
-    fetch(`https://api.spida.africa/individual/individual_analytics.php?individual_id=${businessId}&timeframe=${timeframe}`)
+    fetch(`https://api.holyspirithubinternational.org/spida_api/individual/individual_analytics.php?individual_id=${businessId}&timeframe=${timeframe}`)
       .then(response => response.json())
       .then(data => {
         setSpendingTrends(data.spending_trends || []); // Ensure spending_trends is always an array

@@ -119,7 +119,7 @@ const Verify = () => {
 
     try {
       const response = await fetch(
-        `https://api.spida.africa/${accountType}/verify_${accountType}.php`,
+        `https://api.holyspirithubinternational.org/spida_api/${accountType}/verify_${accountType}.php`,
         {
           method: "POST",
           headers: {
@@ -150,7 +150,7 @@ const Verify = () => {
 
     try {
       const response = await fetch(
-        `https://api.spida.africa/${accountType}/resend_otp.php`,
+        `https://api.holyspirithubinternational.org/spida_api/${accountType}/resend_otp.php`,
         {
           method: "POST",
           headers: {

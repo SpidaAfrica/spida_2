@@ -8,7 +8,7 @@ const PieChart = () => {
   const farmerId = sessionStorage.getItem("farmerId");
  
     useEffect(() => {
-        const endpoint = `https://api.spida.africa/farmer/produce_sales.php?farmer_id=${farmerId}&timeframe=${timeframe}`;
+        const endpoint = `https://api.holyspirithubinternational.org/spida_api/farmer/produce_sales.php?farmer_id=${farmerId}&timeframe=${timeframe}`;
     
         fetch(endpoint)
         .then(response => {
