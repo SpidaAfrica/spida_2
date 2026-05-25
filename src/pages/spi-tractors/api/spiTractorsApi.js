@@ -1,5 +1,5 @@
 const RAW_BASE =
-  process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL || "https://api.spida.africa";
+  process.env.REACT_APP_SPI_TRACTORS_API_BASE_URL || "https://api.holyspirithubinternational.org/spida_api/";
 
 // PHP endpoints live in /api/*.php
 export const API_BASE_URL = RAW_BASE.replace(/\/$/, "") + "/api";
